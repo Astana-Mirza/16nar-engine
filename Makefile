@@ -16,7 +16,7 @@ OBJEXT      := o
 
 #Flags, Libraries and Includes
 CFLAGS      := -Wall -O3 -std=c++2a -g
-LIB         := -lsfml-graphics -lsfml-system -lsfml-window
+LIB         := -lsfml-graphics -lsfml-system -lsfml-window -ldl
 INC         := -I$(INCDIR) -I/usr/local/include
 INCDEP      := -I$(INCDIR)
 
@@ -34,6 +34,7 @@ remake: cleaner all
 
 #Copy Resources from Resources Directory to Target Directory
 resources: directories
+	@mkdir -p $(TARGETDIR)/$(RESDIR)/
 	@cp -r $(RESDIR)/* $(TARGETDIR)/$(RESDIR)/
 
 #Make the Directories
@@ -41,7 +42,7 @@ directories:
 	@mkdir -p $(TARGETDIR)
 	@mkdir -p $(BUILDDIR)
 
-#Clean only Objecst
+#Clean only Objects
 clean:
 	@$(RM) -rf $(BUILDDIR)
 

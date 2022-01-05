@@ -9,7 +9,7 @@ namespace _16nar {
 
 class DynamicLib {
 public:
-	DynamicLib(const string& lib_name);
+	DynamicLib(const std::string& lib_name);
 	// no copy construction
 	DynamicLib(const DynamicLib&) =delete;
 	DynamicLib& operator= (const DynamicLib&) =delete;
@@ -18,7 +18,7 @@ public:
 	DynamicLib& operator= (DynamicLib&& lib);
 	~DynamicLib() { if (handle) dlclose(handle); }
 
-	void *get_symbol(const string& sym_name) const;
+	void *get_symbol(const std::string& sym_name) const;
 
 private:
 	std::string name;

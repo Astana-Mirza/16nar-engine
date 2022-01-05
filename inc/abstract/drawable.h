@@ -1,7 +1,11 @@
 #ifndef _16NAR_DRAWABLE_H
 #define _16NAR_DRAWABLE_H
 
-#include <set>
+#include "../render/quadrant.h"
+
+namespace _16nar {
+
+class Quadrant;
 
 class Drawable : public sf::Drawable {
 public:
@@ -13,5 +17,7 @@ public:
 private:
 	bool visible = true;
 };
+
+}
 
 #endif // #ifndef _16NAR_DRAWABLE_H

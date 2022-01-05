@@ -91,7 +91,6 @@ struct ResourceID {	// ID of a resource, which is stored in every object
 
 
 struct SpriteNodeInfo {
-	uint32_t draw_parent;
 	int layer;
 	ResourceID res;
 };

@@ -14,26 +14,26 @@ class Drawable;
 // A class for space partitioning
 class Quadrant : public sf::Drawable {
 	public:
-		explicit Quadrant(const FloatRect& a);
+		explicit Quadrant(const FloatRect& a = FloatRect{});
 		~Quadrant();
 		const FloatRect& get_area() const;
-		const std::array<Quadrant*, 4>& get_children() const;
-		const Quadrant *get_parent() const;
+		const std::array<Quadrant*, _16NAR_QUAD_COUNT>& get_children() const;
+		Quadrant *get_parent() const;
 		void add_child(Quadrant* child, int idx);
-		void add_draw_child(Drawable *child);
-		void delete_draw_child(Drawable *child);
+		void add_draw_child(_16nar::Drawable *child);
+		void delete_draw_child(_16nar::Drawable *child);
 		void find_objects(RenderTarget& target, IntRect tr_area,
-			 std::map<int, std::set<Drawable *>>& layers) const;
+		    std::map<int, std::set<_16nar::Drawable *>>& layers) const;
 		void draw(RenderTarget& target, RenderStates states) const;
 
 	private:
 		Quadrant *parent = nullptr;
 		FloatRect area;
-		std::array<Quadrant*, 4> children = {nullptr, nullptr,
+		std::array<Quadrant*, _16NAR_QUAD_COUNT> children =
+						{nullptr, nullptr,
 						nullptr, nullptr};
-		std::map<int, std::set<Drawable *>> draw_layers;
+		std::map<int, std::set<_16nar::Drawable *>> draw_layers;
 };
-
 
 }
 

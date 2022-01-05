@@ -3,11 +3,21 @@
 
 #include <SFML/Graphics.hpp>
 
+namespace _16nar {
+
+#define _16NAR_QUAD_COUNT 4
+
+using sf::Vector2f;
 using sf::IntRect;
 using sf::FloatRect;
 using sf::RenderTarget;
 using sf::RenderStates;
 using sf::Transform;
 using Transformer = sf::Transformable;
+using sf::Sprite;
+using sf::Texture;
+using sf::Time;
+
+}
 
 #endif

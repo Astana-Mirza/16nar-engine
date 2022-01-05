@@ -1,15 +1,15 @@
-#include "dynamic_lib.h"
+#include "../../inc/system/dynamic_lib.h"
 
 using namespace _16nar;
 
 /************************************************************************
 ** Constructor opens the dynamic library
 *************************************************************************/
-DynamicLib::DynamicLib(const string& lib_name) : name{lib_name} {
+DynamicLib::DynamicLib(const std::string& lib_name) : name{lib_name} {
 	handle = dlopen(name.c_str(), RTLD_LAZY);
 	if (!handle) {
 		throw std::runtime_error{"Cannot open library: " +
-						string{dlerror()}};
+						std::string{dlerror()}};
 	}
 	dlerror();	// clear errors
 }
@@ -40,7 +40,7 @@ DynamicLib& DynamicLib::operator= (DynamicLib&& lib) {
 /************************************************************************
 ** Load symbol and handle possible errors
 *************************************************************************/
-void *DynamicLib::get_symbol(const string& sym_name) const {
+void *DynamicLib::get_symbol(const std::string& sym_name) const {
 	void *sym = dlsym(handle, sym_name.c_str());
 	const char *error = dlerror();
 	if (error) {
