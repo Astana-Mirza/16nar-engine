@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include "constructor/node_2d.h"
 #include "system/file_scene_reader.h"
 
 namespace _16nar {

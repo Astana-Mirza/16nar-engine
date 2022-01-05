@@ -1,7 +1,7 @@
 #ifndef _16NAR_SCENE_READER_H
 #define _16NAR_SCENE_READER_H
 
-#include "../constructor/abstrat/node.h"
+#include "../constructor/abstract/node.h"
 #include "../render/quadrant.h"
 
 namespace _16nar {

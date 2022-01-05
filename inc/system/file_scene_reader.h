@@ -6,6 +6,8 @@
 #include <map>
 #include <vector>
 #include "../abstract/scene_reader.h"
+#include "../constructor/node_2d.h"
+#include "dynamic_lib.h"
 #include "scene_file.h"
 
 namespace _16nar {
@@ -38,10 +40,6 @@ private:
 	void load_nodes(const SceneHeader& hdr, Quadrant& quad, Node& world);
 	void load_resources(const std::string& filename, uint16_t file_id,
 		uint16_t res_count, uint16_t *res_ids);
-	void make_quadrants(Quadrant& parent,
-		const Vector2f& start,
-		uint32_t q_width, uint32_t q_height,
-		uint32_t wcount, uint32_t hcount);
 	void create_node(const NodeInfo& info, uint32_t offset,
 		const std::string& name, Quadrant& quad, Node& world);
 	void load_libs(uint32_t *lib_offsets, uint32_t count);

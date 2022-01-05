@@ -11,7 +11,7 @@ void FileSceneReader::load_scene(Quadrant& quad,
 		setup_func_ptr& setup_ptr,
 		loop_func_ptr& loop_ptr) {
 	SceneHeader hdr;
-	is.read(reinterpret_cast<uint8_t*>(&hdr), sizeof(SceneHeader));
+	is.read(reinterpret_cast<char*>(&hdr), sizeof(SceneHeader));
 	FloatRect area({hdr.q_start_x, hdr.q_start_y,
 		hdr.q_start_x+hdr.load_width*hdr.q_width,
 		hdr.q_start_y+hdr.load_height*hdr.q_height});
@@ -29,12 +29,12 @@ void FileSceneReader::load_packages(const SceneHeader& hdr) {
 	is.seekg(hdr.sections.rsrc_off);
 	ResourceTableEntry *res =
 			new ResourceTableEntry[hdr.resource_file_count];
-	is.read(reinterpret_cast<uint8_t*>(res),
+	is.read(reinterpret_cast<char*>(res),
 		sizeof(ResourceTableEntry)*hdr.resource_file_count);
 	for (uint32_t i = 0; i < hdr.resource_file_count; i++) {
 		uint16_t *res_ids = new uint16_t[res[i].res_count];
 		is.seekg(res[i].res_array_off);
-		is.read(reinterpret_cast<uint8_t*>(res_ids),
+		is.read(reinterpret_cast<char*>(res_ids),
 			sizeof(uint16_t)*res[i].res_count);
 		load_resources(read_string(res[i].filename_off) + ".narres",
 				res[i].file_id, res[i].res_count, res_ids);
@@ -50,7 +50,7 @@ void FileSceneReader::load_code(const SceneHeader& hdr,
 		return;
 	is.seekg(hdr.sections.code_off);
 	uint32_t *lib_offsets = new uint32_t[hdr.code_file_count];
-	is.read(reinterpret_cast<uint8_t*>(lib_offsets),
+	is.read(reinterpret_cast<char*>(lib_offsets),
 			sizeof(uint32_t)*hdr.code_file_count);
 	load_libs(lib_offsets, hdr.code_file_count);
 	delete[] lib_offsets;
@@ -58,11 +58,13 @@ void FileSceneReader::load_code(const SceneHeader& hdr,
 	// fill game's function pointers
 	if (hdr.setup_off) {
 		auto s = read_string(hdr.setup_off);
-		setup_ptr = libs.at(hdr.main_code_file).get_symbol(s);
+		setup_ptr = reinterpret_cast<setup_func_ptr>(
+			libs.at(hdr.main_code_file).get_symbol(s));
 	}
 	if (hdr.loop_off) {
 		auto s = read_string(hdr.loop_off);
-		loop_ptr = libs.at(hdr.main_code_file).get_symbol(s);
+		loop_ptr = reinterpret_cast<loop_func_ptr>(
+			libs.at(hdr.main_code_file).get_symbol(s));
 	}
 }
 
@@ -70,7 +72,7 @@ void FileSceneReader::load_nodes(const SceneHeader& hdr,
 				Quadrant& quad, Node& world) {
 	is.seekg(hdr.sections.tree_off);
 	NodeInfo *nodes = new NodeInfo[hdr.node_count];
-	is.read(reinterpret_cast<uint8_t*>(nodes),
+	is.read(reinterpret_cast<char*>(nodes),
 		sizeof(NodeInfo)*hdr.node_count);
 	for (uint32_t i = 0; i < hdr.node_count; i++) {
 		create_node(nodes[i],
@@ -82,19 +84,19 @@ void FileSceneReader::load_nodes(const SceneHeader& hdr,
 
 void FileSceneReader::load_resources(const std::string& filename,
 		uint16_t file_id, uint16_t res_count, uint16_t *res_ids) {
-	ifstream res_file;
+	std::ifstream res_file;
 	ResourceFileHeader hdr;
 	res_file.open(filename, std::ios::in | std::ios::binary);
-	res_file.read(reinterpret_cast<uint8_t*>(&hdr),
+	res_file.read(reinterpret_cast<char*>(&hdr),
 			sizeof(ResourceFileHeader));
 	ResourceSign *signs = new ResourceSign[hdr.res_count];
-	res_file.read(reinterpret_cast<uint8_t*>(signs),
+	res_file.read(reinterpret_cast<char*>(signs),
 			sizeof(ResourceSign)*hdr.res_count);
 	for (uint16_t i = 0; i < res_count; i++) {
-		uint8_t *raw = new uint8_t[signs[res_ids[i]].size];
+		char *raw = new char[signs[res_ids[i]].size];
 		res_file.seekg(signs[res_ids[i]].offset);
-		res_file.read(reinterpret_cast<uint8_t*>(raw),
-			sizeof(uint8_t)*signs[res_ids[i]].size);
+		res_file.read(reinterpret_cast<char*>(raw),
+			sizeof(char)*signs[res_ids[i]].size);
 		switch (signs[res_ids[i]].type) {
 			case ResourceType::Texture:
 			{
