@@ -13,6 +13,7 @@ public:
 				Node& world,
 				void (**setup_ptr)(),
 				void (**loop_ptr)(Time)) =0;
+	virtual ~SceneReader() =default;
 };
 
 }
