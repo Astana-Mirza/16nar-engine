@@ -38,62 +38,62 @@ const Transform& SpriteNode::get_inverse_transform() const {
 
 void SpriteNode::set_position(float x, float y) {
 	sprite.setPosition(x, y);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::set_position(const Vector2f& position) {
 	sprite.setPosition(position);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::set_rotation(float angle) {
 	sprite.setRotation(angle);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::set_scale(float factor_x, float factor_y) {
 	sprite.setScale(factor_x, factor_y);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::set_scale(const Vector2f& factors) {
 	sprite.setScale(factors);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::set_origin(float x, float y) {
 	sprite.setOrigin(x, y);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::set_origin(const Vector2f& origin) {
 	sprite.setOrigin(origin);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::move(float offset_x, float offset_y) {
 	sprite.move(offset_x, offset_y);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::move(const Vector2f& offset) {
 	sprite.move(offset);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::rotate(float angle) {
 	sprite.rotate(angle);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::scale(float factor_x, float factor_y) {
 	sprite.scale(factor_x, factor_y);
-	fix_quadrant();
+	transformed = true;
 }
 
 void SpriteNode::scale(const Vector2f& factor) {
 	sprite.scale(factor);
-	fix_quadrant();
+	transformed = true;
 }
 
 bool SpriteNode::check_quadrant(const Quadrant *q) const {

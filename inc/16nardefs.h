@@ -12,11 +12,17 @@ using sf::IntRect;
 using sf::FloatRect;
 using sf::RenderTarget;
 using sf::RenderStates;
+using sf::RenderWindow;
 using sf::Transform;
 using Transformer = sf::Transformable;
 using sf::Sprite;
 using sf::Texture;
+using sf::Clock;
 using sf::Time;
+using sf::Keyboard;
+using sf::Mouse;
+using sf::Joystick;
+using sf::Event;
 
 }
 

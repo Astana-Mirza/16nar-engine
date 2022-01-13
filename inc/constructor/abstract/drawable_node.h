@@ -15,6 +15,7 @@ public:
 protected:
 	Quadrant *quad;
 
+	void loop_call(bool upd, float delta);
 	virtual bool check_quadrant(const Quadrant *q) const =0;
 };
 

@@ -28,48 +28,60 @@ const Transform& Node2D::get_inverse_transform() const {
 
 void Node2D::set_position(float x, float y) {
 	transformer.setPosition(x, y);
+	transformed = true;
 }
 
 void Node2D::set_position(const Vector2f& position) {
 	transformer.setPosition(position);
+	transformed = true;
 }
 
 void Node2D::set_rotation(float angle) {
 	transformer.setRotation(angle);
+	transformed = true;
 }
 
 void Node2D::set_scale(float factor_x, float factor_y) {
 	transformer.setScale(factor_x, factor_y);
+	transformed = true;
 }
 
 void Node2D::set_scale(const Vector2f& factors) {
 	transformer.setScale(factors);
+	transformed = true;
 }
 
 void Node2D::set_origin(float x, float y) {
 	transformer.setOrigin(x, y);
+	transformed = true;
 }
 
 void Node2D::set_origin(const Vector2f& origin) {
 	transformer.setOrigin(origin);
+	transformed = true;
 }
 
 void Node2D::move(float offset_x, float offset_y) {
 	transformer.move(offset_x, offset_y);
+	transformed = true;
 }
 
 void Node2D::move(const Vector2f& offset) {
 	transformer.move(offset);
+	transformed = true;
 }
 
 void Node2D::rotate(float angle) {
 	transformer.rotate(angle);
+	transformed = true;
 }
 
 void Node2D::scale(float factor_x, float factor_y) {
 	transformer.scale(factor_x, factor_y);
+	transformed = true;
 }
 
 void Node2D::scale(const Vector2f& factor) {
 	transformer.scale(factor);
+	transformed = true;
 }

@@ -1,10 +1,27 @@
 #include "../../../inc/constructor/abstract/node.h"
+#include "../../../inc/game.h"
 
 using namespace _16nar;
 
 Node::~Node() {
+	if (name_ptr)
+		Game::get_game().delete_node_name(*name_ptr);
 	for (auto child : children)
 		delete child;
+}
+
+void Node::setup_call() {
+	setup();
+	for (auto ch : children)
+		ch->setup_call();
+}
+
+void Node::loop_call(bool upd, float delta) {
+	loop(delta);
+	upd = upd || transformed;
+	transformed = false;
+	for (auto ch : get_children())
+		ch->loop_call(upd, delta);
 }
 
 void Node::set_parent(Node *par) {

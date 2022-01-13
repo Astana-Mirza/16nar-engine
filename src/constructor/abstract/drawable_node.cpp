@@ -31,3 +31,13 @@ void DrawableNode::fix_quadrant() {
 		quad->add_draw_child(this);
 	}
 }
+
+void DrawableNode::loop_call(bool upd, float delta) {
+	loop(delta);
+	upd = upd || transformed;
+	transformed = false;
+	if (upd)
+		fix_quadrant();
+	for (auto ch : get_children())
+		ch->loop_call(upd, delta);
+}

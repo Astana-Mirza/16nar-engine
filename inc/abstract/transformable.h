@@ -7,6 +7,7 @@ namespace _16nar {
 
 class Transformable {
 public:
+	virtual ~Transformable() =default;
 	virtual const Vector2f& get_position() const =0;
 	virtual float get_rotation() const =0;
 	virtual const Vector2f& get_scale() const =0;
@@ -26,6 +27,9 @@ public:
 	virtual void rotate(float angle) =0;
 	virtual void scale(float factor_x, float factor_y) =0;
 	virtual void scale(const Vector2f& factor) =0;
+
+protected:
+	bool transformed = false;
 };
 
 }
