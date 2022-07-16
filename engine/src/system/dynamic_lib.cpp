@@ -1,51 +1,61 @@
-#include "../../inc/system/dynamic_lib.h"
+#include <system/dynamic_lib.h>
 
-using namespace _16nar;
+#include <stdexcept>
+#include <dlfcn.h>
 
-/************************************************************************
-** Constructor opens the dynamic library
-*************************************************************************/
-DynamicLib::DynamicLib(const std::string& lib_name) : name{lib_name} {
-	handle = dlopen(name.c_str(), RTLD_LAZY);
-	if (!handle) {
-		throw std::runtime_error{"Cannot open library: " +
-						std::string{dlerror()}};
-	}
-	dlerror();	// clear errors
+namespace _16nar
+{
+
+DynamicLib::DynamicLib( const std::string& name ):
+     name_{ name }
+{
+     handle_ = dlopen( name_.c_str(), RTLD_LAZY );
+     if ( !handle_ )
+     {
+          throw std::runtime_error{ "Cannot open library: " + std::string{ dlerror() } };
+     }
+     dlerror();	// clear errors
 }
 
 
-/************************************************************************
-** Move constructor
-*************************************************************************/
-DynamicLib::DynamicLib(DynamicLib&& lib) {
-	std::swap(name, lib.name);
-	std::swap(handle, lib.handle);
+DynamicLib::DynamicLib( DynamicLib&& lib )
+{
+     std::swap( name_, lib.name_ );
+     std::swap( handle_, lib.handle_ );
 }
 
 
-/************************************************************************
-** Move assignment
-*************************************************************************/
-DynamicLib& DynamicLib::operator= (DynamicLib&& lib) {
-	if (this != &lib) {
-		handle = nullptr;
-		std::swap(name, lib.name);
-		std::swap(handle, lib.handle);
-	}
-	return *this;
+DynamicLib& DynamicLib::operator= ( DynamicLib&& lib )
+{
+     if ( this != &lib )
+     {
+          handle_ = nullptr;
+          std::swap( name_, lib.name_ );
+          std::swap( handle_, lib.handle_ );
+     }
+     return *this;
 }
 
 
-/************************************************************************
-** Load symbol and handle possible errors
-*************************************************************************/
-void *DynamicLib::get_symbol(const std::string& sym_name) const {
-	void *sym = dlsym(handle, sym_name.c_str());
-	const char *error = dlerror();
-	if (error) {
-		throw std::runtime_error{"Cannot load symbol " + sym_name +
-				" from library " + name + ": " + error};
-	}
-	return sym;
+DynamicLib::~DynamicLib()
+{
+     if ( handle_ )
+     {
+          dlclose( handle_ );
+     }
 }
+
+
+void *DynamicLib::get_symbol( const std::string& name ) const
+{
+     void *sym = dlsym( handle_, name.c_str() );
+     const char *error = dlerror();
+     if ( error )
+     {
+          throw std::runtime_error{ "Cannot load symbol " + name +
+                                    " from library " + name_ + ": " + error };
+     }
+     return sym;
+}
+
+} // namespace _16nar

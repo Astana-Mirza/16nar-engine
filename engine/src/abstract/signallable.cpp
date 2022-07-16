@@ -1,26 +1,35 @@
-#include "../../inc/abstract/signallable.h"
+#include <abstract/signallable.h>
 
-using namespace _16nar;
+namespace std
+{
 
-namespace std {
-	size_t hash<Signallable::SlotId>::operator()(const
-				Signallable::SlotId& id) const {
-		return hash<type_index>{}(id.first) +
-			hash<Signallable*>{}(id.second);
+     size_t hash< _16nar::Signallable::SlotId >::operator()( const _16nar::Signallable::SlotId& id ) const
+     {
+          return hash< type_index >{}( id.first ) + hash< _16nar::Signallable * >{}( id.second );
 	}
+
+} // namespace std
+
+
+namespace _16nar
+{
+
+Signallable::~Signallable()
+{
+     for ( auto& sig_types : acceptors_ )
+     {
+          for ( auto& pair : sig_types.second )
+          {
+               delete pair.second;
+               pair.first->slots_.erase( SlotId{ sig_types.first, this } );
+          }
+     }
+     for ( auto& pair : slots_ )
+     {
+          delete pair.second;
+          auto& id = pair.first;
+          id.second->acceptors_[ id.first ].erase( this );
+     }
 }
 
-Signallable::~Signallable() {
-	for (auto& sig_types : acceptors) {
-		for (auto& pair : sig_types.second) {
-			delete pair.second;
-			pair.first->slots.erase(
-				SlotId{sig_types.first, this});
-		}
-	}
-	for (auto& pair : slots) {
-		delete pair.second;
-		auto& id = pair.first;
-		id.second->acceptors[id.first].erase(this);
-	}
-}
+} // namespace _16nar

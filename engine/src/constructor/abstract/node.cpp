@@ -1,58 +1,105 @@
-#include "../../../inc/constructor/abstract/node.h"
-#include "../../../inc/game.h"
+#include <stdexcept>
 
-using namespace _16nar;
+#include <constructor/abstract/node.h>
+#include <game.h>
 
-Node::~Node() {
-	if (name_ptr)
-		Game::get_game().delete_node_name(*name_ptr);
-	for (auto child : children)
-		delete child;
+namespace _16nar
+{
+
+Node::~Node()
+{
+     if ( name_ptr_ )
+     {
+          Game::get_game().delete_node_name( *name_ptr_ );
+     }
+     for ( auto child : children_ )
+     {
+          delete child;
+     }
 }
 
-void Node::setup_call() {
-	setup();
-	for (auto ch : children)
-		ch->setup_call();
+
+void Node::setup()
+{
+
 }
 
-void Node::loop_call(bool upd, float delta) {
-	loop(delta);
-	upd = upd || transformed;
-	transformed = false;
-	for (auto ch : get_children())
-		ch->loop_call(upd, delta);
+
+void Node::loop( float delta )
+{
+     ( void ) delta;
 }
 
-void Node::set_parent(Node *par) {
-	if (!par)
-		throw std::logic_error{"parent is nullptr"};
-	if (parent)
-		parent->remove_child(this);
-	parent = par;
-	parent->add_child(this);
+
+void Node::loop_call( bool update, float delta )
+{
+     loop( delta );
+     update = update || transformed_;
+     transformed_ = false;
+     for ( auto child : get_children() )
+     {
+          child->loop_call( update, delta );
+     }
 }
 
-const Node *Node::get_parent() const {
-	return parent;
+
+void Node::setup_call()
+{
+     setup();
+     for ( auto child : children_ )
+     {
+          child->setup_call();
+     }
 }
 
-const std::set<Node *>& Node::get_children() const {
-	return children;
+
+void Node::set_parent( Node *parent )
+{
+     if ( !parent )
+     {
+          throw std::runtime_error{ "setting null parent" };
+     }
+     if ( parent_ )
+     {
+          parent_->remove_child( this );
+     }
+     parent_ = parent;
+     parent_->add_child( this );
 }
 
-void Node::add_child(Node *ch) {
-	children.insert(ch);
+
+const Node *Node::get_parent() const
+{
+     return parent_;
 }
 
-void Node::remove_child(Node *ch) {
-	children.erase(ch);
+
+const std::set< Node * >& Node::get_children() const
+{
+     return children_;
 }
 
-Transform Node::get_global_transform() const {
-	Transform transform = get_transform();
-	for (const Node* n = get_parent(); n != nullptr; n = n->get_parent()) {
-		transform = n->get_transform() * transform;
-	}
-	return transform;
+
+void Node::add_child( Node *child )
+{
+     children_.insert( child );
 }
+
+
+void Node::remove_child( Node *child )
+{
+     children_.erase( child );
+}
+
+
+TransformMatrix Node::get_global_transform_matr() const
+{
+     TransformMatrix transform = get_transform_matr();
+     for ( const Node *n = get_parent(); n != nullptr; n = n->get_parent() )
+     {
+          transform = n->get_transform_matr() * transform;
+     }
+     return transform;
+}
+
+} // namespace _16nar

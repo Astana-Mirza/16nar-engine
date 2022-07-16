@@ -1,7 +1,0 @@
-<!DOCTYPE RCC>
-<RCC>
-<qresource>
-	<file>rsrc/origin_mark.png</file>
-	<file>rsrc/scale_mark.png</file>
-</qresource>
-</RCC>

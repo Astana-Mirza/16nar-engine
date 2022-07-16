@@ -1,94 +1,121 @@
-#include "../inc/game.h"
+#include <game.h>
+
+#include <system/dynamic_resource_manager.h>
+#include <constructor/sprite_node.h>
 
 #include <iostream>
-#include "../inc/system/dynamic_resource_manager.h"
-#include "../inc/constructor/sprite_node.h"
 
-using namespace _16nar;
+namespace _16nar
+{
 
-void Game::run() {
-	Clock clock;
-	Time last_update = Time::Zero;
-	while (current_state != State::Exit) {
-		if (current_state == State::Load) {
-			load();
-			clock.restart();
-			last_update = Time::Zero;
-		}
-		last_update += clock.restart();
-		while (last_update > time_per_frame) {
-			last_update -= time_per_frame;
-			read_events();
-			update(time_per_frame.asSeconds());
-		}
-		render();
-	}
+Game& Game::get_game()
+{
+     static Game instance;
+     return instance;
 }
 
-void Game::exit() {
-	current_state = State::Exit;
+
+void Game::run()
+{
+     Clock clock;
+     Time last_update = Time::Zero;
+     setup();
+     while ( true )
+     {
+          last_update += clock.restart();
+          while ( last_update > time_per_frame_ )
+          {
+               last_update -= time_per_frame_;
+               //read_events();
+               loop( time_per_frame_.asSeconds() );
+          }
+          render();
+     }
 }
 
-InputMapper& Game::get_input_mapper() {
-	return input;
+
+void Game::exit()
+{
 }
 
-std::vector<Event>& Game::get_events() {
-	return events;
+
+void Game::load_scene( const std::string& name )
+{
+     scene_name_ = name;
 }
 
-void Game::load_scene(const std::string& name) {
-	scene_name = name;
-	current_state = State::Load;
+
+Node *Game::get_node( const std::string& name ) const
+{
+     auto iter = node_names_.find( name );
+     if ( iter == node_names_.cend() )
+     {
+          return nullptr;
+     }
+     return iter->second;
 }
 
-Node *Game::get_node(const std::string& name) const {
-	auto iter = node_names.find(name);
-	if (iter == node_names.cend())
-		return nullptr;
-	return iter->second;
+
+void Game::set_node_name( Node *node, const std::string& name )
+{
+     auto ret = node_names_.insert( { name, node } );
+     if ( !ret.second )
+     {
+          throw std::runtime_error{ "name \"" + name + "\" already exists" };
+     }
+     if ( node->name_ptr_ )
+     {
+          node_names_.erase( *( node->name_ptr_ ) );          // erase old name
+     }
+     node->name_ptr_ = const_cast< std::string * >( &( ret.first->first ) );
 }
 
-void Game::set_node_name(Node *node, const std::string& name) {
-	auto ret = node_names.insert({name, node});
-	if (!ret.second)
-		throw std::runtime_error{"name \"" + name
-					+ "\" already exists"};
-	if (node->name_ptr)
-		node_names.erase(*(node->name_ptr));	// erase old name
-	node->name_ptr = const_cast<std::string*>(&(ret.first->first));
+
+void Game::delete_node_name( const std::string& name )
+{
+     auto iter = node_names_.find( name );
+     if ( iter != node_names_.end() )
+     {
+          iter->second->name_ptr_ = nullptr;
+          node_names_.erase( iter );
+     }
 }
 
-void Game::delete_node_name(const std::string& name) {
-	auto iter = node_names.find(name);
-	if (iter != node_names.end()) {
-		iter->second->name_ptr = nullptr;
-		node_names.erase(iter);
-	}
+
+void Game::loop( float delta )
+{
+     if ( loop_func_ )
+     {
+          loop_func_( delta );
+     }
+     world_.loop( delta );
 }
 
-void Game::update(float delta) {
-	loop_func(delta);
-	world.loop(current_state == State::Pause, delta);
+
+void Game::setup()
+{
+     if ( setup_func_ )
+     {
+          setup_func_();
+     }
+     world_.setup();
 }
 
-void Game::load() {
-	// use scene_reader
-	if (setup_func)
-		setup_func();
-	world.setup();
-	current_state = State::Run;
+
+void Game::render()
+{
+     window_.clear();
+     world_.render( window_ );
+     window_.display();
 }
 
-void Game::render() {
-	window.clear();
-	window.draw(root_quad);
-	window.display();
-}
 
-void Game::read_events() {
-	events.clear();
-	Event event;
-	while (window.pollEvent(event))
-		events.push_back(event);
-}
+// void Game::read_events()
+// {
+//      events.clear();
+//      Event event;
+//      while (window.pollEvent(event))
+// 		events.push_back(event);
+// }
+
+} // namespace _16nar

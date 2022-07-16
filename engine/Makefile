@@ -6,16 +6,15 @@ TARGET      := game
 
 #The Directories, Source, Includes, Objects, Binary and Resources
 SRCDIR      := src
-INCDIR      := inc
+INCDIR      := include
 BUILDDIR    := obj
 TARGETDIR   := bin
-RESDIR      := res
 SRCEXT      := cpp
 DEPEXT      := d
 OBJEXT      := o
 
 #Flags, Libraries and Includes
-CFLAGS      := -Wall -O3 -std=c++2a -g
+CFLAGS      := -Wall -O3 -std=c++2a -g -DRENDER_SFML
 LIB         := -lsfml-graphics -lsfml-system -lsfml-window -ldl
 INC         := -I$(INCDIR) -I/usr/local/include
 INCDEP      := -I$(INCDIR)
@@ -27,15 +26,10 @@ SOURCES     := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
 
 #Defauilt Make
-all: resources $(TARGET)
+all: directories $(TARGET)
 
 #Remake
 remake: cleaner all
-
-#Copy Resources from Resources Directory to Target Directory
-resources: directories
-	@mkdir -p $(TARGETDIR)/$(RESDIR)/
-	@cp -r $(RESDIR)/* $(TARGETDIR)/$(RESDIR)/
 
 #Make the Directories
 directories:

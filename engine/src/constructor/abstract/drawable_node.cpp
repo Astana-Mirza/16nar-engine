@@ -1,43 +1,63 @@
-#include "../../../inc/constructor/abstract/drawable_node.h"
+#include <constructor/abstract/drawable_node.h>
 
-using namespace _16nar;
+namespace _16nar
+{
 
-DrawableNode::DrawableNode(Quadrant *q) : quad{q} {
-	quad->add_draw_child(this);
+DrawableNode::DrawableNode( Quadrant *quad ) : quad_{ quad }
+{
+     quad_->add_draw_child( this );
 }
 
-DrawableNode::~DrawableNode() {
-	quad->delete_draw_child(this);
+
+DrawableNode::~DrawableNode()
+{
+     quad_->delete_draw_child( this );
 }
 
-void DrawableNode::fix_quadrant() {
-	bool found;
-	Quadrant *prev = quad;
-	while (quad->get_parent() && !check_quadrant(quad)) {
-		quad = quad->get_parent();
-	}
-	do {	// go to the lowest possible level
-		const auto& ch = quad->get_children();
-		found = false;
-		for (size_t i = 0; i < _16NAR_QUAD_COUNT && !found; i++) {
-			if (ch[i] && check_quadrant(ch[i])) {
-				quad = ch[i];
-				found = true;
-			}
-		}
-	} while (found);
-	if (prev != quad) {
-		prev->delete_draw_child(this);
-		quad->add_draw_child(this);
-	}
+
+void DrawableNode::fix_quadrant()
+{
+     bool found = false;
+     Quadrant *prev = quad_;
+     while ( quad_->get_parent() && !check_quadrant( quad_ ) )
+     {
+          quad_ = quad_->get_parent();
+     }
+     do
+     {                        // go to the lowest possible level
+          found = false;
+          const auto& children = quad_->get_children();
+          for ( size_t i = 0; i < Quadrant::quad_count && !found; i++ )
+          {
+               if ( children[ i ] && check_quadrant( children[ i ] ) )
+               {
+                    quad_ = children[ i ];
+                    found = true;
+               }
+          }
+     }
+     while ( found );
+     if ( prev != quad_ )
+     {
+          prev->delete_draw_child( this );
+          quad_->add_draw_child( this );
+     }
 }
 
-void DrawableNode::loop_call(bool upd, float delta) {
-	loop(delta);
-	upd = upd || transformed;
-	transformed = false;
-	if (upd)
-		fix_quadrant();
-	for (auto ch : get_children())
-		ch->loop_call(upd, delta);
+
+void DrawableNode::loop_call( bool update, float delta )
+{
+     loop( delta );
+     update = update || transformed_;
+     transformed_ = false;
+     if ( update )
+     {
+          fix_quadrant();
+     }
+     for ( auto child : get_children() )
+     {
+          child->loop_call( update, delta );
+     }
 }
+
+} // namespace _16nar

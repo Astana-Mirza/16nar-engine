@@ -1,36 +1,45 @@
-#include "../../inc/constructor/world_node.h"
+#include <constructor/world_node.h>
 
-using namespace _16nar;
+namespace _16nar
+{
 
-WorldNode::~WorldNode() {
-	for (const auto ptr : pause_nodes)
-		delete ptr;
-	for (const auto ptr : nodes)
-		delete ptr;
+void WorldNode::setup()
+{
+     for ( auto& [ order, state ] : states_ )
+     {
+          state->setup();
+     }
 }
 
-void WorldNode::add_node(Node *node) {
-	nodes.insert(node);
+
+void WorldNode::loop( float delta )
+{
+     for ( auto& [ order, state ] : states_ )
+     {
+          if ( state->get_updating() )
+          {
+               state->loop( delta );
+          }
+     }
 }
 
-void WorldNode::add_pause_node(Node *node) {
-	pause_nodes.insert(node);
+
+void WorldNode::render( RenderTarget& target )
+{
+     for ( auto& [ order, state ] : states_ )
+     {
+          if ( state->get_rendering() )
+          {
+               state->render( target );
+          }
+     }
 }
 
-void WorldNode::setup() {
-	for (auto ptr : pause_nodes)
-		ptr->setup_call();
-	for (auto ptr : nodes)
-		ptr->setup_call();
+
+void WorldNode::register_state( int order, std::unique_ptr< SceneState >&& state )
+{
+     states_[ order ] = std::move( state );
 }
 
-void WorldNode::loop(bool in_pause, float delta) {
-	if (in_pause) {
-		for (auto ptr : pause_nodes)
-			ptr->loop_call(false, delta);
-	}
-	else {
-		for (auto ptr : nodes)
-			ptr->loop_call(false, delta);
-	}
-}
+
+} // namespace _16nar
