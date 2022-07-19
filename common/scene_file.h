@@ -8,6 +8,8 @@
 namespace _16nar
 {
 
+#pragma pack ( push, 1 )
+
 /// Type of a resource packed in a file.
 enum class ResourceType : uint8_t
 {
@@ -104,7 +106,7 @@ struct SpriteNodeInfo
 /// Record about one node.
 struct NodeInfo
 {
-     uint32_t parent;              ///< offset to a parent (may be node or scene state).
+     uint32_t parent;              ///< offset to a parent (parent is scene state if offset is zero).
      uint32_t name_off;            ///< offset to the node's name.
      float pos[ 2 ];               ///< position of the node.
      float scale[ 2 ];             ///< scale of the node.
@@ -127,8 +129,7 @@ struct StateInfo
      float gravity_vec[ 2 ];       ///< gravity vector.
      float q_size[ 2 ];            ///< size of one quadrant (in pixels).
      float pixels_per_meter;       ///< how many pixels are considered as one meter.
-     uint32_t scene_width;         ///< number of quadrants that should be made in width.
-     uint32_t scene_height;        ///< number of quadrants that should be made in height.
+     uint32_t scene_size[ 2 ];     ///< number of quadrants that should be made in width and in height.
      uint32_t node_count;          ///< count of nodes in this state.
      int order;                    ///< order of this state.
      uint8_t updating;             ///< is this state is initially updating.
@@ -136,6 +137,8 @@ struct StateInfo
 };
 
 
-} // namespace _16nar
+} // namespace _16
+
+#pragma pack ( pop )
 
 #endif    // #ifndef _16NAR_SCENE_FILE_H

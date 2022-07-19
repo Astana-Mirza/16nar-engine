@@ -28,14 +28,14 @@ void FileSceneReader::load_scene( WorldNode& world, SetupFuncPtr& setup_ptr, Loo
           auto state_ptr = std::make_unique< SceneState >( states[ i ].updating, states[ i ].rendering );
 
           FloatRect area( { states[ i ].q_start[ 0 ], states[ i ].q_start[ 1 ],
-                    states[ i ].scene_width  * states[ i ].q_size[ 0 ],
-                    states[ i ].scene_height * states[ i ].q_size[ 1 ] } );
+                    states[ i ].scene_size[ 0 ] * states[ i ].q_size[ 0 ],
+                    states[ i ].scene_size[ 1 ] * states[ i ].q_size[ 1 ] } );
           Quadrant& root = state_ptr->get_root_quadrant();
           root = Quadrant( area );
 
           make_quadrants( root, Vector2f{ area.left, area.top },
                     states[ i ].q_size[ 0 ], states[ i ].q_size[ 1 ],
-                    states[ i ].scene_width, states[ i ].scene_height);
+                    states[ i ].scene_size[ 0 ], states[ i ].scene_size[ 1 ] );
 
           load_state_nodes( states[i].node_count, root, *state_ptr );
           world.register_state( states[ i ].order, std::move( state_ptr ) );
@@ -48,7 +48,7 @@ void FileSceneReader::load_packages( const SceneHeader& hdr )
 {
      file_stream_.seekg( hdr.sections.rsrc_off );
      auto res = std::make_unique< ResourceTableEntry[] >( hdr.resource_file_count );
-	file_stream_.read( reinterpret_cast< char * >( res.get() ),
+     file_stream_.read( reinterpret_cast< char * >( res.get() ),
                         sizeof( ResourceTableEntry ) * hdr.resource_file_count);
 
      for ( uint32_t i = 0; i < hdr.resource_file_count; i++ )
