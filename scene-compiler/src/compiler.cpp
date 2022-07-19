@@ -31,6 +31,8 @@ void Compiler::compile_package( const QString& output_file )
      QJsonArray resources = main_object_[ "resources" ].toArray();
      hdr.res_count = resources.size();
 
+     out_file_.write( reinterpret_cast< char * >( &hdr ), sizeof( hdr ) );
+
      uint32_t res_offset = sizeof( hdr ) + hdr.res_count * sizeof( _16nar::ResourceSign );
      for ( const auto& res : resources )
      {
@@ -48,7 +50,7 @@ void Compiler::compile_package( const QString& output_file )
           {
                info.type = _16nar::ResourceType::Sound;
           }
-          out_file_.write( reinterpret_cast< char * >( &info ), sizeof( _16nar::ResourceSign ) );
+          out_file_.write( reinterpret_cast< char * >( &info ), sizeof( info ) );
           res_offset += info.size;
      }
 
@@ -100,24 +102,24 @@ void Compiler::count_offsets( _16nar::SceneHeader& hdr )
      hdr.sections.state_off = offset;
 
      QJsonArray state_infos = main_object_[ "states" ].toArray();     // skip states section: n StateInfo structures
-     offset += state_infos.size() * sizeof( _16nar::StateInfo );
+     offset += static_cast< uint32_t >( state_infos.size() * sizeof( _16nar::StateInfo ) );
      hdr.sections.tree_off = offset;
      for ( const auto& state : state_infos )              // skip tree section: n NodeInfo structures for each state
      {
-          offset += state.toObject()[ "nodes" ].toArray().size() * sizeof( _16nar::NodeInfo );
+          offset += static_cast< uint32_t >( state.toObject()[ "nodes" ].toArray().size() * sizeof( _16nar::NodeInfo ) );
      }
      hdr.sections.code_off = offset;
 
      // skip code section: n offsets to code names, each offset is uint32_t
-     offset += main_object_[ "code_files" ].toArray().size() * sizeof( uint32_t );
+     offset += static_cast< uint32_t >( main_object_[ "code_files" ].toArray().size() * sizeof( uint32_t ) );
      hdr.sections.rsrc_off = offset;
 
      // skip rsrc section: n ResourceTableEntry structures, m resource IDs (uint16_t) from each table entry
      QJsonArray package_infos = main_object_[ "resource_packages" ].toArray();
-     offset += package_infos.size() * sizeof( _16nar::ResourceTableEntry );
+     offset += static_cast< uint32_t >( package_infos.size() * sizeof( _16nar::ResourceTableEntry ) );
      for ( const auto& package : package_infos )
      {
-          offset += package.toObject()[ "resources" ].toArray().size() * sizeof( uint16_t );
+          offset += static_cast< uint32_t >( package.toObject()[ "resources" ].toArray().size() * sizeof( uint16_t ) );
      }
 
      str_pos_ = offset;
@@ -162,7 +164,8 @@ void Compiler::write_nodes()
                _16nar::NodeInfo info;
                QJsonObject json = node.toObject();
                qint64 parent_index = json[ "parent" ].toInteger();
-               info.parent = parent_index == -1 ? 0 : state_subtree_start + parent_index * sizeof( _16nar::NodeInfo );
+               info.parent = parent_index == -1 ? 0 : static_cast< uint32_t >( state_subtree_start +
+                                                      parent_index * sizeof( _16nar::NodeInfo ) );
                info.name_off = save_string( json[ "name" ].toString() );
                info.pos[ 0 ] = json[ "pos" ].toArray()[ 0 ].toDouble();
                info.pos[ 1 ] = json[ "pos" ].toArray()[ 1 ].toDouble();
@@ -195,7 +198,8 @@ void Compiler::write_code_files()
 void Compiler::write_resources()
 {
      QJsonArray package_infos = main_object_[ "resource_packages" ].toArray();
-     uint32_t res_array_offset = out_file_.pos() + package_infos.size() * sizeof( _16nar::ResourceTableEntry );
+     uint32_t res_array_offset = static_cast< uint32_t >( out_file_.pos() +
+                                 package_infos.size() * sizeof( _16nar::ResourceTableEntry ) );
      for ( const auto& package : package_infos )
      {
           _16nar::ResourceTableEntry info;
