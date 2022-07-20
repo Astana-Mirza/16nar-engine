@@ -3,7 +3,7 @@
 namespace _16nar
 {
 
-#ifdef RENDER_SFML
+#ifdef USE_SFML
 
 SpriteNode::SpriteNode( Quadrant *quad, const Texture& tex ):
      DrawableNode::DrawableNode( quad ), sprite_( tex ) {}
@@ -151,6 +151,6 @@ bool SpriteNode::check_quadrant( const Quadrant *quad ) const
      return false;
 }
 
-#endif // #ifdef RENDER_SFML
+#endif // #ifdef USE_SFML
 
 } // namespace _16nar

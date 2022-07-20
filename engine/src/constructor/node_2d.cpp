@@ -3,7 +3,7 @@
 namespace _16nar
 {
 
-#ifdef RENDER_SFML
+#ifdef USE_SFML
 
 const Vector2f& Node2D::get_position() const
 {
@@ -124,6 +124,6 @@ void Node2D::scale( const Vector2f& factor )
      transformed_ = true;
 }
 
-#endif // #ifdef RENDER_SFML
+#endif // #ifdef USE_SFML
 
 } // namespace _16nar

@@ -23,7 +23,6 @@ set(TS_FILES ${TS_DIR}/scene-compiler_ru_RU.ts)
 add_executable(scene-compiler
   ${SRC_DIR}/main.cpp
   ${SRC_DIR}/compiler.cpp
-  ${INCLUDE_DIR}/compiler.h
   ${TS_FILES}
 )
 

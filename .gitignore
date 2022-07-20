@@ -1,4 +1,5 @@
-obj/*
+*/out/*
 bin/*
 .vs/*
 *.user
+CMakeSettings.json

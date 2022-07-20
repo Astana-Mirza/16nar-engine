@@ -3,13 +3,16 @@
 #ifndef _16NAR_DEFS_H
 #define _16NAR_DEFS_H
 
-#ifdef RENDER_SFML
-#include <SFML/Graphics.hpp>
+#include <16narconfig.h>
+
+#ifdef USE_SFML
+#    define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
+#    include <SFML/Graphics.hpp>
 #endif
 
 namespace _16nar {
 
-#ifdef RENDER_SFML
+#ifdef USE_SFML
 
 using Transform = sf::Transformable;
 using DrawableBase = sf::Drawable;
@@ -30,7 +33,7 @@ using sf::Mouse;
 using sf::Joystick;
 using sf::Event;
 
-#endif // #ifdef RENDER_SFML
+#endif // #ifdef USE_SFML
 
 } // namespace _16nar
 

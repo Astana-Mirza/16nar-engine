@@ -22,11 +22,11 @@ public:
 
      /// Move constructor.
      /// @param lib rvalue reference to DynamicLib.
-     DynamicLib( DynamicLib&& lib );
+     DynamicLib( DynamicLib&& lib ) noexcept;
 
      /// Move assignment.
      /// @param lib rvalue reference to DynamicLib.
-     DynamicLib& operator= ( DynamicLib&& lib );
+     DynamicLib& operator= ( DynamicLib&& lib ) noexcept;
 
      /// Destructor, which closes the handle.
      ~DynamicLib();

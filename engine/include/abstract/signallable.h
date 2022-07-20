@@ -5,7 +5,6 @@
 
 #include <unordered_map>
 #include <typeindex>
-//#include <utility>
 
 #include <signals/slot.h>
 
