@@ -15,7 +15,7 @@ namespace _16nar
 /// scene's quadrant tree. The quadrant tree is used for space
 /// partitioning to make render faster, because only visible
 /// quadrants are drawn.
-class DrawableNode : public Node, public Drawable
+class ENGINE_API DrawableNode : public Node, public Drawable
 {
 public:
      /// Constructor which links node to quadrant.

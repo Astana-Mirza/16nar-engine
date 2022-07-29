@@ -1,12 +1,17 @@
 #include <game.h>
 
-#include <system/dynamic_resource_manager.h>
-#include <constructor/sprite_node.h>
-
-#include <iostream>
+#include <system/file_scene_reader.h>
 
 namespace _16nar
 {
+
+
+Game::Game():
+     scene_reader_{ std::make_unique< FileSceneReader >() },
+     event_manager_{ std::make_unique< EventManager >() },
+     time_per_frame_{ 1.f / 60.f },
+     current_task_{ TaskType::Running } {}
+
 
 Game& Game::get_game()
 {
@@ -15,90 +20,68 @@ Game& Game::get_game()
 }
 
 
+WorldNode& Game::get_world()
+{
+     return get_game().world_;
+}
+
+
 void Game::run()
 {
-     Clock clock;
-     Time last_update = Time::Zero;
-     setup();
-     while ( true )
+     if ( current_task_ == TaskType::Loading )
      {
-          last_update += clock.restart();
-          while ( last_update > time_per_frame_ )
+          world_.load( *scene_reader_ );
+     }
+     current_task_ = TaskType::Running;
+     std::chrono::steady_clock clock;
+     world_.setup();
+     auto prev_time = clock.now();
+     while ( current_task_ != TaskType::Exiting )
+     {
+          if ( current_task_ == TaskType::Loading )
           {
-               last_update -= time_per_frame_;
-               //read_events();
-               loop( time_per_frame_.asSeconds() );
+               world_.load( *scene_reader_ );
+               current_task_ = TaskType::Running;
+               prev_time = clock.now();
+          }
+          while ( clock.now() - prev_time >= time_per_frame_ )
+          {
+               read_events();
+               world_.loop( time_per_frame_.count() );
+               prev_time = clock.now();
           }
           render();
+          if ( current_task_ == TaskType::Exiting )
+          {
+               window_.close();
+          }
      }
 }
 
 
 void Game::exit()
 {
+     current_task_ = TaskType::Exiting;
 }
 
 
 void Game::load_scene( const std::string& name )
 {
-     scene_name_ = name;
+     scene_reader_ = std::move( std::make_unique< FileSceneReader >() );
+     scene_reader_->set_scene( name );
+     current_task_ = TaskType::Loading;
 }
 
 
-Node *Game::get_node( const std::string& name ) const
+void Game::set_window( const std::string& title, unsigned width, unsigned height, uint32_t flags, unsigned bits_per_pixel )
 {
-     auto iter = node_names_.find( name );
-     if ( iter == node_names_.cend() )
-     {
-          return nullptr;
-     }
-     return iter->second;
+     window_.create( { width, height, bits_per_pixel }, title, flags );
 }
 
 
-void Game::set_node_name( Node *node, const std::string& name )
+EventManager& Game::get_event_manager()
 {
-     auto ret = node_names_.insert( { name, node } );
-     if ( !ret.second )
-     {
-          throw std::runtime_error{ "name \"" + name + "\" already exists" };
-     }
-     if ( node->name_ptr_ )
-     {
-          node_names_.erase( *( node->name_ptr_ ) );          // erase old name
-     }
-     node->name_ptr_ = const_cast< std::string * >( &( ret.first->first ) );
-}
-
-
-void Game::delete_node_name( const std::string& name )
-{
-     auto iter = node_names_.find( name );
-     if ( iter != node_names_.end() )
-     {
-          iter->second->name_ptr_ = nullptr;
-          node_names_.erase( iter );
-     }
-}
-
-
-void Game::loop( float delta )
-{
-     if ( loop_func_ )
-     {
-          loop_func_( delta );
-     }
-     world_.loop( delta );
-}
-
-
-void Game::setup()
-{
-     if ( setup_func_ )
-     {
-          setup_func_();
-     }
-     world_.setup();
+     return *event_manager_;
 }
 
 
@@ -110,12 +93,22 @@ void Game::render()
 }
 
 
-// void Game::read_events()
-// {
-//      events.clear();
-//      Event event;
-//      while (window.pollEvent(event))
-// 		events.push_back(event);
-// }
+void Game::read_events()
+{
+     event_manager_->clear_events();
+     Event event;
+     while ( window_.pollEvent( event ) )
+     {
+          if ( event.type != Event::Closed )
+          {
+               event_manager_->handle_event( event );
+          }
+          else
+          {
+               exit();
+          }
+     }
+}
+
 
 } // namespace _16nar

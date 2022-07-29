@@ -10,9 +10,24 @@
 #    include <SFML/Graphics.hpp>
 #endif
 
-namespace _16nar {
+
+#ifdef WIN_EXPORT
+#    ifdef BUILDING_DLL
+#         define ENGINE_API __declspec( dllexport )
+#    else
+#         define ENGINE_API __declspec( dllimport )
+#    endif
+#else
+#    define ENGINE_API
+#endif
+
+
+namespace _16nar
+{
 
 #ifdef USE_SFML
+
+namespace Style = sf::Style;
 
 using Transform = sf::Transformable;
 using DrawableBase = sf::Drawable;
@@ -26,8 +41,6 @@ using sf::RenderStates;
 using sf::RenderWindow;
 using sf::Sprite;
 using sf::Texture;
-using sf::Clock;
-using sf::Time;
 using sf::Keyboard;
 using sf::Mouse;
 using sf::Joystick;

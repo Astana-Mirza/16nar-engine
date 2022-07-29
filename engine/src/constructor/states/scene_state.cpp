@@ -7,6 +7,15 @@ SceneState::SceneState( bool updating, bool rendering ):
      updating_{ updating }, rendering_{ rendering } {}
 
 
+SceneState::~SceneState()
+{
+     for ( Node* node : nodes_ )
+     {
+          delete node;
+     }
+}
+
+
 void SceneState::set_rendering( bool rendering )
 {
      rendering_ = rendering;
@@ -35,6 +44,7 @@ Quadrant& SceneState::get_root_quadrant()
 {
      return root_;
 }
+
 
 void SceneState::add_node( Node *node )
 {

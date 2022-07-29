@@ -9,7 +9,7 @@ namespace _16nar
 {
 
 /// Abstract base class, providing interface for basic drawing functionality.
-class Drawable : public DrawableBase
+class ENGINE_API Drawable : public DrawableBase
 {
 public:
      /// Checks if the object is visible.

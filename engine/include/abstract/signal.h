@@ -3,11 +3,13 @@
 #ifndef _16NAR_SIGNAL_H
 #define _16NAR_SIGNAL_H
 
+#include <16nardefs.h>
+
 namespace _16nar
 {
 
 /// Abstract base class for a signal.
-struct Signal
+struct ENGINE_API Signal
 {
      virtual ~Signal() = default;
 };

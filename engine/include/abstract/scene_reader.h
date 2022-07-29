@@ -10,21 +10,20 @@ namespace _16nar
 {
 
 /// Abstract class for reading scene.
-class SceneReader
+class ENGINE_API SceneReader
 {
 public:
-     using SetupFuncPtr = void ( * )();
-     using LoopFuncPtr = void ( * )( float );
-
      /// Sets scene name.
      /// @name name of the scene.
      virtual void set_scene( const std::string& name ) = 0;
 
      /// Loads the scene from source.
      /// @world root node in node tree.
-     /// @setup_func double pointer to setup function.
-     /// @loop_func double pointer to loop function.
-     virtual void load_scene( WorldNode& world, SetupFuncPtr *setup_func, LoopFuncPtr *loop_func ) = 0;
+     /// @setup_func pointer to setup function.
+     /// @loop_func pointer to loop function.
+     virtual void load_scene( WorldNode& world,
+                              WorldNode::SetupFuncPtr& setup_func,
+                              WorldNode::LoopFuncPtr& loop_func ) = 0;
 	virtual ~SceneReader() = default;
 };
 

@@ -9,7 +9,7 @@ namespace _16nar
 {
 
 /// A simple node that has its own transformation object and can be transformed.
-class Node2D : public Node
+class ENGINE_API Node2D : public Node
 {
 public:
      /// Gets current object position.

@@ -3,13 +3,14 @@
 #ifndef _16NAR_DYNAMIC_LIB_H
 #define _16NAR_DYNAMIC_LIB_H
 
+#include <16nardefs.h>
 #include <string>
 
 namespace _16nar
 {
 
 /// Class for work with dynamically loaded libraries.
-class DynamicLib
+class ENGINE_API DynamicLib
 {
 public:
      /// Constructor.

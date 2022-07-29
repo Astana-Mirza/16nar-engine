@@ -10,13 +10,16 @@ namespace _16nar
 {
 
 /// Simple state of scene which takes update and render flow.
-class SceneState
+class ENGINE_API SceneState
 {
 public:
      /// Constructor sets updating and rendering of the state.
      /// @param updating set if this state will be updated in game loop.
      /// @param rendering set if this state will be rendered in game loop.
      SceneState( bool updating = true, bool rendering = true );
+
+     /// Destructor deletes all nodes of this state.
+     ~SceneState();
 
      /// Sets the updating option.
      /// @param rendering set if this state will be rendered in game loop.

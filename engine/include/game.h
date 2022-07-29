@@ -1,50 +1,85 @@
+/// @file
+/// File with Game class definition.
 #ifndef _16NAR_GAME_H
 #define _16NAR_GAME_H
 
 #include <memory>
 #include <vector>
 #include <string>
+#include <chrono>
 
 #include <render/quadrant.h>
 #include <constructor/world_node.h>
 #include <abstract/scene_reader.h>
+#include <system/event_manager.h>
 
 namespace _16nar
 {
 
 class Node;
 
-class Game
+/// Singleton class for main game options management.
+class ENGINE_API Game
 {
 public:
+     using Time = std::chrono::duration< float >;
+
+     /// Method for getting single game object.
      static Game& get_game();
+
+     /// Method for getting current scene's world node.
+     static WorldNode& get_world();
 
      Game( const Game& )               = delete;
      void operator=( const Game& )     = delete;
 
+     /// Runs the game loop within loaded scene.
      void run();
+
+     /// Ends current scene's game loop.
      void exit();
 
+     /// Loads scene with given name.
+     /// @param name path to the scene.
      void load_scene( const std::string& name );
-     Node *get_node( const std::string& name ) const;
-     void set_node_name( Node *node, const std::string& name );
-     void delete_node_name( const std::string& name );
+
+     /// Sets window settings and open it.
+     /// @param title title of the window.
+     /// @param width width of window in pixels.
+     /// @param height height of window in pixels.
+     /// @param flags flags for window settings.
+     /// @param bits_per_pixel how many bits used to represent one pixel.
+     void set_window( const std::string& title, unsigned width, unsigned height,
+                      uint32_t flags = Style::Default,
+                      unsigned bits_per_pixel = 32 );
+
+     /// Gets the event manager of the game.
+     EventManager& get_event_manager();
 
 private:
-     RenderWindow window_;
-     std::string scene_name_;
-     std::unordered_map< std::string, Node * > node_names_;
-     WorldNode world_;
-     std::unique_ptr< SceneReader > scene_reader_;
-     Time time_per_frame_ = sf::seconds( 1.f / 60.f );
-     SceneReader::SetupFuncPtr setup_func_ = nullptr;
-     SceneReader::LoopFuncPtr loop_func_ = nullptr;
+     /// Constructor.
+     Game();
 
-     Game() = default;
-     void loop( float delta );
-     void setup();
+     /// Type of current game task.
+     enum class TaskType
+     {
+          Running,       ///< Execution of a scene.
+          Loading,       ///< Loading a scene.
+          Exiting        ///< Exiting from game.
+     };
+
+     /// Renders one frame on the window.
      void render();
-     //void read_events();
+
+     /// Reads all input events for the window.
+     void read_events();
+
+     RenderWindow window_;                                      ///< main window of the game.
+     WorldNode world_;                                          ///< node which manages scene states.
+     std::unique_ptr< SceneReader > scene_reader_;              ///< pointer to reader of scenes.
+     std::unique_ptr< EventManager > event_manager_;            ///< pointer to input event manager.
+     Time time_per_frame_;                                      ///< minimal time of one rendering frame.
+     TaskType current_task_;                                    ///< current game task.
 };
 
 } // namespace _16nar

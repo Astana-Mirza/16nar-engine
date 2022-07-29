@@ -16,27 +16,22 @@ set(SRC_DIR src)
 set(INCLUDE_DIR include)
 set(COMMON_DIR ../common)
 
-add_library(engine
-	${SRC_DIR}/game.cpp
-	${SRC_DIR}/abstract/drawable.cpp
-	${SRC_DIR}/abstract/signallable.cpp
-	${SRC_DIR}/constructor/abstract/drawable_node.cpp
-	${SRC_DIR}/constructor/abstract/node.cpp
-	${SRC_DIR}/constructor/states/scene_state.cpp
-	${SRC_DIR}/constructor/node_2d.cpp
-	${SRC_DIR}/constructor/sprite_node.cpp
-	${SRC_DIR}/constructor/world_node.cpp
-	${SRC_DIR}/render/quadrant.cpp
-	${SRC_DIR}/system/dynamic_lib.cpp
-	${SRC_DIR}/system/file_scene_reader.cpp
-)
-
 set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug or Release)")
-
-set_option(BUILD_SHARED_LIBS OFF BOOL "Build engine as static or dynamic library")
-
+set_option(BUILD_SHARED_LIBS ON BOOL "Build engine as static or dynamic library")
 set_option(USE_SFML ON BOOL "Use SFML for rendering and controlling")
-configure_file(${INCLUDE_DIR}/16narconfig.h.in 16narconfig.h)
+
+
+if (WIN32)
+	if (BUILD_SHARED_LIBS)
+		set(WIN_EXPORT ON)
+		set(EXTRA_COMPILER_DEFS "${EXTRA_COMPILER_DEFS} BUILDING_DLL")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+	else()
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+	endif()
+endif()
 
 
 if (USE_SFML)
@@ -53,29 +48,56 @@ if (USE_SFML)
 	endif()
 
 	if (SFML_STATIC)
-		set(EXTRA_COMPILER_DEFS SFML_STATIC)
+		set(EXTRA_COMPILER_DEFS "${EXTRA_COMPILER_DEFS} SFML_STATIC")
 	endif()
 
 	if (WIN32)
-		set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} opengl32.lib winmm.lib gdi32.lib)
+		set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} opengl32 winmm gdi32)
 		if (SFML_STATIC)
 			if (${CMAKE_BUILD_TYPE} STREQUAL Debug)
-				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-s-d.lib sfml-graphics-s-d.lib sfml-window-s-d.lib)
+				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-s-d sfml-graphics-s-d sfml-window-s-d)
 			elseif(${CMAKE_BUILD_TYPE} STREQUAL Release)
-				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-s.lib sfml-graphics-s.lib sfml-window-s.lib)
+				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-s sfml-graphics-s sfml-window-s)
 			endif()
 		else()
 			if (${CMAKE_BUILD_TYPE} STREQUAL Debug)
-				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-d.lib sfml-graphics-d.lib sfml-window-d.lib)
+				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-d sfml-graphics-d sfml-window-d)
 			elseif(${CMAKE_BUILD_TYPE} STREQUAL Release)
-				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system.lib sfml-graphics.lib sfml-window.lib)
+				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system sfml-graphics sfml-window)
 			endif()
 		endif()
 	endif() # if (WIN32)
 endif() # if (USE_SFML)
+
+configure_file(${INCLUDE_DIR}/16narconfig.h.in 16narconfig.h)
+
+add_library(engine
+	${SRC_DIR}/game.cpp
+	${SRC_DIR}/abstract/drawable.cpp
+	${SRC_DIR}/abstract/signallable.cpp
+	${SRC_DIR}/constructor/abstract/drawable_node.cpp
+	${SRC_DIR}/constructor/abstract/node.cpp
+	${SRC_DIR}/constructor/states/scene_state.cpp
+	${SRC_DIR}/constructor/node_2d.cpp
+	${SRC_DIR}/constructor/sprite_node.cpp
+	${SRC_DIR}/constructor/world_node.cpp
+	${SRC_DIR}/render/quadrant.cpp
+	${SRC_DIR}/system/dynamic_lib.cpp
+	${SRC_DIR}/system/file_scene_reader.cpp
+	${SRC_DIR}/system/event_manager.cpp
+)
 
 target_include_directories(engine PRIVATE ${INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${COMMON_DIR} ${EXTRA_INCLUDE_DIRS})
 target_compile_definitions(engine PRIVATE ${EXTRA_COMPILER_DEFS})
 target_link_directories(engine PRIVATE ${EXTRA_LINK_DIRS})
 target_link_libraries(engine PRIVATE ${EXTRA_LINK_LIBS})
 
+install(DIRECTORY ${INCLUDE_DIR} DESTINATION .)
+install(FILES ${PROJECT_BINARY_DIR}/16narconfig.h DESTINATION include)
+install(FILES ${COMMON_DIR}/scene_file.h DESTINATION include)
+if (WIN32)
+	install(FILES ${PROJECT_BINARY_DIR}/engine.lib DESTINATION lib)
+	install(FILES ${PROJECT_BINARY_DIR}/engine.dll DESTINATION bin)
+else()
+	install(TARGETS engine DESTINATION bin)
+endif()

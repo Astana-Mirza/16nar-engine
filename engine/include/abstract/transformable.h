@@ -9,7 +9,7 @@ namespace _16nar
 {
 
 /// Abstract base class providing functionality for transformations
-class Transformable
+class ENGINE_API Transformable
 {
 public:
      virtual ~Transformable()                           = default;

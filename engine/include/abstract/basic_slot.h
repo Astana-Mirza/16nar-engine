@@ -9,7 +9,7 @@ namespace _16nar
 {
 
 /// Abstract base class for signal accepting slot
-class BasicSlot
+class ENGINE_API BasicSlot
 {
 public:
      /// Accept an emitted signal.

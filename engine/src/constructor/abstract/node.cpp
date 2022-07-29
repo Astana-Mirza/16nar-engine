@@ -10,7 +10,7 @@ Node::~Node()
 {
      if ( name_ptr_ )
      {
-          Game::get_game().delete_node_name( *name_ptr_ );
+          Game::get_world().delete_node_name( *name_ptr_ );
      }
      for ( auto child : children_ )
      {

@@ -9,7 +9,7 @@ namespace _16nar
 {
 
 /// A node that represents one sprite on the scene.
-class SpriteNode : public DrawableNode
+class ENGINE_API SpriteNode : public DrawableNode
 {
 public:
      using DrawableNode::DrawableNode;

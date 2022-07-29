@@ -1,1 +1,2 @@
 #cmakedefine USE_SFML
+#cmakedefine WIN_EXPORT

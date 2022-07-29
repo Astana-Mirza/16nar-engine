@@ -1,5 +1,9 @@
 #include <system/file_scene_reader.h>
 #include <render/quadrant.h>
+#include <game.h>
+
+#include <constructor/node_2d.h>
+#include <constructor/sprite_node.h>
 
 namespace _16nar
 {
@@ -10,7 +14,9 @@ void FileSceneReader::set_scene( const std::string& name )
 }
 
 
-void FileSceneReader::load_scene( WorldNode& world, SetupFuncPtr& setup_ptr, LoopFuncPtr& loop_ptr )
+void FileSceneReader::load_scene( WorldNode& world,
+                                  WorldNode::SetupFuncPtr& setup_ptr,
+                                  WorldNode::LoopFuncPtr& loop_ptr )
 {
      SceneHeader hdr;
      file_stream_.read( reinterpret_cast< char * >( &hdr ), sizeof( SceneHeader ) );
@@ -74,9 +80,9 @@ void FileSceneReader::load_resources( const std::string& filename, uint16_t file
 
      for ( uint16_t i = 0; i < res_count; i++ )
      {
-          auto raw = std::make_unique< char >( signs[ res_ids[ i ] ].size );
+          auto raw = std::make_unique< char[] >(signs[res_ids[i]].size);
           res_file.seekg( signs[ res_ids[ i ] ].offset );
-          res_file.read( reinterpret_cast< char * >( raw.get() ), signs[ res_ids[ i ] ].size );
+          res_file.read( reinterpret_cast< char * >( raw.get() ), signs[ res_ids[ i ] ].size);
           switch ( signs[ res_ids[ i ] ].type )
           {
                case ResourceType::Texture:
@@ -97,7 +103,9 @@ void FileSceneReader::load_resources( const std::string& filename, uint16_t file
 }
 
 
-void FileSceneReader::load_code( const SceneHeader& hdr, SetupFuncPtr& setup_ptr, LoopFuncPtr& loop_ptr )
+void FileSceneReader::load_code( const SceneHeader& hdr,
+                                 WorldNode::SetupFuncPtr& setup_ptr,
+                                 WorldNode::LoopFuncPtr& loop_ptr)
 {
      if ( !hdr.sections.code_off )
      {
@@ -113,13 +121,15 @@ void FileSceneReader::load_code( const SceneHeader& hdr, SetupFuncPtr& setup_ptr
      if ( hdr.setup_off )
      {
           auto setup_name = read_string( hdr.setup_off );
-          setup_ptr = reinterpret_cast< SetupFuncPtr >( libs_.at( hdr.main_code_file ).get_symbol( setup_name ) );
+          setup_ptr = reinterpret_cast< WorldNode::SetupFuncPtr >(
+               libs_.at( hdr.main_code_file ).get_symbol( setup_name ) );
 	}
 
      if ( hdr.loop_off )
      {
           auto loop_name = read_string( hdr.loop_off );
-          loop_ptr = reinterpret_cast< LoopFuncPtr >( libs_.at( hdr.main_code_file ).get_symbol( loop_name ) );
+          loop_ptr = reinterpret_cast< WorldNode::LoopFuncPtr >(
+               libs_.at( hdr.main_code_file ).get_symbol( loop_name ) );
      }
 }
 
@@ -218,9 +228,59 @@ void FileSceneReader::make_quadrants( Quadrant& parent, const Vector2f& start,
 
 void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadrant& quad, SceneState& state )
 {
-     // read name
-     // node_offsets_[ offset ] = pointer to node
-     // if parent is nullptr, add node to state
+     Node *node = nullptr;
+     switch ( info.node_type )
+     {
+          case NodeType::SpriteNode:
+          {
+               SpriteNode* sp_node = nullptr;
+               if ( 0 != info.creator_name_off )
+               {
+                    void *func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
+                    auto creator = static_cast< SpriteNode *( * )( Quadrant *, const Texture& ) >( func );
+                    sp_node = creator( &quad, textures_.at( info.sprite_inf.res ) );
+               }
+               else
+               {
+                    sp_node = new SpriteNode( &quad, textures_.at( info.sprite_inf.res ) );
+               }
+               sp_node->set_layer( info.sprite_inf.layer );
+               sp_node->set_visible( info.sprite_inf.visible );
+               node = sp_node;
+          }
+          break;
+          case NodeType::Node2D:
+          {
+               if ( 0 != info.creator_name_off )
+               {
+                    void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
+                    auto creator = static_cast< Node2D * ( * )() >( func );
+                    node = creator();
+               }
+               else
+               {
+                    node = new Node2D;
+               }
+          }
+          break;
+     }
+     if ( 0 != info.name_off )
+     {
+          Game::get_world().set_node_name( node, read_string( info.name_off ) );
+     }
+     if ( 0 != info.parent )
+     {
+          node->set_parent( node_offsets_.at( info.parent ) );
+     }
+     else
+     {
+          state.add_node( node );
+     }
+     node_offsets_[ offset ] = node;
+     node->set_origin({info.origin[0], info.origin[1]});
+     node->set_position( { info.pos[ 0 ], info.pos[ 1 ] } );
+     node->set_rotation( info.rotation );
+     node->set_scale( { info.scale[ 0 ], info.scale[ 1 ] } );
 }
 
 

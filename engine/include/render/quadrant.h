@@ -15,7 +15,7 @@ namespace _16nar
 class Drawable;
 
 /// Class for space partitioning with quadrant tree.
-class Quadrant
+class ENGINE_API Quadrant
 {
 public:
      /// Constant which represents this quadrant's children count.

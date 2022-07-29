@@ -18,7 +18,7 @@ namespace _16nar
 {
 
 /// Class for reading compiled scene from .nar file.
-class FileSceneReader : public SceneReader
+class ENGINE_API FileSceneReader : public SceneReader
 {
 public:
 
@@ -30,7 +30,9 @@ public:
      /// @world root node in node tree.
      /// @param setup_ptr pointer to the setup function of the scene.
      /// @param loop_ptr pointer to the loop function of the scene.
-     void load_scene( WorldNode& world, SetupFuncPtr& setup_ptr, LoopFuncPtr& loop_ptr );
+     void load_scene( WorldNode& world,
+                      WorldNode::SetupFuncPtr& setup_ptr,
+                      WorldNode::LoopFuncPtr& loop_ptr );
 
 private:
      /// Loads all resource packages for the scene.
@@ -49,7 +51,9 @@ private:
      /// @param hdr scene header structure.
      /// @param setup_ptr pointer to the setup function of the scene.
      /// @param loop_ptr pointer to the loop function of the scene.
-     void load_code( const SceneHeader& hdr, SetupFuncPtr& setup_ptr, LoopFuncPtr& loop_ptr );
+     void load_code( const SceneHeader& hdr,
+                     WorldNode::SetupFuncPtr& setup_ptr,
+                     WorldNode::LoopFuncPtr & loop_ptr);
 
      /// Loads dynamic libraries.
      /// @param lib_offsets array of offsets of library names.

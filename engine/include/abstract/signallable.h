@@ -30,7 +30,7 @@ namespace _16nar
 
 /// A base class which can send and accept signals.
 /// Acts as both sender and receiver of signals.
-class Signallable
+class ENGINE_API Signallable
 {
 public:
      using SlotId = std::pair< std::type_index, Signallable * >;

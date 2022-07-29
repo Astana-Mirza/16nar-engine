@@ -13,10 +13,10 @@ namespace _16nar
 {
 
 /// Abstract base class for all nodes in the engine.
-class Node : public Signallable, public Transformable
+class ENGINE_API Node : public Signallable, public Transformable
 {
 public:
-     friend class Game;
+     friend class WorldNode;
 
      /// Virtual destructor, which deletes node's name and children.
      virtual ~Node();
