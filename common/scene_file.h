@@ -14,7 +14,8 @@ namespace _16nar
 enum class ResourceType : uint8_t
 {
      Texture,
-     Sound
+     Sound,
+     Font
 };
 
 
@@ -22,7 +23,9 @@ enum class ResourceType : uint8_t
 enum class NodeType : uint8_t
 {
      Node2D,
-     SpriteNode
+     SpriteNode,
+     SoundNode,
+     TextNode
 };
 
 
@@ -93,12 +96,54 @@ struct ResourceID
 
 // ------------------------ NODE-SPECIFIC STRUCTS ------------------------------
 
-/// Record about sprite node.
-struct SpriteNodeInfo
+/// Base structure for nodes that need resources.
+struct ResourceNodeRecord
 {
-     ResourceID res;               ///< sprite resource.
+     ResourceID res;               ///< identifier of a resource.
+};
+
+
+/// Base structure for drawable nodes.
+struct DrawableNodeRecord : public ResourceNodeRecord
+{
+     uint32_t color;               ///< color of the node.
      int layer;                    ///< draw layer.
      uint8_t visible;              ///< 1 if it is visible, 0 otherwise.
+};
+
+
+/// Record about sprite node.
+struct SpriteNodeInfo : public DrawableNodeRecord
+{
+     int rect_coords[ 2 ];         ///< coordinates of sprite rectangle in the texture.
+     int rect_size[ 2 ];           ///< size of sprite rectangle in the texture.
+};
+
+
+/// Record about sound node.
+struct SoundNodeInfo : public ResourceNodeRecord
+{
+     float z_coord;                ///< z coordinate for 3D sound.
+     float offset;                 ///< playing offset.
+     float min_distance;           ///< minimal distance of the sound.
+     float volume;                 ///< volume of the sound.
+     float pitch;                  ///< pitch of the sound.
+     float attenuation;            ///< attenuation of the sound.
+     uint8_t relative_to_listener; ///< should the sound be absolute or relative to listener.
+     uint8_t loop;                 ///< should the sound be played in a loop.
+};
+
+
+/// Record about text node.
+struct TextNodeInfo : public DrawableNodeRecord
+{
+     uint32_t string_offset;       ///< offset of a string of the text.
+     uint32_t char_size;           ///< size of a character.
+     uint32_t style;               ///< style of the text.
+     uint32_t outline_color;       ///< outline color.
+     float outline_thickness;      ///< thickness of the outline.
+     float line_spacing;           ///< line spacing of the text.
+     float letter_spacing;         ///< letter spacing of the text.
 };
 
 // -----------------------------------------------------------------------------
@@ -118,6 +163,8 @@ struct NodeInfo
      union                         ///< node-specific structures.
      {
           SpriteNodeInfo sprite_inf;    ///< sprite node record.
+          SoundNodeInfo sound_inf;      ///< sound node record.
+          TextNodeInfo text_inf;        ///< text node record.
      };
 };
 
@@ -128,6 +175,8 @@ struct StateInfo
      float q_start[ 2 ];           ///< coordinates of a starting quadrant.
      float gravity_vec[ 2 ];       ///< gravity vector.
      float q_size[ 2 ];            ///< size of one quadrant (in pixels).
+     float view_rect_pos[ 2 ];     ///< position of a view rectangle.
+     float view_rect_size[ 2 ];    ///< size of a view rectangle.
      float pixels_per_meter;       ///< how many pixels are considered as one meter.
      uint32_t scene_size[ 2 ];     ///< number of quadrants that should be made in width and in height.
      uint32_t node_count;          ///< count of nodes in this state.
@@ -137,7 +186,7 @@ struct StateInfo
 };
 
 
-} // namespace _16
+} // namespace _16nar
 
 #pragma pack ( pop )
 

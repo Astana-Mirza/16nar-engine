@@ -1,59 +1,94 @@
 /// @file
-/// File with SpriteNode class definition.
-#ifndef _16NAR_SPRITE_NODE_H
-#define _16NAR_SPRITE_NODE_H
+/// File with TextNode class definition.
+#ifndef _16NAR_TEXT_NODE_H
+#define _16NAR_TEXT_NODE_H
 
 #include <constructor/abstract/drawable_node.h>
 
 namespace _16nar
 {
 
-/// A node that represents one sprite on the scene.
-class ENGINE_API SpriteNode : public DrawableNode
+/// Node that displays text with given font.
+class ENGINE_API TextNode : public DrawableNode
 {
 public:
-     using DrawableNode::DrawableNode;
-
-     /// Constructor creating a sprite with entire texture.
+     /// Constructor.
      /// @param quad base quadrant of this node.
-     /// @param tex texture (picture) for the sprite.
-     SpriteNode( Quadrant *quad, const Texture& tex );
-
-     /// Constructor creating a sprite with part of texture.
-     /// @param quad base quadrant of this node.
-     /// @param tex texture (picture) for the sprite.
-     /// @param rect rectangular area of texture displayed by the sprite.
-     SpriteNode( Quadrant *quad, const Texture& tex, const IntRect& rect );
+     /// @param string string of a text.
+     /// @param font text font.
+     /// @param char_size size of a character.
+     TextNode( Quadrant* quad, const std::string& string, const Font& font, uint32_t char_size = 30 );
 
      /// Draw this object on the target.
      /// @param target target where object should be rendered.
      /// @param states options for rendering.
      void draw( RenderTarget& target, RenderStates states ) const;
 
-     /// Set texture for the sprite.
-     /// @param texture texture (picture) for the sprite.
-     /// @param reset_rect should existing rect be used or reset to fit full texture.
-     void set_texture( const Texture& texture, bool reset_rect = false );
+     /// Sets the sstring to be displayed.
+     /// @param string string of a text.
+     void set_string( const std::string& string );
 
-     /// Sets rectangular area displayed by the sprite.
-     /// @param rect rectangle area of texture.
-     void set_texture_rect( const IntRect& rect );
+     /// Sets font of a text.
+     /// @param font text font.
+     void set_font( const Font& font );
 
-     /// Sets color of an object.
-     /// @param color color of an object
+     /// Sets size of one character.
+     /// @param char_size size of a character.
+     void set_character_size( uint32_t char_size );
+
+     /// Sets the line spacing.
+     /// @param factor factor of spacing between lines, default is 1.
+     void set_line_spacing( float factor );
+
+     /// Sets the line spacing.
+     /// @param factor factor of spacing between letters, default is 1.
+     void set_letter_spacing( float factor );
+
+     /// Sets text style.
+     /// @param style style of a text.
+     void set_style( uint32_t style );
+
+     /// Sets fill color of a text.
+     /// @param color fill color.
      void set_color( const Color& color );
+
+     /// Sets outline color of a text.
+     /// @param color outline color.
+     void set_outline_color( const Color& color );
+
+     /// Sets outline thickness of a text.
+     /// @param thickness thickness of an outline.
+     void set_outline_thickness( float thickness );
+
+     /// Gets text string.
+     std::string get_string() const;
+
+     /// Gets text font.
+     const Font *get_font() const;
+
+     /// Gets character size.
+     uint32_t get_character_size() const;
+
+     /// Gets line spacing factor.
+     float get_line_spacing() const;
+
+     /// Gets letter spacing factor.
+     float get_letter_spacing() const;
+
+     /// Gets text style.
+     uint32_t get_style() const;
 
      /// Gets color of an object.
      const Color& get_color() const;
 
+     /// Gets outline color of the text.
+     const Color& get_outline_color() const;
+
+     /// Gets outline thickness of the text.
+     float get_outline_thickness() const;
+
      /// Gets local bounds of an object (in its own coordinates).
      FloatRect get_local_bounds() const;
-
-     /// Gets texture of the sprite.
-     const Texture *get_texture() const;
-
-     /// Gets texture rectangular area displayed by the sprite.
-     const IntRect& get_texture_rect() const;
 
      /// Gets current object position.
      const Vector2f& get_position() const;
@@ -127,9 +162,9 @@ public:
      void scale( const Vector2f& factor );
 
 private:
-	Sprite sprite_;         ///< sprite that is displayed on the screen.
+     Text text_;         ///< text that is displayed on the screen.
 };
 
 } // namespace _16nar
 
-#endif // #ifndef _16NAR_SPRITE_NODE_H
+#endif // #ifndef _16NAR_TEXT_NODE_H

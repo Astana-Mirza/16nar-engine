@@ -48,6 +48,10 @@ void DrawableNode::fix_quadrant()
 void DrawableNode::loop_call( bool update, float delta )
 {
      loop( delta );
+     for ( auto& [name, anim] : animations_ )
+     {
+          anim->advance( delta );
+     }
      update = update || transformed_;
      transformed_ = false;
      if ( update )
@@ -58,6 +62,19 @@ void DrawableNode::loop_call( bool update, float delta )
      {
           child->loop_call( update, delta );
      }
+}
+
+
+bool DrawableNode::check_quadrant( const Quadrant* quad ) const
+{
+     auto transform = get_global_transform_matr();
+     auto rect = transform.transformRect( get_local_bounds() );
+     if ( quad->get_area().contains( rect.left, rect.top ) &&
+          quad->get_area().contains( rect.left + rect.width - 1, rect.top + rect.height - 1 ) )
+     {
+          return true;
+     }
+     return false;
 }
 
 } // namespace _16nar

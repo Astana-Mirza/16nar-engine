@@ -14,9 +14,10 @@ class ENGINE_API SceneState
 {
 public:
      /// Constructor sets updating and rendering of the state.
+     /// @param view_rect rectangular area of a scene, which is displayed by a view.
      /// @param updating set if this state will be updated in game loop.
      /// @param rendering set if this state will be rendered in game loop.
-     SceneState( bool updating = true, bool rendering = true );
+     SceneState( const FloatRect& view_rect, bool updating = true, bool rendering = true );
 
      /// Destructor deletes all nodes of this state.
      ~SceneState();
@@ -34,6 +35,9 @@ public:
 
      /// Gets the rendering option.
      bool get_rendering() const;
+
+     /// Gets view of the state.
+     View& get_view();
 
      /// Gets reference to the root quadrant.
      Quadrant& get_root_quadrant();
@@ -60,6 +64,7 @@ public:
 protected:
      Quadrant root_;                ///< root quadrant of scene state.
      std::set< Node * > nodes_;     ///< set of this state's direct children nodes.
+     View view_;                    ///< view of the state.
 
 private:
      bool updating_;                ///< set if this state will be rendered in game loop.

@@ -45,6 +45,10 @@ public:
      /// @param state pointer to scene state.
      void register_state( int order, std::unique_ptr< SceneState >&& state );
 
+     /// Gets the scene state with given order, throws exception if no such state.
+     /// @param order order of the state.
+     SceneState& get_state( int order ) const;
+
      /// Gets pointer to node by name, returns nullptr if no such name.
      /// @param name name of the node.
      Node* get_node( const std::string& name ) const;

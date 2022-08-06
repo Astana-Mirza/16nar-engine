@@ -5,18 +5,28 @@
 
 #include <set>
 #include <string>
+#include <unordered_map>
+#include <memory>
 
+#include <constructor/animations/animation.h>
 #include <abstract/transformable.h>
 #include <abstract/signallable.h>
 
 namespace _16nar
 {
 
+class Animation;
+
 /// Abstract base class for all nodes in the engine.
 class ENGINE_API Node : public Signallable, public Transformable
 {
 public:
+     using AnimationMap = std::unordered_map< std::string, std::unique_ptr< Animation > >;
      friend class WorldNode;
+
+     Node()              = default;
+     Node( const Node& ) = delete;
+     Node( Node&& )      = delete;
 
      /// Virtual destructor, which deletes node's name and children.
      virtual ~Node();
@@ -42,6 +52,19 @@ public:
      /// @param delta time since last update, in seconds.
      virtual void loop_call( bool upd, float delta );
 
+     /// Adds an animation to this node.
+     /// @param name name of the animation.
+     /// @param anim pointer to the animation.
+     void add_animation( const std::string& name, std::unique_ptr< Animation >&& anim );
+
+     /// Deletes animation with given name.
+     /// @param name name of the animation.
+     void delete_animation( const std::string& name );
+
+     /// Gets animation with given name, nullptr if no animation with given name.
+     /// @param name name of the animation.
+     Animation *get_animation( const std::string& name ) const;
+
 protected:
      /// Function to be executed at scene startup.
      virtual void setup();
@@ -51,7 +74,6 @@ protected:
      virtual void loop( float delta );
 
 private:
-
      /// Adds child to set of children.
      /// @param child pointer to new child node.
      void add_child( Node *child );
@@ -60,6 +82,10 @@ private:
      /// @param child pointer to the child to be removed.
      void remove_child( Node *child );
 
+protected:
+     AnimationMap animations_;               ///< all animations of this node.
+
+private:
      std::set< Node * > children_;           ///< set of this node's children.
      std::string *name_ptr_  = nullptr;      ///< pointer to this node's name.
      Node *parent_           = nullptr;      ///< pointer to this node's parent node.

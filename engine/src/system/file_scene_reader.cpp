@@ -4,6 +4,8 @@
 
 #include <constructor/node_2d.h>
 #include <constructor/sprite_node.h>
+#include <constructor/sound_node.h>
+#include <constructor/text_node.h>
 
 namespace _16nar
 {
@@ -18,7 +20,8 @@ void FileSceneReader::load_scene( WorldNode& world,
                                   WorldNode::SetupFuncPtr& setup_ptr,
                                   WorldNode::LoopFuncPtr& loop_ptr )
 {
-     SceneHeader hdr;
+     IOGuard guard( file_stream_, std::ios_base::badbit | std::ios_base::failbit | std::ios_base::eofbit );
+     SceneHeader hdr{};
      file_stream_.read( reinterpret_cast< char * >( &hdr ), sizeof( SceneHeader ) );
 
      auto states = std::make_unique< StateInfo[] >( hdr.state_count );
@@ -31,7 +34,9 @@ void FileSceneReader::load_scene( WorldNode& world,
      file_stream_.seekg( hdr.sections.tree_off );
      for ( uint32_t i = 0; i < hdr.state_count; i++ )
      {
-          auto state_ptr = std::make_unique< SceneState >( states[ i ].updating, states[ i ].rendering );
+          FloatRect rect{ states[ i ].view_rect_pos[ 0 ], states[ i ].view_rect_pos[ 1 ],
+                          states[ i ].view_rect_size[ 0 ], states[ i ].view_rect_size[ 1 ] };
+          auto state_ptr = std::make_unique< SceneState >( rect, states[ i ].updating, states[ i ].rendering );
 
           FloatRect area( { states[ i ].q_start[ 0 ], states[ i ].q_start[ 1 ],
                     states[ i ].scene_size[ 0 ] * states[ i ].q_size[ 0 ],
@@ -71,7 +76,7 @@ void FileSceneReader::load_resources( const std::string& filename, uint16_t file
                                       uint16_t res_count, std::shared_ptr< uint16_t[] > res_ids )
 {
      std::ifstream res_file;
-     ResourceFileHeader hdr;
+     ResourceFileHeader hdr{};
      res_file.open( filename, std::ios::in | std::ios::binary );
      res_file.read( reinterpret_cast< char * >( &hdr ), sizeof( ResourceFileHeader ) );
 
@@ -82,7 +87,7 @@ void FileSceneReader::load_resources( const std::string& filename, uint16_t file
      {
           auto raw = std::make_unique< char[] >(signs[res_ids[i]].size);
           res_file.seekg( signs[ res_ids[ i ] ].offset );
-          res_file.read( reinterpret_cast< char * >( raw.get() ), signs[ res_ids[ i ] ].size);
+          res_file.read( reinterpret_cast< char * >( raw.get() ), signs[ res_ids[ i ] ].size );
           switch ( signs[ res_ids[ i ] ].type )
           {
                case ResourceType::Texture:
@@ -91,13 +96,33 @@ void FileSceneReader::load_resources( const std::string& filename, uint16_t file
                     if ( !textures_[ { file_id, res_ids[ i ] } ]
                          .loadFromMemory( raw.get(), signs[ res_ids[ i ] ].size ) )
                     {
-                         throw std::runtime_error{ "cannot load resource from file " + filename };
+                         throw std::runtime_error{ "cannot load texture from file " + filename };
                     }
 			}
 			break;
+               case ResourceType::Sound:
+               {
+                    sounds_[ { file_id, res_ids[ i ] } ] = SoundBuffer{};
+                    if ( !sounds_[ { file_id, res_ids[ i ] } ]
+                         .loadFromMemory( raw.get(), signs[ res_ids[ i ] ].size ) )
+                    {
+                         throw std::runtime_error{ "cannot load sound buffer from file " + filename };
+                    }
+               }
+               break;
+               case ResourceType::Font:
+               {
+                    fonts_[ { file_id, res_ids[ i ] } ] = Font{};
+                    if ( !fonts_[ { file_id, res_ids[ i ] } ]
+                         .loadFromMemory( raw.get(), signs[ res_ids[ i ] ].size ) )
+                    {
+                         throw std::runtime_error{ "cannot load font from file " + filename };
+                    }
+               }
+               break;
 			default:
                     throw std::runtime_error{ "unknown resource type in file " + filename };
-                    break;
+               break;
           }
      }
 }
@@ -176,9 +201,9 @@ void FileSceneReader::make_quadrants( Quadrant& parent, const Vector2f& start,
           uint32_t new_wcount = ( current_wcount + 1 ) / 2;
           uint32_t new_hcount = ( current_hcount + 1 ) / 2;
           uint32_t enlarge = 0;
-          for ( uint32_t i = 0; i < current_hcount; i += 2 )
+          for ( size_t i = 0; i < current_hcount; i += 2 )
           {
-               for ( uint32_t j = 0; j < current_wcount; j += 2 )
+               for ( size_t j = 0; j < current_wcount; j += 2 )
                {
                     Quadrant *bigger = new Quadrant( FloatRect{ start.x + x * q_width *  ( 2 << enlarge ),
                                                                 start.y + y * q_height * ( 2 << enlarge ),
@@ -234,19 +259,82 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
           case NodeType::SpriteNode:
           {
                SpriteNode* sp_node = nullptr;
+               IntRect texture_rect{ info.sprite_inf.rect_coords[ 0 ], info.sprite_inf.rect_coords[ 1 ],
+                                     info.sprite_inf.rect_size[ 0 ], info.sprite_inf.rect_size[ 1 ] };
                if ( 0 != info.creator_name_off )
                {
                     void *func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
-                    auto creator = static_cast< SpriteNode *( * )( Quadrant *, const Texture& ) >( func );
-                    sp_node = creator( &quad, textures_.at( info.sprite_inf.res ) );
+                    auto creator = static_cast< SpriteNode *( * )( Quadrant *, const Texture&, const IntRect& ) >( func );
+                    sp_node = creator( &quad, textures_.at( info.sprite_inf.res ), texture_rect );
                }
                else
                {
-                    sp_node = new SpriteNode( &quad, textures_.at( info.sprite_inf.res ) );
+                    if ( texture_rect.height == 0 || texture_rect.width == 0 )
+                    {
+                         sp_node = new SpriteNode( &quad, textures_.at( info.sprite_inf.res ) );
+                    }
+                    else
+                    {
+                         sp_node = new SpriteNode( &quad, textures_.at( info.sprite_inf.res ), texture_rect );
+                    }
                }
                sp_node->set_layer( info.sprite_inf.layer );
                sp_node->set_visible( info.sprite_inf.visible );
+               sp_node->set_color( Color( info.sprite_inf.color ) );
                node = sp_node;
+          }
+          break;
+          case NodeType::SoundNode:
+          {
+               SoundNode* so_node = nullptr;
+               if ( 0 != info.creator_name_off )
+               {
+                    void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
+                    auto creator = static_cast< SoundNode *( * )( const SoundBuffer& ) >( func );
+                    so_node = creator( sounds_.at( info.sound_inf.res ) );
+               }
+               else
+               {
+                    so_node = new SoundNode( sounds_.at( info.sound_inf.res ) );
+               }
+               so_node->set_attenuation( info.sound_inf.attenuation );
+               so_node->set_loop( info.sound_inf.loop );
+               so_node->set_min_distance( info.sound_inf.min_distance );
+               so_node->set_offset( info.sound_inf.offset );
+               so_node->set_pitch( info.sound_inf.pitch );
+               so_node->set_relative_to_listener( info.sound_inf.relative_to_listener );
+               so_node->set_volume( info.sound_inf.volume );
+               so_node->set_z( info.sound_inf.z_coord );
+               node = so_node;
+          }
+          break;
+          case NodeType::TextNode:
+          {
+               TextNode* t_node = nullptr;
+               if ( 0 != info.creator_name_off )
+               {
+                    void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
+                    auto creator = static_cast< TextNode *( * )( Quadrant *,const std::string&,
+                                                                 const Font&, uint32_t ) >( func );
+                    t_node = creator( &quad, read_string( info.text_inf.string_offset ),
+                                      fonts_.at( info.text_inf.res ),
+                                      info.text_inf.char_size );
+               }
+               else
+               {
+                    t_node = new TextNode( &quad, read_string( info.text_inf.string_offset ),
+                                           fonts_.at( info.text_inf.res ),
+                                           info.text_inf.char_size );
+               }
+               t_node->set_layer( info.text_inf.layer );
+               t_node->set_visible( info.text_inf.visible );
+               t_node->set_color( Color( info.text_inf.color ) );
+               t_node->set_style( info.text_inf.style );
+               t_node->set_outline_color( Color{ info.text_inf.outline_color } );
+               t_node->set_outline_thickness( info.text_inf.outline_thickness );
+               t_node->set_line_spacing( info.text_inf.line_spacing );
+               t_node->set_letter_spacing( info.text_inf.letter_spacing );
+               node = t_node;
           }
           break;
           case NodeType::Node2D:

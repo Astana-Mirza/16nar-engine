@@ -2,9 +2,8 @@
 
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <QDebug>
 
-Compiler::Compiler( const QString& input_file ) : str_pos_{ 0 }
+Compiler::Compiler( const QString& input_file ) : data_pos_{ 0 }
 {
      QFile file( input_file );
 
@@ -22,12 +21,26 @@ Compiler::Compiler( const QString& input_file ) : str_pos_{ 0 }
 }
 
 
+template <>
+uint32_t Compiler::save_data< QString >( const QString& data )
+{
+     if ( data.isEmpty() )
+     {
+          return 0;
+     }
+     uint32_t ret = data_pos_;
+     data_.emplace_back( new SceneData< QString >( data ) );
+     data_pos_ += data_.constLast()->size();
+     return ret;
+}
+
+
 void Compiler::compile_package( const QString& output_file )
 {
      out_file_.setFileName( output_file );
      out_file_.open( QIODevice::WriteOnly );
 
-     _16nar::ResourceFileHeader hdr;
+     _16nar::ResourceFileHeader hdr{};
      QJsonArray resources = main_object_[ "resources" ].toArray();
      hdr.res_count = resources.size();
 
@@ -37,7 +50,7 @@ void Compiler::compile_package( const QString& output_file )
      for ( const auto& res : resources )
      {
           QJsonObject json = res.toObject();
-          _16nar::ResourceSign info;
+          _16nar::ResourceSign info{};
           QString type = json[ "type" ].toString();
           info.offset = res_offset;
           info.size = QFile( json[ "file" ].toString() ).size();
@@ -49,6 +62,10 @@ void Compiler::compile_package( const QString& output_file )
           else if ( type == "Sound" )
           {
                info.type = _16nar::ResourceType::Sound;
+          }
+          else if ( type == "Font" )
+          {
+               info.type = _16nar::ResourceType::Font;
           }
           out_file_.write( reinterpret_cast< char * >( &info ), sizeof( info ) );
           res_offset += info.size;
@@ -72,15 +89,15 @@ void Compiler::compile_package( const QString& output_file )
 
 void Compiler::compile_scene( const QString& output_file )
 {
-     _16nar::SceneHeader hdr;
+     _16nar::SceneHeader hdr{};
      hdr.main_code_file = main_object_[ "main_code_file" ].toInt();
      hdr.code_file_count = main_object_[ "code_files" ].toArray().size();
      hdr.resource_file_count = main_object_[ "resource_packages" ].toArray().size();
      hdr.state_count = main_object_[ "states" ].toArray().size();
 
      count_offsets( hdr );
-     hdr.setup_off = save_string( main_object_[ "setup_func" ].toString() );
-     hdr.loop_off = save_string( main_object_[ "loop_func" ].toString() );
+     hdr.setup_off = save_data( main_object_[ "setup_func" ].toString() );
+     hdr.loop_off = save_data( main_object_[ "loop_func" ].toString() );
 
      out_file_.setFileName( output_file );
      out_file_.open( QIODevice::WriteOnly );
@@ -90,7 +107,7 @@ void Compiler::compile_scene( const QString& output_file )
      write_nodes();
      write_code_files();
      write_resources();
-     write_strings();
+     write_data();
 
      out_file_.close();
 }
@@ -122,7 +139,7 @@ void Compiler::count_offsets( _16nar::SceneHeader& hdr )
           offset += static_cast< uint32_t >( package.toObject()[ "resources" ].toArray().size() * sizeof( uint16_t ) );
      }
 
-     str_pos_ = offset;
+     data_pos_ = offset;
 }
 
 
@@ -131,7 +148,7 @@ void Compiler::write_states()
      QJsonArray state_infos = main_object_[ "states" ].toArray();
      for ( const auto& state : state_infos )
      {
-          _16nar::StateInfo info;
+          _16nar::StateInfo info{};
           QJsonObject json = state.toObject();
           info.q_start[ 0 ] = json[ "q_start" ].toArray()[ 0 ].toDouble();
           info.q_start[ 1 ] = json[ "q_start" ].toArray()[ 1 ].toDouble();
@@ -139,6 +156,10 @@ void Compiler::write_states()
           info.gravity_vec[ 1 ] = json[ "gravity_vec" ].toArray()[ 1 ].toDouble();
           info.q_size[ 0 ] = json[ "q_size" ].toArray()[ 0 ].toDouble();
           info.q_size[ 1 ] = json[ "q_size" ].toArray()[ 1 ].toDouble();
+          info.view_rect_pos[ 0 ] = json[ "view_rect_pos" ].toArray()[ 0 ].toDouble();
+          info.view_rect_pos[ 1 ] = json[ "view_rect_pos" ].toArray()[ 1 ].toDouble();
+          info.view_rect_size[ 0 ] = json[ "view_rect_size" ].toArray()[ 0 ].toDouble();
+          info.view_rect_size[ 1 ] = json[ "view_rect_size" ].toArray()[ 1 ].toDouble();
           info.pixels_per_meter = json[ "pixels_per_meter" ].toDouble();
           info.scene_size[ 0 ] = json[ "scene_size" ].toArray()[ 0 ].toInt();
           info.scene_size[ 1 ] = json[ "scene_size" ].toArray()[ 1 ].toInt();
@@ -161,12 +182,12 @@ void Compiler::write_nodes()
           QJsonArray node_array = state.toObject()[ "nodes" ].toArray();
           for ( const auto& node : node_array )
           {
-               _16nar::NodeInfo info;
+               _16nar::NodeInfo info{};
                QJsonObject json = node.toObject();
                qint64 parent_index = json[ "parent" ].toInteger();
                info.parent = parent_index == -1 ? 0 : static_cast< uint32_t >( state_subtree_start +
                                                       parent_index * sizeof( _16nar::NodeInfo ) );
-               info.name_off = save_string( json[ "name" ].toString() );
+               info.name_off = save_data( json[ "name" ].toString() );
                info.pos[ 0 ] = json[ "pos" ].toArray()[ 0 ].toDouble();
                info.pos[ 1 ] = json[ "pos" ].toArray()[ 1 ].toDouble();
                info.scale[ 0 ] = json[ "scale" ].toArray()[ 0 ].toDouble();
@@ -175,7 +196,7 @@ void Compiler::write_nodes()
                info.origin[ 1 ] = json[ "origin" ].toArray()[ 1 ].toDouble();
                info.rotation = json[ "rotation" ].toDouble();
                info.code_file_num = json[ "code_file_num" ].toInt();
-               info.creator_name_off = save_string( json[ "creator_name" ].toString() );
+               info.creator_name_off = save_data( json[ "creator_name" ].toString() );
                fill_node_by_type( info, json );
 
                out_file_.write( reinterpret_cast< char * >( &info ), sizeof( info ) );
@@ -189,7 +210,7 @@ void Compiler::write_code_files()
      QJsonArray code_files = main_object_[ "code_files" ].toArray();
      for ( const auto& filename : code_files )
      {
-          uint32_t offset = save_string( filename.toString() );
+          uint32_t offset = save_data( filename.toString() );
           out_file_.write( reinterpret_cast< char * >( &offset ), sizeof( uint32_t ) );
      }
 }
@@ -202,9 +223,9 @@ void Compiler::write_resources()
                                  package_infos.size() * sizeof( _16nar::ResourceTableEntry ) );
      for ( const auto& package : package_infos )
      {
-          _16nar::ResourceTableEntry info;
+          _16nar::ResourceTableEntry info{};
           QJsonObject json = package.toObject();
-          info.filename_off = save_string( json[ "filename" ].toString() );
+          info.filename_off = save_data( json[ "filename" ].toString() );
           info.res_array_off = res_array_offset;
           info.res_count = json[ "resources" ].toArray().size();
           info.file_id = json[ "file_id" ].toInt();
@@ -237,30 +258,52 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
           info.node_type = _16nar::NodeType::SpriteNode;
           info.sprite_inf.res.file_id = json[ "res" ].toArray()[ 0 ].toInt();
           info.sprite_inf.res.rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
+          info.sprite_inf.color = json[ "color" ].toString().toUInt( nullptr, 16 );        // number in hex
           info.sprite_inf.layer = json[ "layer" ].toInt();
           info.sprite_inf.visible = json[ "visible" ].toBool();
+          info.sprite_inf.rect_coords[ 0 ] = json[ "rect_coords" ].toArray()[ 0 ].toInt();
+          info.sprite_inf.rect_coords[ 1 ] = json[ "rect_coords" ].toArray()[ 1 ].toInt();
+          info.sprite_inf.rect_size[ 0 ] = json[ "rect_size" ].toArray()[ 0 ].toInt();
+          info.sprite_inf.rect_size[ 1 ] = json[ "rect_size" ].toArray()[ 1 ].toInt();
      }
-}
-
-
-void Compiler::write_strings()
-{
-     for ( const QString& str : strings_ )
+     else if ( type == "SoundNode" )
      {
-          out_file_.write( str.toStdString().data(), str.size() );
-          out_file_.putChar( '\0' );
+          info.node_type = _16nar::NodeType::SoundNode;
+          info.sound_inf.res.file_id = json[ "res" ].toArray()[ 0 ].toInt();
+          info.sound_inf.res.rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
+          info.sound_inf.z_coord = json[ "z_coord" ].toDouble();
+          info.sound_inf.offset = json[ "offset" ].toDouble();
+          info.sound_inf.min_distance = json[ "min_distance" ].toDouble();
+          info.sound_inf.volume = json[ "volume" ].toDouble();
+          info.sound_inf.pitch = json[ "pitch" ].toDouble();
+          info.sound_inf.attenuation = json[ "attenuation" ].toDouble();
+          info.sound_inf.relative_to_listener = json[ "relative_to_listener" ].toBool();
+          info.sound_inf.loop = json[ "loop" ].toBool();
      }
-}
-
-
-uint32_t Compiler::save_string( const QString& str )
-{
-     if ( str.isEmpty() )
+     else if ( type == "TextNode" )
      {
-          return 0;
+          info.node_type = _16nar::NodeType::TextNode;
+          info.text_inf.res.file_id = json[ "res" ].toArray()[ 0 ].toInt();
+          info.text_inf.res.rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
+          info.text_inf.color = json[ "color" ].toString().toUInt( nullptr, 16 );        // number in hex
+          info.text_inf.layer = json[ "layer" ].toInt();
+          info.text_inf.visible = json[ "visible" ].toBool();
+          info.text_inf.string_offset = save_data( json[ "string" ].toString() );
+          info.text_inf.char_size = json[ "char_size" ].toInt();
+          info.text_inf.style = json[ "style" ].toInt();
+          info.text_inf.outline_color = json[ "outline_color" ].toString().toUInt( nullptr, 16 ); // number in hex
+          info.text_inf.outline_thickness = json[ "outline_thickness" ].toDouble();
+          info.text_inf.line_spacing = json[ "line_spacing" ].toDouble();
+          info.text_inf.letter_spacing = json[ "letter_spacing" ].toDouble();
      }
-     uint32_t ret = str_pos_;
-     strings_.append( str + '\n' );
-     str_pos_ += str.size() + 2;        // + 2 for \n and \0 characters
-     return ret;
 }
+
+
+void Compiler::write_data()
+{
+     for ( const auto& ptr : data_ )
+     {
+          ptr->write_binary( out_file_ );
+     }
+}
+

@@ -3,8 +3,8 @@
 namespace _16nar
 {
 
-SceneState::SceneState( bool updating, bool rendering ):
-     updating_{ updating }, rendering_{ rendering } {}
+SceneState::SceneState( const FloatRect& view_rect, bool updating, bool rendering ):
+     view_{ view_rect }, updating_{ updating }, rendering_{ rendering } {}
 
 
 SceneState::~SceneState()
@@ -37,6 +37,12 @@ bool SceneState::get_updating() const
 bool SceneState::get_rendering() const
 {
      return rendering_;
+}
+
+
+View& SceneState::get_view()
+{
+     return view_;
 }
 
 
@@ -78,7 +84,9 @@ void SceneState::loop( float delta )
 
 void SceneState::render( RenderTarget& target )
 {
-     root_.draw( target, RenderStates::Default );
+     RenderStates states = RenderStates::Default;
+     target.setView( view_ );
+     root_.draw( target, states );
 }
 
 } // namespace _16nar

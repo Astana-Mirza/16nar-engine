@@ -56,7 +56,7 @@ public:
      /// Draw all visible objects that intersect with the area of the target.
      /// @param target target where objects should be rendered.
      /// @param states options for rendering.
-     void draw( RenderTarget& target, RenderStates states ) const;
+     void draw( RenderTarget& target, RenderStates& states ) const;
 
 private:
      /// Recursively find objects in this quadrant, which intersect with given area.

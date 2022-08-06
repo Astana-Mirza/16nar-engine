@@ -35,6 +35,18 @@ public:
                       WorldNode::LoopFuncPtr& loop_ptr );
 
 private:
+     /// RAII wrapper for stream exceptions.
+     struct IOGuard
+     {
+          std::istream& s;
+          std::ios_base::iostate old_exceptions = s.exceptions();
+          IOGuard( std::istream& ss, std::ios_base::iostate e ) : s{ ss }
+          {
+               s.exceptions( s.exceptions() | e );
+          }
+          ~IOGuard() { s.exceptions( old_exceptions ); }
+     };
+
      /// Loads all resource packages for the scene.
      /// @param hdr scene header structure.
      void load_packages( const SceneHeader& hdr );
@@ -91,6 +103,8 @@ private:
      std::ifstream file_stream_;                            ///< input stream associated with scene file.
      std::map< uint32_t, Node * > node_offsets_;            ///< offsets of nodes' records and pointers to their nodes.
      std::map< ResourceID, Texture > textures_;             ///< textures with their IDs.
+     std::map< ResourceID, SoundBuffer > sounds_;           ///< sound buffers with their IDs.
+     std::map< ResourceID, Font > fonts_;                   ///< fonts with their IDs.
      std::vector< DynamicLib > libs_;                       ///< dynamic libraries with code for the scene.
 };
 

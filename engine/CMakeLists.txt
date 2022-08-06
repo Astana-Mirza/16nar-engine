@@ -55,15 +55,15 @@ if (USE_SFML)
 		set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} opengl32 winmm gdi32)
 		if (SFML_STATIC)
 			if (${CMAKE_BUILD_TYPE} STREQUAL Debug)
-				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-s-d sfml-graphics-s-d sfml-window-s-d)
+				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-s-d sfml-graphics-s-d sfml-window-s-d sfml-audio-s-d)
 			elseif(${CMAKE_BUILD_TYPE} STREQUAL Release)
-				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-s sfml-graphics-s sfml-window-s)
+				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-s sfml-graphics-s sfml-window-s sfml-audio-s)
 			endif()
 		else()
 			if (${CMAKE_BUILD_TYPE} STREQUAL Debug)
-				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-d sfml-graphics-d sfml-window-d)
+				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system-d sfml-graphics-d sfml-window-d sfml-audio-d)
 			elseif(${CMAKE_BUILD_TYPE} STREQUAL Release)
-				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system sfml-graphics sfml-window)
+				set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system sfml-graphics sfml-window sfml-audio)
 			endif()
 		endif()
 	endif() # if (WIN32)
@@ -78,8 +78,11 @@ add_library(engine
 	${SRC_DIR}/constructor/abstract/drawable_node.cpp
 	${SRC_DIR}/constructor/abstract/node.cpp
 	${SRC_DIR}/constructor/states/scene_state.cpp
+	${SRC_DIR}/constructor/animations/animation.cpp
 	${SRC_DIR}/constructor/node_2d.cpp
 	${SRC_DIR}/constructor/sprite_node.cpp
+	${SRC_DIR}/constructor/sound_node.cpp
+	${SRC_DIR}/constructor/text_node.cpp
 	${SRC_DIR}/constructor/world_node.cpp
 	${SRC_DIR}/render/quadrant.cpp
 	${SRC_DIR}/system/dynamic_lib.cpp

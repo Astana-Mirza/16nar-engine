@@ -41,6 +41,7 @@ void Game::run()
           if ( current_task_ == TaskType::Loading )
           {
                world_.load( *scene_reader_ );
+               world_.setup();
                current_task_ = TaskType::Running;
                prev_time = clock.now();
           }

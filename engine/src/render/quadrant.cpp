@@ -79,7 +79,7 @@ void Quadrant::find_objects( RenderTarget& target, IntRect area, LayerMap& layer
 }
 
 
-void Quadrant::draw( RenderTarget& target, RenderStates states ) const
+void Quadrant::draw( RenderTarget& target, RenderStates& states ) const
 {
      LayerMap layers;
      find_objects( target, target.getViewport( target.getView() ), layers );

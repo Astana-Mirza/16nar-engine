@@ -12,6 +12,8 @@ namespace _16nar
 class ENGINE_API Drawable : public DrawableBase
 {
 public:
+     virtual ~Drawable() = default;
+
      /// Checks if the object is visible.
      bool is_visible() const;
 
@@ -26,7 +28,15 @@ public:
      /// @param layer scene layer.
      void set_layer( int layer );
 
-     virtual ~Drawable() = default;
+     /// Sets color of an object.
+     /// @param color color of an object
+     virtual void set_color( const Color& color ) = 0;
+
+     /// Gets color of an object.
+     virtual const Color& get_color() const = 0;
+
+     /// Gets local bounds of an object (in its own coordinates).
+     virtual FloatRect get_local_bounds() const = 0;
 
 private:
      int layer_ = 0;               ///< scene layer.

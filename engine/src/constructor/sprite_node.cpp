@@ -19,6 +19,48 @@ void SpriteNode::draw( RenderTarget& target, RenderStates states ) const
 }
 
 
+void SpriteNode::set_texture( const Texture& texture, bool reset_rect )
+{
+     sprite_.setTexture( texture, reset_rect );
+}
+
+
+void SpriteNode::set_texture_rect( const IntRect& rect )
+{
+     sprite_.setTextureRect( rect );
+}
+
+
+void SpriteNode::set_color( const Color& color )
+{
+     sprite_.setColor( color );
+}
+
+
+const Color& SpriteNode::get_color() const
+{
+     return sprite_.getColor();
+}
+
+
+FloatRect SpriteNode::get_local_bounds() const
+{
+     return sprite_.getLocalBounds();
+}
+
+
+const Texture *SpriteNode::get_texture() const
+{
+     return sprite_.getTexture();
+}
+
+
+const IntRect& SpriteNode::get_texture_rect() const
+{
+     return sprite_.getTextureRect();
+}
+
+
 const Vector2f& SpriteNode::get_position() const
 {
      return sprite_.getPosition();
@@ -136,19 +178,6 @@ void SpriteNode::scale( const Vector2f& factor )
 {
      sprite_.scale( factor );
      transformed_ = true;
-}
-
-
-bool SpriteNode::check_quadrant( const Quadrant *quad ) const
-{
-     auto transform = get_global_transform_matr();
-     auto rect = transform.transformRect( sprite_.getLocalBounds() );
-     if ( quad->get_area().contains( rect.left, rect.top ) &&
-          quad->get_area().contains( rect.left + rect.width - 1, rect.top + rect.height - 1 ) )
-     {
-          return true;
-     }
-     return false;
 }
 
 #endif // #ifdef USE_SFML

@@ -4,10 +4,12 @@
 #define _16NAR_COMPILER_H
 
 #include <scene_file.h>
+#include <scene_data.h>
 
 #include <QJsonObject>
 #include <QFile>
 #include <QList>
+#include <QSharedPointer>
 
 /// Class for main functionality of scene compiler.
 class Compiler
@@ -16,6 +18,8 @@ public:
      /// Constructor.
      /// @param input_file path to the input JSON file
      Compiler( const QString& input_file );
+
+     Compiler( const Compiler& ) = delete;
 
      /// Make a resource package.
      /// @param output_file path to output file.
@@ -42,23 +46,38 @@ private:
      /// Write all scene resources information to file.
      void write_resources();
 
-     /// Write all strings information to file.
-     void write_strings();
+     /// Write all data to file.
+     void write_data();
 
      /// Fills node information structure using given JSON object.
      /// @param info node information structure.
      /// @param json JSON object with node information.
      void fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json );
 
-     /// Save string which will be written to the file.
-     /// @param str string to be saved.
-     /// @return offset of string in file.
-     uint32_t save_string( const QString& str );
+     /// Saves data which will be written to the file.
+     /// @param data data to be saved.
+     /// @return offset of data in file.
+     template < typename T >
+     uint32_t save_data( const T& data );
 
-     QJsonObject main_object_;          ///< object that is read from input file.
-     QFile out_file_;                   ///< compiled object file.
-     QList< QString > strings_;         ///< all strings that will be saved to file, in proper order.
-     uint32_t str_pos_;                 ///< offset of the next strig to be written.
+     QJsonObject main_object_;                    ///< object that is read from input file.
+     QFile out_file_;                             ///< compiled object file.
+     QList< QSharedPointer< BaseData > > data_;   ///< all data that will be saved to file, in proper order.
+     uint32_t data_pos_;                          ///< offset of the next data structure to be written.
 };
+
+
+template < typename T >
+uint32_t Compiler::save_data( const T& data )
+{
+     uint32_t ret = data_pos_;
+     data_.emplace_back( new SceneData< T >( data ) );
+     data_pos_ += data_.constLast()->size();
+     return ret;
+}
+
+
+template <>
+uint32_t Compiler::save_data< QString >( const QString& data );
 
 #endif // #ifndef _16NAR_COMPILER_H

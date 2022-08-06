@@ -57,6 +57,12 @@ void WorldNode::register_state( int order, std::unique_ptr< SceneState >&& state
 }
 
 
+SceneState& WorldNode::get_state( int order ) const
+{
+     return *states_.at( order );
+}
+
+
 Node* WorldNode::get_node( const std::string& name ) const
 {
      auto iter = node_names_.find( name );

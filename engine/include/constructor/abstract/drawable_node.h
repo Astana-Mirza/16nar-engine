@@ -34,10 +34,12 @@ protected:
      /// @param delta time since last update, in seconds.
      void loop_call( bool update, float delta );
 
+private:
      /// Check if this node fits in specified quadrant.
      /// @param quad pointer to quadrant to be checked.
-     virtual bool check_quadrant( const Quadrant *quad ) const = 0;
+     bool check_quadrant( const Quadrant *quad ) const;
 
+protected:
      Quadrant *quad_;         ///< pointer to quadrant, in which this node is located.
 };
 

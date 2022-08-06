@@ -1,7 +1,7 @@
-#include <stdexcept>
-
 #include <constructor/abstract/node.h>
+
 #include <game.h>
+#include <stdexcept>
 
 namespace _16nar
 {
@@ -34,6 +34,10 @@ void Node::loop( float delta )
 void Node::loop_call( bool update, float delta )
 {
      loop( delta );
+     for ( auto& [name, anim] : animations_ )
+     {
+          anim->advance( delta );
+     }
      update = update || transformed_;
      transformed_ = false;
      for ( auto child : get_children() )
@@ -46,6 +50,10 @@ void Node::loop_call( bool update, float delta )
 void Node::setup_call()
 {
      setup();
+     for ( auto& [ name, anim ] : animations_ )
+     {
+          anim->start();
+     }
      for ( auto child : children_ )
      {
           child->setup_call();
@@ -100,6 +108,29 @@ TransformMatrix Node::get_global_transform_matr() const
           transform = n->get_transform_matr() * transform;
      }
      return transform;
+}
+
+
+void Node::add_animation( const std::string& name, std::unique_ptr< Animation >&& anim )
+{
+     animations_[ name ] = std::move( anim );
+}
+
+
+void Node::delete_animation( const std::string& name )
+{
+     animations_.erase( name );
+}
+
+
+Animation *Node::get_animation( const std::string& name ) const
+{
+     auto it = animations_.find( name );
+     if ( it != animations_.cend() )
+     {
+          return ( it->second ).get();
+     }
+     return nullptr;
 }
 
 } // namespace _16nar

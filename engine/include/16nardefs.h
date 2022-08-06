@@ -6,8 +6,9 @@
 #include <16narconfig.h>
 
 #ifdef USE_SFML
-#    define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
+#    include <SFML/GpuPreference.hpp>
 #    include <SFML/Graphics.hpp>
+#    include <SFML/Audio.hpp>
 #endif
 
 
@@ -39,12 +40,19 @@ using sf::FloatRect;
 using sf::RenderTarget;
 using sf::RenderStates;
 using sf::RenderWindow;
+using sf::View;
+using sf::Color;
 using sf::Sprite;
 using sf::Texture;
+using sf::Text;
+using sf::Font;
 using sf::Keyboard;
 using sf::Mouse;
 using sf::Joystick;
 using sf::Event;
+using sf::SoundBuffer;
+using sf::Sound;
+using sf::Listener;
 
 #endif // #ifdef USE_SFML
 
