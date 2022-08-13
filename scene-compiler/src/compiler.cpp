@@ -29,7 +29,7 @@ uint32_t Compiler::save_data< QString >( const QString& data )
           return 0;
      }
      uint32_t ret = data_pos_;
-     data_.emplace_back( new SceneData< QString >( data ) );
+     data_.push_back( QSharedPointer< BaseData >{ new SceneData< QString >( data ) } );
      data_pos_ += data_.constLast()->size();
      return ret;
 }
@@ -184,7 +184,7 @@ void Compiler::write_nodes()
           {
                _16nar::NodeInfo info{};
                QJsonObject json = node.toObject();
-               qint64 parent_index = json[ "parent" ].toInteger();
+               qint64 parent_index = json[ "parent" ].toInt();
                info.parent = parent_index == -1 ? 0 : static_cast< uint32_t >( state_subtree_start +
                                                       parent_index * sizeof( _16nar::NodeInfo ) );
                info.name_off = save_data( json[ "name" ].toString() );
@@ -306,4 +306,3 @@ void Compiler::write_data()
           ptr->write_binary( out_file_ );
      }
 }
-

@@ -1,5 +1,6 @@
 */out/*
-bin/*
+*/bin/*
+*/build/*
 .vs/*
 *.user
 CMakeSettings.json

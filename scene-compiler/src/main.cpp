@@ -1,8 +1,17 @@
 #include <QCoreApplication>
 #include <QLocale>
 #include <QTranslator>
+#include <QTextStream>
 
 #include <compiler.h>
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace Qt
+{
+    static auto endl = ::endl;
+    static auto SkipEmptyParts = QString::SkipEmptyParts;
+}
+#endif
 
 void usage( const QString& prog_name )
 {

@@ -264,7 +264,9 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                if ( 0 != info.creator_name_off )
                {
                     void *func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
-                    auto creator = static_cast< SpriteNode *( * )( Quadrant *, const Texture&, const IntRect& ) >( func );
+                    auto creator = reinterpret_cast< SpriteNode *( * )( Quadrant *,
+                                                                        const Texture&,
+                                                                        const IntRect& ) >( func );
                     sp_node = creator( &quad, textures_.at( info.sprite_inf.res ), texture_rect );
                }
                else
@@ -290,7 +292,7 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                if ( 0 != info.creator_name_off )
                {
                     void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
-                    auto creator = static_cast< SoundNode *( * )( const SoundBuffer& ) >( func );
+                    auto creator = reinterpret_cast< SoundNode *( * )( const SoundBuffer& ) >( func );
                     so_node = creator( sounds_.at( info.sound_inf.res ) );
                }
                else
@@ -314,7 +316,7 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                if ( 0 != info.creator_name_off )
                {
                     void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
-                    auto creator = static_cast< TextNode *( * )( Quadrant *,const std::string&,
+                    auto creator = reinterpret_cast< TextNode *( * )( Quadrant *,const std::string&,
                                                                  const Font&, uint32_t ) >( func );
                     t_node = creator( &quad, read_string( info.text_inf.string_offset ),
                                       fonts_.at( info.text_inf.res ),
@@ -342,7 +344,7 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                if ( 0 != info.creator_name_off )
                {
                     void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
-                    auto creator = static_cast< Node2D * ( * )() >( func );
+                    auto creator = reinterpret_cast< Node2D * ( * )() >( func );
                     node = creator();
                }
                else

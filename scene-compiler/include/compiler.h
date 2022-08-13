@@ -71,7 +71,7 @@ template < typename T >
 uint32_t Compiler::save_data( const T& data )
 {
      uint32_t ret = data_pos_;
-     data_.emplace_back( new SceneData< T >( data ) );
+     data_.push_back( { new SceneData< T >( data ) } );
      data_pos_ += data_.constLast()->size();
      return ret;
 }
