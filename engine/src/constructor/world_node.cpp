@@ -4,6 +4,15 @@
 namespace _16nar
 {
 
+void WorldNode::clear()
+{
+     node_names_.clear();
+     states_.clear();
+     setup_func_ = nullptr;
+     loop_func_ = nullptr;
+}
+
+
 void WorldNode::load( SceneReader& reader )
 {
      reader.load_scene( *this, setup_func_, loop_func_ );

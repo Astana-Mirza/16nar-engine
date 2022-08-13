@@ -55,6 +55,7 @@ void Game::run()
           if ( current_task_ == TaskType::Exiting )
           {
                window_.close();
+               world_.clear();
           }
      }
 }

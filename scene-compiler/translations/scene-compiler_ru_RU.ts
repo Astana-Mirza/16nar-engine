@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/compiler.cpp" line="17"/>
         <source>wrong JSON file: </source>
-        <translation type="unfinished"></translation>
+        <translation>неверный файл JSON: </translation>
     </message>
     <message>
         <location filename="../src/compiler.cpp" line="80"/>
@@ -14,32 +14,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="9"/>
+        <location filename="../src/main.cpp" line="18"/>
         <source>Usage:
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="10"/>
+        <location filename="../src/main.cpp" line="19"/>
         <source> OPTION &lt;input_file&gt; &lt;output_file&gt;
 
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="11"/>
+        <location filename="../src/main.cpp" line="20"/>
         <source>Options:
 	-s	compile a scene,
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="12"/>
+        <location filename="../src/main.cpp" line="21"/>
         <source>	-r	compile a resource package.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="57"/>
+        <location filename="../src/main.cpp" line="66"/>
         <source>Error: </source>
         <translation type="unfinished"></translation>
     </message>

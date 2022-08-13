@@ -25,6 +25,9 @@ public:
      using SetupFuncPtr = void ( * )( );
      using LoopFuncPtr = void ( * )( float );
 
+     /// Delete all states and node names.
+     void clear();
+
      /// Load the scene world with reader.
      /// @param reader object that will load the scene.
      void load( SceneReader& reader );
