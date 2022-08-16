@@ -12,7 +12,7 @@ void SoundNode::set_position( float x, float y )
 {
      Node2D::set_position( x, y );
      auto global = get_global_transform_matr().transformPoint( { 0, 0 } );
-     sound_.setPosition( global.x, global.y, get_z() );
+     sound_.setPosition( global.x, -global.y, get_z() );          // make y axis like in graphics.
 }
 
 
@@ -20,7 +20,7 @@ void SoundNode::set_position( const Vector2f& position )
 {
      Node2D::set_position( position );
      auto global = get_global_transform_matr().transformPoint( { 0, 0 } );
-     sound_.setPosition( global.x, global.y, get_z() );
+     sound_.setPosition( global.x, -global.y, get_z() );          // make y axis like in graphics.
 }
 
 
@@ -28,7 +28,7 @@ void SoundNode::move( float offset_x, float offset_y )
 {
      Node2D::move( offset_x, offset_y );
      auto global = get_global_transform_matr().transformPoint( { 0, 0 } );
-     sound_.setPosition( global.x, global.y, get_z() );
+     sound_.setPosition( global.x, -global.y, get_z() );          // make y axis like in graphics.
 }
 
 
@@ -36,7 +36,7 @@ void SoundNode::move( const Vector2f& offset )
 {
      Node2D::move( offset );
      auto global = get_global_transform_matr().transformPoint( { 0, 0 } );
-     sound_.setPosition( global.x, global.y, get_z() );
+     sound_.setPosition( global.x, -global.y, get_z() );          // make y axis like in graphics.
 }
 
 

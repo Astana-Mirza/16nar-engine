@@ -52,7 +52,6 @@ using sf::Joystick;
 using sf::Event;
 using sf::SoundBuffer;
 using sf::Sound;
-using sf::Listener;
 
 #endif // #ifdef USE_SFML
 

@@ -69,6 +69,7 @@ add_library(engine
     ${SRC_DIR}/system/dynamic_lib.cpp
     ${SRC_DIR}/system/file_scene_reader.cpp
     ${SRC_DIR}/system/event_manager.cpp
+    ${SRC_DIR}/system/listener.cpp
 )
 
 target_include_directories(engine PRIVATE ${INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${COMMON_DIR} ${EXTRA_INCLUDE_DIRS})
