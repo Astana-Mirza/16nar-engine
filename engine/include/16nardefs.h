@@ -1,5 +1,5 @@
 /// @file
-/// File with basic definitions, needed by engine.
+/// @brief File with basic definitions, needed by engine.
 #ifndef _16NAR_DEFS_H
 #define _16NAR_DEFS_H
 
@@ -31,7 +31,6 @@ namespace _16nar
 namespace Style = sf::Style;
 
 using Transform = sf::Transformable;
-using DrawableBase = sf::Drawable;
 using TransformMatrix = sf::Transform;
 
 using sf::Vector2f;

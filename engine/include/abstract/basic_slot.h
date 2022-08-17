@@ -1,5 +1,5 @@
 /// @file
-/// Header file with BasicSlot class definition.
+/// @brief Header file with BasicSlot class definition.
 #ifndef _16NAR_BASIC_SLOT_H
 #define _16NAR_BASIC_SLOT_H
 
@@ -8,11 +8,11 @@
 namespace _16nar
 {
 
-/// Abstract base class for signal accepting slot
+/// @brief Abstract base class for signal accepting slot
 class ENGINE_API BasicSlot
 {
 public:
-     /// Accept an emitted signal.
+     /// @brief Accept an emitted signal.
      /// @param sig signal being accepted.
      virtual void accept_signal( const Signal& sig ) = 0;
      virtual ~BasicSlot()                            = default;

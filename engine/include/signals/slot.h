@@ -1,5 +1,5 @@
 /// @file
-/// Header file with Slot template class definition.
+/// @brief Header file with Slot template class definition.
 #ifndef _16NAR_SLOT_H
 #define _16NAR_SLOT_H
 
@@ -8,17 +8,17 @@
 namespace _16nar
 {
 
-/// Class for signal accepting slot with custom handler.
+/// @brief Class for signal accepting slot with custom handler.
 template < typename SignalType, typename Handler >
 class Slot : public BasicSlot
 {
 public:
-     /// Constructor, taking handler.
+     /// @brief Constructor, taking handler.
      /// @param handler Handler of a signal.
      Slot( const Handler& handler ) : handler_{ handler } {}
 
 
-     /// Accept an emitted signal.
+     /// @brief Accept an emitted signal.
      /// @param sig Signal being accepted.
      void accept_signal( const Signal& sig )
      {

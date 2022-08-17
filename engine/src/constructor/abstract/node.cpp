@@ -100,9 +100,9 @@ void Node::remove_child( Node *child )
 }
 
 
-TransformMatrix Node::get_global_transform_matr() const
+TransformMatrix Node::get_global_transform_matr( bool include_local ) const
 {
-     TransformMatrix transform = get_transform_matr();
+     TransformMatrix transform = include_local ? get_transform_matr() : TransformMatrix{};
      for ( const Node *n = get_parent(); n != nullptr; n = n->get_parent() )
      {
           transform = n->get_transform_matr() * transform;

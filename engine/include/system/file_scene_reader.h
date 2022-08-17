@@ -1,5 +1,5 @@
 /// @file
-/// Header file with FileSceneReader class definition.
+/// @brief Header file with FileSceneReader class definition.
 #ifndef _16NAR_FILE_SCENE_READER_H
 #define _16NAR_FILE_SCENE_READER_H
 
@@ -17,16 +17,16 @@
 namespace _16nar
 {
 
-/// Class for reading compiled scene from .nar file.
+/// @brief Class for reading compiled scene from .nar file.
 class ENGINE_API FileSceneReader : public SceneReader
 {
 public:
 
-     /// Set scene file name.
+     /// @brief Set scene file name.
      /// @param name of scene file, absolute or relative to current path.
      void set_scene( const std::string& name );
 
-     /// Loads the scene from source.
+     /// @brief Loads the scene from source.
      /// @world root node in node tree.
      /// @param setup_ptr pointer to the setup function of the scene.
      /// @param loop_ptr pointer to the loop function of the scene.
@@ -35,7 +35,7 @@ public:
                       WorldNode::LoopFuncPtr& loop_ptr );
 
 private:
-     /// RAII wrapper for stream exceptions.
+     /// @brief RAII wrapper for stream exceptions.
      struct IOGuard
      {
           std::istream& s;
@@ -47,11 +47,19 @@ private:
           ~IOGuard() { s.exceptions( old_exceptions ); }
      };
 
-     /// Loads all resource packages for the scene.
+     /// @brief Checks if given resource id is valid.
+     /// @param id resource id to be checked.
+     bool check_resource( ResourceID id )    // inline
+     {
+          return id.file_id != std::numeric_limits< uint16_t >::max()
+              || id.rsrc_id != std::numeric_limits< uint16_t >::max();
+     }
+
+     /// @brief Loads all resource packages for the scene.
      /// @param hdr scene header structure.
      void load_packages( const SceneHeader& hdr );
 
-     /// Loads all needed resources from one package.
+     /// @brief Loads all needed resources from one package.
      /// @param filename name of package file.
      /// @param file_id id of a package in this scene.
      /// @param res_count number of resources needed from the package.
@@ -59,7 +67,7 @@ private:
      void load_resources( const std::string& filename, uint16_t file_id, uint16_t res_count,
                           std::shared_ptr< uint16_t[] > res_ids );
 
-     /// Loads all dynamic libraries and fills the setup and loop function pointers.
+     /// @brief Loads all dynamic libraries and fills the setup and loop function pointers.
      /// @param hdr scene header structure.
      /// @param setup_ptr pointer to the setup function of the scene.
      /// @param loop_ptr pointer to the loop function of the scene.
@@ -67,25 +75,25 @@ private:
                      WorldNode::SetupFuncPtr& setup_ptr,
                      WorldNode::LoopFuncPtr & loop_ptr);
 
-     /// Loads dynamic libraries.
+     /// @brief Loads dynamic libraries.
      /// @param lib_offsets array of offsets of library names.
      /// @param count number of libraries to be loaded.
      void load_libs( std::shared_ptr< uint32_t[] > lib_offsets, uint32_t count );
 
-     /// Load all nodes for the state, seekg() must be at proper position before calling this method.
+     /// @brief Load all nodes for the state, seekg() must be at proper position before calling this method.
      /// @param count number of nodes to be loaded.
      /// @param quad root quadrant of the state.
      /// @param state scene state, for which nodes will be loaded.
      void load_state_nodes( uint32_t count, Quadrant& quad, SceneState& state );
 
-     /// Creates one node using record.
+     /// @brief Creates one node using record.
      /// @param info record structure.
      /// @param offset offset of the record in file.
      /// @param quad quadrant where the node will be placed.
      /// @param state scene state, in which this node is contained.
      void create_node( const NodeInfo& info, uint32_t offset, Quadrant& quad, SceneState& state );
 
-     /// Makes quadrant tree for space partitioning with combining smaller quadrants into bigger ones.
+     /// @brief Makes quadrant tree for space partitioning with combining smaller quadrants into bigger ones.
      /// @param parent root quadrant of the tree.
      /// @param start coordinates of upper left corner of root quadrant.
      /// @param q_width width of one quadrant.
@@ -96,7 +104,7 @@ private:
                           float q_width, float q_height,
                           uint32_t wcount, uint32_t hcount );
 
-     /// Reads ASCIIZ-string from file at given offset.
+     /// @brief Reads ASCIIZ-string from file at given offset.
      /// @param offset offset of the string.
      std::string read_string( uint32_t offset );
 

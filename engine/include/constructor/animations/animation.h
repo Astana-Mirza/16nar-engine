@@ -1,5 +1,5 @@
 /// @file
-/// File with Animation class definition.
+/// @brief File with Animation class definition.
 #ifndef _16NAR_ANIMATION_H
 #define _16NAR_ANIMATION_H
 
@@ -13,14 +13,14 @@ namespace _16nar
 
 class Node;
 
-/// Class for controlling game animations.
+/// @brief Class for controlling game animations.
 class ENGINE_API Animation
 {
 public:
      using AnimationCallback = std::function< void( Node * ) >;
      using CallbackMap = std::map< float, AnimationCallback >;
 
-     /// Constructor.
+     /// @brief Constructor.
      /// @param node node controlled by the animation.
      /// @param duration duration of the animation, in seconds.
      Animation( Node *node, float duration );
@@ -29,39 +29,39 @@ public:
      Animation( const Animation& )  = delete;
      virtual ~Animation()           = default;
 
-     /// Advances animation execution, returns true if animation continued, false otherwise.
+     /// @brief Advances animation execution, returns true if animation continued, false otherwise.
      /// @param delta time elapsed since last update, in seconds.
      virtual bool advance( float delta );
 
-     /// Adds callback function for specified time point.
+     /// @brief Adds callback function for specified time point.
      /// @param point time point for calling the function, in seconds since start of animation.
      /// @param callback function to be called at the time point.
      void add_callback( float point, AnimationCallback&& callback );
 
-     /// Starts the animation.
+     /// @brief Starts the animation.
      void start();
 
-     /// Pauses or continues animation.
+     /// @brief Pauses or continues animation.
      /// @param paused will the animation be paused or not.
      void set_paused( bool paused );
 
-     /// Sets or disables replaying of the animation after it finishes.
+     /// @brief Sets or disables replaying of the animation after it finishes.
      /// @param replay will the animation be replayed or not.
      void set_replay( bool replay );
 
-     /// Will the animation be replayed.
+     /// @brief Will the animation be replayed.
      bool get_replay() const;
 
-     /// Is the animation paused.
+     /// @brief Is the animation paused.
      bool get_paused() const;
 
-     /// Is the animation playing now.
+     /// @brief Is the animation playing now.
      bool is_playing() const;
 
-     /// Gets duration of the animation.
+     /// @brief Gets duration of the animation.
      float get_duration() const;
 
-     /// Gets node contolled by this animation.
+     /// @brief Gets node contolled by this animation.
      Node *get_node() const;
 
 private:

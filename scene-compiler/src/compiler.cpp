@@ -3,6 +3,8 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
+#include <numeric>
+
 Compiler::Compiler( const QString& input_file ) : data_pos_{ 0 }
 {
      QFile file( input_file );
@@ -248,6 +250,7 @@ void Compiler::write_resources()
 
 void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
 {
+     int max_id = static_cast< int >( std::numeric_limits< uint16_t >::max() );
      QString type = json[ "type" ].toString();
      if ( type == "Node2D" )
      {
@@ -255,9 +258,11 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
      }
      else if ( type == "SpriteNode" )
      {
+          int file_id = id = json[ "res" ].toArray()[ 0 ].toInt();
+          int rsrc_id = id = json[ "res" ].toArray()[ 1 ].toInt();
           info.node_type = _16nar::NodeType::SpriteNode;
-          info.sprite_inf.res.file_id = json[ "res" ].toArray()[ 0 ].toInt();
-          info.sprite_inf.res.rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
+          info.sprite_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
+          info.sprite_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
           info.sprite_inf.color = json[ "color" ].toString().toUInt( nullptr, 16 );        // number in hex
           info.sprite_inf.layer = json[ "layer" ].toInt();
           info.sprite_inf.visible = json[ "visible" ].toBool();
@@ -268,9 +273,11 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
      }
      else if ( type == "SoundNode" )
      {
+          int file_id = id = json[ "res" ].toArray()[ 0 ].toInt();
+          int rsrc_id = id = json[ "res" ].toArray()[ 1 ].toInt();
           info.node_type = _16nar::NodeType::SoundNode;
-          info.sound_inf.res.file_id = json[ "res" ].toArray()[ 0 ].toInt();
-          info.sound_inf.res.rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
+          info.sound_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
+          info.sound_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
           info.sound_inf.z_coord = json[ "z_coord" ].toDouble();
           info.sound_inf.offset = json[ "offset" ].toDouble();
           info.sound_inf.min_distance = json[ "min_distance" ].toDouble();
@@ -282,9 +289,11 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
      }
      else if ( type == "TextNode" )
      {
+          int file_id = id = json[ "res" ].toArray()[ 0 ].toInt();
+          int rsrc_id = id = json[ "res" ].toArray()[ 1 ].toInt();
           info.node_type = _16nar::NodeType::TextNode;
-          info.text_inf.res.file_id = json[ "res" ].toArray()[ 0 ].toInt();
-          info.text_inf.res.rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
+          info.text_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
+          info.text_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
           info.text_inf.color = json[ "color" ].toString().toUInt( nullptr, 16 );        // number in hex
           info.text_inf.layer = json[ "layer" ].toInt();
           info.text_inf.visible = json[ "visible" ].toBool();

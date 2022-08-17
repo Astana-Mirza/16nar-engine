@@ -1,5 +1,5 @@
 /// @file
-/// File with Compiler class definition.
+/// @brief File with Compiler class definition.
 #ifndef _16NAR_COMPILER_H
 #define _16NAR_COMPILER_H
 
@@ -11,50 +11,50 @@
 #include <QList>
 #include <QSharedPointer>
 
-/// Class for main functionality of scene compiler.
+/// @brief Class for main functionality of scene compiler.
 class Compiler
 {
 public:
-     /// Constructor.
+     /// @brief Constructor.
      /// @param input_file path to the input JSON file
      Compiler( const QString& input_file );
 
      Compiler( const Compiler& ) = delete;
 
-     /// Make a resource package.
+     /// @brief Make a resource package.
      /// @param output_file path to output file.
      void compile_package( const QString& output_file );
 
-     /// Make a scene package.
+     /// @brief Make a scene package.
      /// @param output_file path to output file.
      void compile_scene( const QString& output_file );
 
 private:
-     /// Count offsets of all sections in file.
+     /// @brief Count offsets of all sections in file.
      /// @param hdr header where offsets will be filled.
      void count_offsets( _16nar::SceneHeader& hdr );
 
-     /// Write all scene states information to file.
+     /// @brief Write all scene states information to file.
      void write_states();
 
-     /// Write all scene nodes information to file.
+     /// @brief Write all scene nodes information to file.
      void write_nodes();
 
-     /// Write all scene code files information to file.
+     /// @brief Write all scene code files information to file.
      void write_code_files();
 
-     /// Write all scene resources information to file.
+     /// @brief Write all scene resources information to file.
      void write_resources();
 
-     /// Write all data to file.
+     /// @brief Write all data to file.
      void write_data();
 
-     /// Fills node information structure using given JSON object.
+     /// @brief Fills node information structure using given JSON object.
      /// @param info node information structure.
      /// @param json JSON object with node information.
      void fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json );
 
-     /// Saves data which will be written to the file.
+     /// @brief Saves data which will be written to the file.
      /// @param data data to be saved.
      /// @return offset of data in file.
      template < typename T >

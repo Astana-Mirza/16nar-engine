@@ -79,17 +79,17 @@ void Quadrant::find_objects( RenderTarget& target, IntRect area, LayerMap& layer
 }
 
 
-void Quadrant::draw( RenderTarget& target, RenderStates& states ) const
+void Quadrant::draw( RenderTarget& target ) const
 {
      LayerMap layers;
      find_objects( target, target.getViewport( target.getView() ), layers );
      for ( const auto& [ lay, objs ] : layers )
      {
-          for ( const auto ptr : objs )
+          for ( const auto drawable : objs )
           {
-               if ( ptr->is_visible() )
+               if ( drawable->is_visible() )
                {
-                    target.draw( *ptr, states );
+                    drawable->draw( target );
                }
           }
      }

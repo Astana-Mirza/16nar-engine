@@ -13,9 +13,9 @@ SpriteNode::SpriteNode( Quadrant *quad, const Texture& tex, const IntRect& rect 
      DrawableNode::DrawableNode( quad ), sprite_( tex, rect ) {}
 
 
-void SpriteNode::draw( RenderTarget& target, RenderStates states ) const
+void SpriteNode::draw( RenderTarget& target ) const
 {
-     target.draw( sprite_, states );
+     target.draw( sprite_, get_global_transform_matr( false ) );
 }
 
 

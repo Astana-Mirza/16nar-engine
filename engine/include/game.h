@@ -1,5 +1,5 @@
 /// @file
-/// File with Game class definition.
+/// @brief File with Game class definition.
 #ifndef _16NAR_GAME_H
 #define _16NAR_GAME_H
 
@@ -18,32 +18,32 @@ namespace _16nar
 
 class Node;
 
-/// Singleton class for main game options management.
+/// @brief Singleton class for main game options management.
 class ENGINE_API Game
 {
 public:
      using Time = std::chrono::duration< float >;
 
-     /// Method for getting single game object.
+     /// @brief Method for getting single game object.
      static Game& get_game();
 
-     /// Method for getting current scene's world node.
+     /// @brief Method for getting current scene's world node.
      static WorldNode& get_world();
 
      Game( const Game& )               = delete;
      void operator=( const Game& )     = delete;
 
-     /// Runs the game loop within loaded scene.
+     /// @brief Runs the game loop within loaded scene.
      void run();
 
-     /// Ends current scene's game loop.
+     /// @brief Ends current scene's game loop.
      void exit();
 
-     /// Loads scene with given name.
+     /// @brief Loads scene with given name.
      /// @param name path to the scene.
      void load_scene( const std::string& name );
 
-     /// Sets window settings and open it.
+     /// @brief Sets window settings and opens it.
      /// @param title title of the window.
      /// @param width width of window in pixels.
      /// @param height height of window in pixels.
@@ -53,14 +53,14 @@ public:
                       uint32_t flags = Style::Default,
                       unsigned bits_per_pixel = 32 );
 
-     /// Gets the event manager of the game.
+     /// @brief Gets the event manager of the game.
      EventManager& get_event_manager();
 
 private:
-     /// Constructor.
+     /// @brief Constructor.
      Game();
 
-     /// Type of current game task.
+     /// @brief Type of current game task.
      enum class TaskType
      {
           Running,       ///< Execution of a scene.
@@ -68,10 +68,10 @@ private:
           Exiting        ///< Exiting from game.
      };
 
-     /// Renders one frame on the window.
+     /// @brief Renders one frame on the window.
      void render();
 
-     /// Reads all input events for the window.
+     /// @brief Reads all input events for the window.
      void read_events();
 
      RenderWindow window_;                                      ///< main window of the game.

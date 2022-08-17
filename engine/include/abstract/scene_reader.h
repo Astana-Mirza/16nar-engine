@@ -1,5 +1,5 @@
 /// @file
-/// Header file with SceneReader abstract class definition.
+/// @brief Header file with SceneReader abstract class definition.
 #ifndef _16NAR_SCENE_READER_H
 #define _16NAR_SCENE_READER_H
 
@@ -9,15 +9,15 @@
 namespace _16nar
 {
 
-/// Abstract class for reading scene.
+/// @brief Abstract class for reading scene.
 class ENGINE_API SceneReader
 {
 public:
-     /// Sets scene name.
+     /// @brief Sets scene name.
      /// @name name of the scene.
      virtual void set_scene( const std::string& name ) = 0;
 
-     /// Loads the scene from source.
+     /// @brief Loads the scene from source.
      /// @world root node in node tree.
      /// @setup_func pointer to setup function.
      /// @loop_func pointer to loop function.

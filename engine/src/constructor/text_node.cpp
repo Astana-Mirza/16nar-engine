@@ -9,9 +9,9 @@ TextNode::TextNode( Quadrant *quad, const std::string& string, const Font& font,
      DrawableNode::DrawableNode( quad ), text_( string, font, char_size ) {}
 
 
-void TextNode::draw( RenderTarget& target, RenderStates states ) const
+void TextNode::draw( RenderTarget& target ) const
 {
-     target.draw( text_, states );
+     target.draw( text_, get_global_transform_matr( false ) );
 }
 
 

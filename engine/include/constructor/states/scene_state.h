@@ -1,5 +1,5 @@
 /// @file
-/// Header file with SceneState class definition.
+/// @brief Header file with SceneState class definition.
 #ifndef _16NAR_SCENE_STATE_H
 #define _16NAR_SCENE_STATE_H
 
@@ -9,55 +9,55 @@
 namespace _16nar
 {
 
-/// Simple state of scene which takes update and render flow.
+/// @brief Simple state of scene which takes update and render flow.
 class ENGINE_API SceneState
 {
 public:
-     /// Constructor sets updating and rendering of the state.
+     /// @brief Constructor sets updating and rendering of the state.
      /// @param view_rect rectangular area of a scene, which is displayed by a view.
      /// @param updating set if this state will be updated in game loop.
      /// @param rendering set if this state will be rendered in game loop.
      SceneState( const FloatRect& view_rect, bool updating = true, bool rendering = true );
 
-     /// Destructor deletes all nodes of this state.
+     /// @brief Destructor deletes all nodes of this state.
      ~SceneState();
 
-     /// Sets the updating option.
+     /// @brief Sets the updating option.
      /// @param rendering set if this state will be rendered in game loop.
      void set_rendering( bool rendering );
 
-     /// Sets the updating option.
+     /// @brief Sets the updating option.
      /// @param updating set if this state will be updated in game loop.
      void set_updating( bool updating );
 
-     /// Gets the updating option.
+     /// @brief Gets the updating option.
      bool get_updating() const;
 
-     /// Gets the rendering option.
+     /// @brief Gets the rendering option.
      bool get_rendering() const;
 
-     /// Gets view of the state.
+     /// @brief Gets view of the state.
      View& get_view();
 
-     /// Gets reference to the root quadrant.
+     /// @brief Gets reference to the root quadrant.
      Quadrant& get_root_quadrant();
 
-     /// Adds the node, it will have no parent.
+     /// @brief Adds the node, it will have no parent.
      /// @param node pointer to node to be added.
      void add_node( Node *node );
 
-     /// Removes the node, memory will not be freed.
+     /// @brief Removes the node, memory will not be freed.
      /// @param node pointer to node to be removed.
      void remove_node( Node *node );
 
-     /// Function to be executed at scene startup.
+     /// @brief Function to be executed at scene startup.
      void setup();
 
-     /// Function to be executed at scene update.
+     /// @brief Function to be executed at scene update.
      /// @param delta time since last update, in seconds.
      void loop( float delta );
 
-     /// Renders this state on the target.
+     /// @brief Renders this state on the target.
      /// @param target target on which everething will be drawn.
      void render( RenderTarget& target );
 

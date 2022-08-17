@@ -1,5 +1,5 @@
 /// @file
-/// File with DynamicResourceManager class definition.
+/// @brief File with DynamicResourceManager class definition.
 #ifndef _16NAR_DYNAMIC_RESOURCE_MANAGER_H
 #define _16NAR_DYNAMIC_RESOURCE_MANAGER_H
 
@@ -12,13 +12,13 @@
 namespace _16nar
 {
 
-/// Singleton for handling dynamically loaded resources.
+/// @brief Singleton for handling dynamically loaded resources.
 /// @tparam T type of loaded resource.
 template < typename T >
 class DynamicResourceManager
 {
 public:
-     /// Get the only one instance of the class.
+     /// @brief Get the only one instance of the class.
      static DynamicResourceManager& instance()
      {
           static DynamicResourceManager obj;
@@ -29,18 +29,20 @@ public:
      DynamicResourceManager( const DynamicResourceManager& ) = delete;
      void operator=( const DynamicResourceManager& )         = delete;
 
-     /// Load (reload) a resource from storage.
+     /// @brief Load (reload) a resource from storage.
      /// @param name relative path to a resource, aka its name.
      void load( const std::string& name )
      {
+#ifdef USE_SFML
           if ( !resources_[ name ].loadFromFile( name ) )
           {
                throw std::runtime_error{ "Cannot load resource from file " + name };
           }
+#endif // #ifdef USE_SFML
      }
 
 
-     /// Get resource with given name, load if needed.
+     /// @brief Get resource with given name, load if needed.
      /// @param name relative path to a resource, aka its name.
      const T& get( const std::string& name )
      {
@@ -54,7 +56,7 @@ public:
      }
 
 
-     /// Free resource memory.
+     /// @brief Free resource memory.
      /// @param name relative path to a resource, aka its name.
      void free( const std::string& name )
      {

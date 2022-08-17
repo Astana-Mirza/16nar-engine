@@ -84,9 +84,8 @@ void SceneState::loop( float delta )
 
 void SceneState::render( RenderTarget& target )
 {
-     RenderStates states = RenderStates::Default;
      target.setView( view_ );
-     root_.draw( target, states );
+     root_.draw( target );
 }
 
 } // namespace _16nar

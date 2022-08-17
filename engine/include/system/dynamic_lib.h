@@ -1,5 +1,5 @@
 /// @file
-/// File with DynamicLib class definition.
+/// @brief File with DynamicLib class definition.
 #ifndef _16NAR_DYNAMIC_LIB_H
 #define _16NAR_DYNAMIC_LIB_H
 
@@ -9,11 +9,11 @@
 namespace _16nar
 {
 
-/// Class for work with dynamically loaded libraries.
+/// @brief Class for work with dynamically loaded libraries.
 class ENGINE_API DynamicLib
 {
 public:
-     /// Constructor.
+     /// @brief Constructor.
      /// @param name relative path to the library.
      DynamicLib( const std::string& name );
 
@@ -21,18 +21,18 @@ public:
      DynamicLib( const DynamicLib& )             = delete;
      DynamicLib& operator= ( const DynamicLib& ) = delete;
 
-     /// Move constructor.
+     /// @brief Move constructor.
      /// @param lib rvalue reference to DynamicLib.
      DynamicLib( DynamicLib&& lib ) noexcept;
 
-     /// Move assignment.
+     /// @brief Move assignment.
      /// @param lib rvalue reference to DynamicLib.
      DynamicLib& operator= ( DynamicLib&& lib ) noexcept;
 
-     /// Destructor, which closes the handle.
+     /// @brief Destructor, which closes the handle.
      ~DynamicLib();
 
-     /// Get the symbol with given name.
+     /// @brief Get the symbol with given name.
      /// @param name name of the symbol.
      void *get_symbol( const std::string& name ) const;
 

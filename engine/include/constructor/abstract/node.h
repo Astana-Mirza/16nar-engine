@@ -1,5 +1,5 @@
 /// @file
-/// File with Node abstract class definition.
+/// @brief File with Node abstract class definition.
 #ifndef _16NAR_NODE_H
 #define _16NAR_NODE_H
 
@@ -17,7 +17,7 @@ namespace _16nar
 
 class Animation;
 
-/// Abstract base class for all nodes in the engine.
+/// @brief Abstract base class for all nodes in the engine.
 class ENGINE_API Node : public Signallable, public Transformable
 {
 public:
@@ -28,57 +28,58 @@ public:
      Node( const Node& ) = delete;
      Node( Node&& )      = delete;
 
-     /// Virtual destructor, which deletes node's name and children.
+     /// @brief Virtual destructor, which deletes node's name and children.
      virtual ~Node();
 
-     /// Sets parent of this node.
+     /// @brief Sets parent of this node.
      /// @param pointer to new parent node.
      void set_parent( Node *parent );
 
-     /// Gets parent of this node.
+     /// @brief Gets parent of this node.
      const Node *get_parent() const;
 
-     /// Gets set of all first-order children (no grandchildren) of this node.
+     /// @brief Gets set of all first-order children (no grandchildren) of this node.
      const std::set< Node * >& get_children() const;
 
-     /// Gets global transform matrix of this node.
-     TransformMatrix get_global_transform_matr() const;
+     /// @brief Gets global transform matrix of this node.
+     /// @param include_local should the local transform be included in calculation
+     TransformMatrix get_global_transform_matr( bool include_local = true ) const;
 
-     /// Function that launches setup recursively.
+     /// @brief Function that launches setup recursively.
      void setup_call();
 
-     /// Function that launches update loop recursively.
+     /// @brief Function that launches update loop recursively.
      /// @param upd value, telling if this branch of scene tree has to be updated.
      /// @param delta time since last update, in seconds.
      virtual void loop_call( bool upd, float delta );
 
-     /// Adds an animation to this node.
+     /// @brief Adds an animation to this node.
      /// @param name name of the animation.
      /// @param anim pointer to the animation.
      void add_animation( const std::string& name, std::unique_ptr< Animation >&& anim );
 
-     /// Deletes animation with given name.
+     /// @brief Deletes animation with given name.
      /// @param name name of the animation.
      void delete_animation( const std::string& name );
 
-     /// Gets animation with given name, nullptr if no animation with given name.
+     /// @brief Gets animation with given name, nullptr if no animation with given name.
      /// @param name name of the animation.
      Animation *get_animation( const std::string& name ) const;
 
 protected:
-     /// Function to be executed at scene startup.
+     /// @brief Function to be executed at scene startup.
      virtual void setup();
 
-     /// Function to be executed at scene update.
+     /// @brief Function to be executed at scene update.
      /// @param delta time since last update, in seconds.
      virtual void loop( float delta );
 
 private:
-     /// Adds child to set of children.
+     /// @brief Adds child to set of children.
      /// @param child pointer to new child node.
      void add_child( Node *child );
 
-     /// Removes child from set of children, memory will not be freed.
+     /// @brief Removes child from set of children, memory will not be freed.
      /// @param child pointer to the child to be removed.
      void remove_child( Node *child );
 

@@ -1,5 +1,5 @@
 /// @file
-/// Header file with Signallable class definition.
+/// @brief Header file with Signallable class definition.
 #ifndef _16NAR_SIGNALLABLE_H
 #define _16NAR_SIGNALLABLE_H
 
@@ -16,7 +16,7 @@ namespace _16nar
 
 namespace std
 {
-     /// Definition of hash for pair of std::type_index and pointer, needed for signals.
+     /// @brief Definition of hash for pair of std::type_index and pointer, needed for signals.
      template<>
      struct hash< std::pair< std::type_index, _16nar::Signallable * > >
      {
@@ -28,14 +28,14 @@ namespace std
 namespace _16nar
 {
 
-/// A base class which can send and accept signals.
+/// @brief A base class which can send and accept signals.
 /// Acts as both sender and receiver of signals.
 class ENGINE_API Signallable
 {
 public:
      using SlotId = std::pair< std::type_index, Signallable * >;
 
-     /// Sets a handler for a signal of given type from specified sender.
+     /// @brief Sets a handler for a signal of given type from specified sender.
      /// @tparam SignalType type of a signal being handled.
      /// @tparam Handler type of a handler, must be callable.
      /// @param sender pointer to an object which emits signals.
@@ -51,7 +51,7 @@ public:
 	}
 
 
-     /// Deletes a handler for a signal of given type from specified sender.
+     /// @brief Deletes a handler for a signal of given type from specified sender.
      /// @tparam SignalType type of a signal being handled.
      /// @param sender pointer to an object which emits signals.
      template < typename SignalType >
@@ -64,7 +64,7 @@ public:
      }
 
 
-     /// Emits a signal, making all acceptors to handle it
+     /// @brief Emits a signal, making all acceptors to handle it
      /// @tparam signalType type of a signal being emitted.
      /// @param sig signal object.
 	template < typename SignalType >
@@ -83,7 +83,7 @@ private:
      using AcceptorMap = std::unordered_map< Signallable *, BasicSlot * >;
      std::unordered_map< std::type_index, AcceptorMap > acceptors_; ///< all slots accepting signals from this object.
                                                                     ///< maps signal type and receiver to accepting slot,
-                                                                    ///< has ability to group by signal type
+                                                                    ///< has ability to group by signal type.
      std::unordered_map< SlotId, BasicSlot * > slots_;              ///< maps slot identifier to accepting slot.
 };
 

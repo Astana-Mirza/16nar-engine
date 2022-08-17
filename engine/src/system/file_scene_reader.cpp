@@ -264,14 +264,26 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                if ( 0 != info.creator_name_off )
                {
                     void *func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
-                    auto creator = reinterpret_cast< SpriteNode *( * )( Quadrant *,
-                                                                        const Texture&,
-                                                                        const IntRect& ) >( func );
-                    sp_node = creator( &quad, textures_.at( info.sprite_inf.res ), texture_rect );
+                    if ( check_resource( info.sprite_inf.res ) )
+                    {
+                         auto creator = reinterpret_cast< SpriteNode * ( * )( Quadrant *,
+                                                                              const Texture&,
+                                                                              const IntRect& ) >( func );
+                         sp_node = creator( &quad, textures_.at( info.sprite_inf.res ), texture_rect );
+                    }
+                    else
+                    {
+                         auto creator = reinterpret_cast< SpriteNode * ( * )( Quadrant * ) >( func );
+                         sp_node = creator( &quad );
+                    }
                }
                else
                {
-                    if ( texture_rect.height == 0 || texture_rect.width == 0 )
+                    if ( !check_resource( info.sprite_inf.res ) )
+                    {
+                         sp_node = new SpriteNode( &quad );
+                    }
+                    else if ( texture_rect.height == 0 || texture_rect.width == 0 )
                     {
                          sp_node = new SpriteNode( &quad, textures_.at( info.sprite_inf.res ) );
                     }
@@ -292,12 +304,24 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                if ( 0 != info.creator_name_off )
                {
                     void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
-                    auto creator = reinterpret_cast< SoundNode *( * )( const SoundBuffer& ) >( func );
-                    so_node = creator( sounds_.at( info.sound_inf.res ) );
+                    if ( check_resource( info.sound_inf.res ) )
+                    {
+                         auto creator = reinterpret_cast< SoundNode * ( * )( const SoundBuffer& ) >( func );
+                         so_node = creator( sounds_.at( info.sound_inf.res ) );
+                    }
+                    else
+                    {
+                         auto creator = reinterpret_cast< SoundNode * ( * )() >( func );
+                         so_node = creator();
+                    }
+               }
+               else if ( check_resource( info.sound_inf.res ) )
+               {
+                    so_node = new SoundNode( sounds_.at( info.sound_inf.res ) );
                }
                else
                {
-                    so_node = new SoundNode( sounds_.at( info.sound_inf.res ) );
+                    so_node = new SoundNode();
                }
                so_node->set_attenuation( info.sound_inf.attenuation );
                so_node->set_loop( info.sound_inf.loop );
@@ -316,17 +340,29 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                if ( 0 != info.creator_name_off )
                {
                     void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
-                    auto creator = reinterpret_cast< TextNode *( * )( Quadrant *,const std::string&,
-                                                                 const Font&, uint32_t ) >( func );
-                    t_node = creator( &quad, read_string( info.text_inf.string_offset ),
-                                      fonts_.at( info.text_inf.res ),
-                                      info.text_inf.char_size );
+                    if ( check_resource( info.text_inf.res ) )
+                    {
+                         auto creator = reinterpret_cast< TextNode * ( * )( Quadrant *, const std::string&,
+                                                                            const Font&, uint32_t ) >( func );
+                         t_node = creator( &quad, read_string( info.text_inf.string_offset ),
+                                           fonts_.at( info.text_inf.res ),
+                                           info.text_inf.char_size );
+                    }
+                    else
+                    {
+                         auto creator = reinterpret_cast< TextNode * ( * )( Quadrant * )>( func );
+                         t_node = creator( &quad );
+                    }
                }
-               else
+               else if ( check_resource( info.text_inf.res ) )
                {
                     t_node = new TextNode( &quad, read_string( info.text_inf.string_offset ),
                                            fonts_.at( info.text_inf.res ),
                                            info.text_inf.char_size );
+               }
+               else
+               {
+                    t_node = new TextNode( &quad );
                }
                t_node->set_layer( info.text_inf.layer );
                t_node->set_visible( info.text_inf.visible );

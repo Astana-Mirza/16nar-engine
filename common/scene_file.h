@@ -1,5 +1,5 @@
 /// @file
-/// A file with definition of structures for serialization of a scene.
+/// @brief A file with definition of structures for serialization of a scene.
 #ifndef _16NAR_SCENE_FILE_H
 #define _16NAR_SCENE_FILE_H
 
@@ -10,7 +10,7 @@ namespace _16nar
 
 #pragma pack ( push, 1 )
 
-/// Type of a resource packed in a file.
+/// @brief Type of a resource packed in a file.
 enum class ResourceType : uint8_t
 {
      Texture,
@@ -19,7 +19,7 @@ enum class ResourceType : uint8_t
 };
 
 
-/// Value indicating a type of a node
+/// @brief Value indicating a type of a node
 enum class NodeType : uint8_t
 {
      Node2D,
@@ -29,7 +29,7 @@ enum class NodeType : uint8_t
 };
 
 
-/// Table with offsets to different sections.
+/// @brief Table with offsets to different sections.
 struct SectionTable
 {
      uint32_t state_off;           ///< offset of scene state structures.
@@ -39,7 +39,7 @@ struct SectionTable
 };
 
 
-/// Header of a scene file.
+/// @brief Header of a scene file.
 struct SceneHeader
 {
      uint32_t main_code_file;      ///< number of dynamic library with setup and update functions.
@@ -52,14 +52,14 @@ struct SceneHeader
 };
 
 
-/// Header of a resource file.
+/// @brief Header of a resource file.
 struct ResourceFileHeader
 {
      uint16_t res_count;           ///< number of resources in the file.
 };
 
 
-/// Entry of a resource table.
+/// @brief Entry of a resource table.
 struct ResourceTableEntry
 {
      uint32_t filename_off;        ///< offset of the name of the file.
@@ -69,7 +69,7 @@ struct ResourceTableEntry
 };
 
 
-/// Signature of a resource.
+/// @brief Signature of a resource.
 struct ResourceSign
 {
      uint32_t offset;              ///< offset of a packed resource.
@@ -78,7 +78,7 @@ struct ResourceSign
 };
 
 
-/// ID of a resource, which is stored for every node with resource.
+/// @brief ID of a resource, which is stored for every node with resource.
 struct ResourceID
 {
      uint16_t file_id;             ///< identifier of resource file.
@@ -96,14 +96,14 @@ struct ResourceID
 
 // ------------------------ NODE-SPECIFIC STRUCTS ------------------------------
 
-/// Base structure for nodes that need resources.
+/// @brief Base structure for nodes that need resources.
 struct ResourceNodeRecord
 {
      ResourceID res;               ///< identifier of a resource.
 };
 
 
-/// Base structure for drawable nodes.
+/// @brief Base structure for drawable nodes.
 struct DrawableNodeRecord : public ResourceNodeRecord
 {
      uint32_t color;               ///< color of the node.
@@ -112,7 +112,7 @@ struct DrawableNodeRecord : public ResourceNodeRecord
 };
 
 
-/// Record about sprite node.
+/// @brief Record about sprite node.
 struct SpriteNodeInfo : public DrawableNodeRecord
 {
      int rect_coords[ 2 ];         ///< coordinates of sprite rectangle in the texture.
@@ -120,7 +120,7 @@ struct SpriteNodeInfo : public DrawableNodeRecord
 };
 
 
-/// Record about sound node.
+/// @brief Record about sound node.
 struct SoundNodeInfo : public ResourceNodeRecord
 {
      float z_coord;                ///< z coordinate for 3D sound.
@@ -134,7 +134,7 @@ struct SoundNodeInfo : public ResourceNodeRecord
 };
 
 
-/// Record about text node.
+/// @brief Record about text node.
 struct TextNodeInfo : public DrawableNodeRecord
 {
      uint32_t string_offset;       ///< offset of a string of the text.
@@ -148,7 +148,7 @@ struct TextNodeInfo : public DrawableNodeRecord
 
 // -----------------------------------------------------------------------------
 
-/// Record about one node.
+/// @brief Record about one node.
 struct NodeInfo
 {
      uint32_t parent;              ///< offset to a parent (parent is scene state if offset is zero).
@@ -169,7 +169,7 @@ struct NodeInfo
 };
 
 
-/// Record about one state of the scene.
+/// @brief Record about one state of the scene.
 struct StateInfo
 {
      float q_start[ 2 ];           ///< coordinates of a starting quadrant.
