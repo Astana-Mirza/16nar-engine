@@ -6,7 +6,6 @@ namespace _16nar
 
 void WorldNode::clear()
 {
-     node_names_.clear();
      states_.clear();
      setup_func_ = nullptr;
      loop_func_ = nullptr;

@@ -258,8 +258,8 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
      }
      else if ( type == "SpriteNode" )
      {
-          int file_id = id = json[ "res" ].toArray()[ 0 ].toInt();
-          int rsrc_id = id = json[ "res" ].toArray()[ 1 ].toInt();
+          int file_id = json[ "res" ].toArray()[ 0 ].toInt();
+          int rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
           info.node_type = _16nar::NodeType::SpriteNode;
           info.sprite_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
           info.sprite_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
@@ -273,8 +273,8 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
      }
      else if ( type == "SoundNode" )
      {
-          int file_id = id = json[ "res" ].toArray()[ 0 ].toInt();
-          int rsrc_id = id = json[ "res" ].toArray()[ 1 ].toInt();
+          int file_id = json[ "res" ].toArray()[ 0 ].toInt();
+          int rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
           info.node_type = _16nar::NodeType::SoundNode;
           info.sound_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
           info.sound_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
@@ -289,8 +289,8 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
      }
      else if ( type == "TextNode" )
      {
-          int file_id = id = json[ "res" ].toArray()[ 0 ].toInt();
-          int rsrc_id = id = json[ "res" ].toArray()[ 1 ].toInt();
+          int file_id = json[ "res" ].toArray()[ 0 ].toInt();
+          int rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
           info.node_type = _16nar::NodeType::TextNode;
           info.text_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
           info.text_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;

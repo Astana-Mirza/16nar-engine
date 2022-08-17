@@ -74,8 +74,8 @@ private:
      /// @brief Reads all input events for the window.
      void read_events();
 
-     RenderWindow window_;                                      ///< main window of the game.
      WorldNode world_;                                          ///< node which manages scene states.
+     std::unique_ptr< RenderWindow > window_;                   ///< pointer to main window of the game.
      std::unique_ptr< SceneReader > scene_reader_;              ///< pointer to reader of scenes.
      std::unique_ptr< EventManager > event_manager_;            ///< pointer to input event manager.
      Time time_per_frame_;                                      ///< minimal time of one rendering frame.

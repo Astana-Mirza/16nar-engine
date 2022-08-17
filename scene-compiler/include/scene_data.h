@@ -43,7 +43,7 @@ class SceneData< QString > : public BaseData
 public:
      /// @brief Constructor.
      /// @param data data to be stored.
-     SceneData( const QString& data ) : data_{ data + '\n' } {}
+     SceneData( const QString& data ) : data_{ data } {}
 
 
      /// @brief Gets the size of stored data.

@@ -90,6 +90,7 @@ void FileSceneReader::load_resources( const std::string& filename, uint16_t file
           res_file.read( reinterpret_cast< char * >( raw.get() ), signs[ res_ids[ i ] ].size );
           switch ( signs[ res_ids[ i ] ].type )
           {
+#ifdef USE_SFML
                case ResourceType::Texture:
                {
                     textures_[ { file_id, res_ids[ i ] } ] = Texture{};
@@ -123,6 +124,7 @@ void FileSceneReader::load_resources( const std::string& filename, uint16_t file
 			default:
                     throw std::runtime_error{ "unknown resource type in file " + filename };
                break;
+#endif // #ifdef USE_SFML
           }
      }
 }
@@ -425,7 +427,7 @@ std::string FileSceneReader::read_string( uint32_t offset )
      auto current_pos = file_stream_.tellg();
      file_stream_.seekg( offset );
      std::string result;
-     file_stream_ >> result;
+     std::getline( file_stream_, result, '\0' );
      file_stream_.seekg( current_pos );
      return result;
 }

@@ -7,6 +7,7 @@ namespace _16nar
 
 
 Game::Game():
+     window_{ std::make_unique< RenderWindow >() },
      scene_reader_{ std::make_unique< FileSceneReader >() },
      event_manager_{ std::make_unique< EventManager >() },
      time_per_frame_{ 1.f / 60.f },
@@ -54,8 +55,11 @@ void Game::run()
           render();
           if ( current_task_ == TaskType::Exiting )
           {
-               window_.close();
+               window_->close();
                world_.clear();
+               scene_reader_.reset();
+               event_manager_.reset();
+               window_.reset();
           }
      }
 }
@@ -77,7 +81,7 @@ void Game::load_scene( const std::string& name )
 
 void Game::set_window( const std::string& title, unsigned width, unsigned height, uint32_t flags, unsigned bits_per_pixel )
 {
-     window_.create( { width, height, bits_per_pixel }, title, flags );
+     window_->create( { width, height, bits_per_pixel }, title, flags );
 }
 
 
@@ -89,9 +93,9 @@ EventManager& Game::get_event_manager()
 
 void Game::render()
 {
-     window_.clear();
-     world_.render( window_ );
-     window_.display();
+     window_->clear();
+     world_.render( *window_ );
+     window_->display();
 }
 
 
@@ -99,7 +103,7 @@ void Game::read_events()
 {
      event_manager_->clear_events();
      Event event;
-     while ( window_.pollEvent( event ) )
+     while ( window_->pollEvent( event ) )
      {
           if ( event.type != Event::Closed )
           {
