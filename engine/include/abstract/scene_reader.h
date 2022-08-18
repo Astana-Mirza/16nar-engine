@@ -6,6 +6,8 @@
 #include <constructor/world_node.h>
 #include <render/quadrant.h>
 
+#include <scene_file.h>
+
 namespace _16nar
 {
 
@@ -13,6 +15,8 @@ namespace _16nar
 class ENGINE_API SceneReader
 {
 public:
+     virtual ~SceneReader() = default;
+
      /// @brief Sets scene name.
      /// @name name of the scene.
      virtual void set_scene( const std::string& name ) = 0;
@@ -24,7 +28,23 @@ public:
      virtual void load_scene( WorldNode& world,
                               WorldNode::SetupFuncPtr& setup_func,
                               WorldNode::LoopFuncPtr& loop_func ) = 0;
-	virtual ~SceneReader() = default;
+
+     /// @brief Gets texture with given id, throws runtime_error if no such texture.
+     /// @param id id of a texture.
+     virtual const Texture& get_texture( ResourceID id ) const = 0;
+
+     /// @brief Gets sound buffer with given id, throws runtime_error if no such sound buffer.
+     /// @param id id of a sound buffer.
+     virtual const SoundBuffer& get_sound( ResourceID id ) const = 0;
+
+     /// @brief Gets font with given id, throws runtime_error if no such font.
+     /// @param id id of a font.
+     virtual const Font& get_font( ResourceID id ) const = 0;
+
+     /// @brief Gets shader with given id, throws runtime_error if no such shader.
+     /// @param id id of a shader.
+     virtual const Shader& get_shader( ResourceID id ) const = 0;
+
 };
 
 } // namespace _16nar

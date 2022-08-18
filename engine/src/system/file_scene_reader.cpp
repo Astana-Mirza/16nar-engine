@@ -55,6 +55,58 @@ void FileSceneReader::load_scene( WorldNode& world,
 }
 
 
+const Texture& FileSceneReader::get_texture( ResourceID id ) const
+{
+     auto iter = textures_.find( id );
+     if ( iter == textures_.cend() )
+     {
+          throw std::runtime_error{ "cannot get texture with id "
+                                   + std::to_string( id.file_id ) + ":"
+                                   + std::to_string( id.rsrc_id ) };
+     }
+     return iter->second;
+}
+
+
+const SoundBuffer& FileSceneReader::get_sound( ResourceID id ) const
+{
+     auto iter = sounds_.find( id );
+     if ( iter == sounds_.cend() )
+     {
+          throw std::runtime_error{ "cannot get sound buffer with id "
+                                   + std::to_string( id.file_id ) + ":"
+                                   + std::to_string( id.rsrc_id ) };
+     }
+     return iter->second;
+}
+
+
+const Font& FileSceneReader::get_font( ResourceID id ) const
+{
+     auto iter = fonts_.find( id );
+     if ( iter == fonts_.cend() )
+     {
+          throw std::runtime_error{ "cannot get font with id "
+                                   + std::to_string( id.file_id ) + ":"
+                                   + std::to_string( id.rsrc_id ) };
+     }
+     return iter->second;
+}
+
+
+const Shader& FileSceneReader::get_shader( ResourceID id ) const
+{
+     auto iter = shaders_.find( id );
+     if ( iter == shaders_.cend() )
+     {
+          throw std::runtime_error{ "cannot get shader with id "
+                                   + std::to_string( id.file_id ) + ":"
+                                   + std::to_string( id.rsrc_id ) };
+     }
+     return iter->second;
+}
+
+
 void FileSceneReader::load_packages( const SceneHeader& hdr )
 {
      file_stream_.seekg( hdr.sections.rsrc_off );

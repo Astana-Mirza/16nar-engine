@@ -45,6 +45,7 @@ using sf::Sprite;
 using sf::Texture;
 using sf::Text;
 using sf::Font;
+using sf::Shader;
 using sf::Keyboard;
 using sf::Mouse;
 using sf::Joystick;

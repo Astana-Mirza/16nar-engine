@@ -15,7 +15,12 @@ enum class ResourceType : uint8_t
 {
      Texture,
      Sound,
-     Font
+     Font,
+     VertexShader,
+     GeometryShader,
+     FragmentShader,
+     VGShader,
+     VGFShader
 };
 
 

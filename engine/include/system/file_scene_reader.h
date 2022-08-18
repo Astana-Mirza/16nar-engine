@@ -12,8 +12,6 @@
 #include <map>
 #include <vector>
 
-#include <scene_file.h>
-
 namespace _16nar
 {
 
@@ -33,6 +31,22 @@ public:
      void load_scene( WorldNode& world,
                       WorldNode::SetupFuncPtr& setup_ptr,
                       WorldNode::LoopFuncPtr& loop_ptr );
+
+     /// @brief Gets texture with given id, throws runtime_error if no such texture.
+     /// @param id id of a texture.
+     const Texture& get_texture( ResourceID id ) const;
+
+     /// @brief Gets sound buffer with given id, throws runtime_error if no such sound buffer.
+     /// @param id id of a sound buffer.
+     const SoundBuffer& get_sound( ResourceID id ) const;
+
+     /// @brief Gets font with given id, throws runtime_error if no such font.
+     /// @param id id of a font.
+     const Font& get_font( ResourceID id ) const;
+
+     /// @brief Gets shader with given id, throws runtime_error if no such shader.
+     /// @param id id of a shader.
+     const Shader& get_shader( ResourceID id ) const;
 
 private:
      /// @brief RAII wrapper for stream exceptions.
@@ -113,6 +127,7 @@ private:
      std::map< ResourceID, Texture > textures_;             ///< textures with their IDs.
      std::map< ResourceID, SoundBuffer > sounds_;           ///< sound buffers with their IDs.
      std::map< ResourceID, Font > fonts_;                   ///< fonts with their IDs.
+     std::map< ResourceID, Shader > shaders_;               ///< shaders with their IDs.
      std::vector< DynamicLib > libs_;                       ///< dynamic libraries with code for the scene.
 };
 
