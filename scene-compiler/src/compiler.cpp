@@ -55,7 +55,19 @@ void Compiler::compile_package( const QString& output_file )
           _16nar::ResourceSign info{};
           QString type = json[ "type" ].toString();
           info.offset = res_offset;
-          info.size = QFile( json[ "file" ].toString() ).size();
+          info.size = 0;
+          if ( type == "VFShader" || type == "VGFShader" )
+          {
+               QStringList files = json[ "file" ].toString().split( ',', Qt::SkipEmptyParts );
+               for ( const auto& filename : files )
+               {
+                    info.size += QFile( filename ).size() + 1; // +1 for \0, because shader is a string
+               }
+          }
+          else
+          {
+               info.size = QFile( json[ "file" ].toString() ).size();
+          }
 
           if ( type == "Texture" )
           {
@@ -69,6 +81,29 @@ void Compiler::compile_package( const QString& output_file )
           {
                info.type = _16nar::ResourceType::Font;
           }
+          else if ( type == "VertexShader" )
+          {
+               info.type = _16nar::ResourceType::VertexShader;
+               info.size += 1;     // +1 for \0, because shader is a string
+          }
+          else if ( type == "GeometryShader" )
+          {
+               info.type = _16nar::ResourceType::GeometryShader;
+               info.size += 1;     // +1 for \0, because shader is a string
+          }
+          else if ( type == "FragmentShader" )
+          {
+               info.type = _16nar::ResourceType::FragmentShader;
+               info.size += 1;     // +1 for \0, because shader is a string
+          }
+          else if ( type == "VFShader" )
+          {
+               info.type = _16nar::ResourceType::VFShader;
+          }
+          else if ( type == "VGFShader" )
+          {
+               info.type = _16nar::ResourceType::VGFShader;
+          }
           out_file_.write( reinterpret_cast< char * >( &info ), sizeof( info ) );
           res_offset += info.size;
      }
@@ -76,13 +111,36 @@ void Compiler::compile_package( const QString& output_file )
      for ( const auto& res : resources )
      {
           QJsonObject json = res.toObject();
-          QFile res_file( json[ "file" ].toString() );
-          if ( !res_file.open( QIODevice::ReadOnly ) )
+          QString type = json[ "type" ].toString();
+          if ( type == "VFShader" || type == "VGFShader" )
           {
-               throw std::runtime_error{ ( QObject::tr( "cannot open file " ) +
-                                           json[ "file" ].toString() ).toStdString() };
+               QStringList files = json[ "file" ].toString().split( ',', Qt::SkipEmptyParts );
+               for ( const auto& filename : files )
+               {
+                    QFile res_file( filename );
+                    if ( !res_file.open( QIODevice::ReadOnly ) )
+                    {
+                         throw std::runtime_error{ ( QObject::tr( "cannot open file " ) +
+                                                     json[ "file" ].toString() ).toStdString() };
+                    }
+                    out_file_.write( res_file.readAll() );
+                    out_file_.putChar( '\0' );
+               }
           }
-          out_file_.write( res_file.readAll() );
+          else
+          {
+               QFile res_file( json[ "file" ].toString() );
+               if ( !res_file.open( QIODevice::ReadOnly ) )
+               {
+                    throw std::runtime_error{ ( QObject::tr( "cannot open file " ) +
+                                                json[ "file" ].toString() ).toStdString() };
+               }
+               out_file_.write( res_file.readAll() );
+               if ( type.endsWith( "Shader" ) )
+               {
+                    out_file_.putChar( '\0' );
+               }
+          }
      }
 
      out_file_.close();
@@ -258,11 +316,20 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
      }
      else if ( type == "SpriteNode" )
      {
+          QJsonArray blend = json[ "blend" ].toArray();
           int file_id = json[ "res" ].toArray()[ 0 ].toInt();
           int rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
           info.node_type = _16nar::NodeType::SpriteNode;
           info.sprite_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
           info.sprite_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
+          file_id = json[ "shader" ].toArray()[ 0 ].toInt();
+          rsrc_id = json[ "shader" ].toArray()[ 1 ].toInt();
+          info.sprite_inf.shader.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
+          info.sprite_inf.shader.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
+          for ( size_t i = 0; i < sizeof( info.sprite_inf.blend ) / sizeof( int ); i++ )
+          {
+               info.sprite_inf.blend[ i ] = blend[ i ].toInt();
+          }
           info.sprite_inf.color = json[ "color" ].toString().toUInt( nullptr, 16 );        // number in hex
           info.sprite_inf.layer = json[ "layer" ].toInt();
           info.sprite_inf.visible = json[ "visible" ].toBool();
@@ -289,11 +356,20 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
      }
      else if ( type == "TextNode" )
      {
+          QJsonArray blend = json[ "blend" ].toArray();
           int file_id = json[ "res" ].toArray()[ 0 ].toInt();
           int rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
           info.node_type = _16nar::NodeType::TextNode;
           info.text_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
           info.text_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
+          file_id = json[ "shader" ].toArray()[ 0 ].toInt();
+          rsrc_id = json[ "shader" ].toArray()[ 1 ].toInt();
+          info.sprite_inf.shader.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
+          info.sprite_inf.shader.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
+          for ( size_t i = 0; i < sizeof( info.sprite_inf.blend ) / sizeof( int ); i++ )
+          {
+               info.sprite_inf.blend[ i ] = blend[ i ].toInt();
+          }
           info.text_inf.color = json[ "color" ].toString().toUInt( nullptr, 16 );        // number in hex
           info.text_inf.layer = json[ "layer" ].toInt();
           info.text_inf.visible = json[ "visible" ].toBool();

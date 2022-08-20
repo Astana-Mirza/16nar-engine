@@ -91,25 +91,25 @@ EventManager& Game::get_event_manager()
 }
 
 
-const Texture& Game::get_texture( ResourceID id ) const
+Texture& Game::get_texture( ResourceID id )
 {
      return scene_reader_->get_texture( id );
 }
 
 
-const SoundBuffer& Game::get_sound( ResourceID id ) const
+SoundBuffer& Game::get_sound( ResourceID id )
 {
      return scene_reader_->get_sound( id );
 }
 
 
-const Font& Game::get_font( ResourceID id ) const
+Font& Game::get_font( ResourceID id )
 {
      return scene_reader_->get_font( id );
 }
 
 
-const Shader& Game::get_shader( ResourceID id ) const
+Shader& Game::get_shader( ResourceID id )
 {
      return scene_reader_->get_shader( id );
 }

@@ -19,7 +19,7 @@ enum class ResourceType : uint8_t
      VertexShader,
      GeometryShader,
      FragmentShader,
-     VGShader,
+     VFShader,
      VGFShader
 };
 
@@ -111,7 +111,9 @@ struct ResourceNodeRecord
 /// @brief Base structure for drawable nodes.
 struct DrawableNodeRecord : public ResourceNodeRecord
 {
+     ResourceID shader;            ///< identifier of a shader.
      uint32_t color;               ///< color of the node.
+     int blend[ 6 ];               ///< blend mode of the node.
      int layer;                    ///< draw layer.
      uint8_t visible;              ///< 1 if it is visible, 0 otherwise.
 };

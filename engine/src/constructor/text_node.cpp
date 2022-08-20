@@ -11,7 +11,8 @@ TextNode::TextNode( Quadrant *quad, const std::string& string, const Font& font,
 
 void TextNode::draw( RenderTarget& target ) const
 {
-     target.draw( text_, get_global_transform_matr( false ) );
+     RenderStates states{ get_blend(), get_global_transform_matr( false ), nullptr, get_shader() };
+     target.draw( text_, states );
 }
 
 

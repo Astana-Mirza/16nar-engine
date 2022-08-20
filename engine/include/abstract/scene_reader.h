@@ -31,19 +31,19 @@ public:
 
      /// @brief Gets texture with given id, throws runtime_error if no such texture.
      /// @param id id of a texture.
-     virtual const Texture& get_texture( ResourceID id ) const = 0;
+     virtual Texture& get_texture( ResourceID id ) = 0;
 
      /// @brief Gets sound buffer with given id, throws runtime_error if no such sound buffer.
      /// @param id id of a sound buffer.
-     virtual const SoundBuffer& get_sound( ResourceID id ) const = 0;
+     virtual SoundBuffer& get_sound( ResourceID id ) = 0;
 
      /// @brief Gets font with given id, throws runtime_error if no such font.
      /// @param id id of a font.
-     virtual const Font& get_font( ResourceID id ) const = 0;
+     virtual Font& get_font( ResourceID id ) = 0;
 
      /// @brief Gets shader with given id, throws runtime_error if no such shader.
      /// @param id id of a shader.
-     virtual const Shader& get_shader( ResourceID id ) const = 0;
+     virtual Shader& get_shader( ResourceID id ) = 0;
 
 };
 

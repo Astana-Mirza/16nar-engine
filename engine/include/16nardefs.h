@@ -46,12 +46,19 @@ using sf::Texture;
 using sf::Text;
 using sf::Font;
 using sf::Shader;
+using sf::BlendMode;
 using sf::Keyboard;
 using sf::Mouse;
 using sf::Joystick;
 using sf::Event;
 using sf::SoundBuffer;
 using sf::Sound;
+
+// globals
+using sf::BlendAdd;
+using sf::BlendAlpha;
+using sf::BlendMultiply;
+using sf::BlendNone;
 
 #endif // #ifdef USE_SFML
 
