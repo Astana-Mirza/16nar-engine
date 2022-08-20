@@ -55,10 +55,10 @@ void FileSceneReader::load_scene( WorldNode& world,
 }
 
 
-const Texture& FileSceneReader::get_texture( ResourceID id ) const
+Texture& FileSceneReader::get_texture( ResourceID id )
 {
      auto iter = textures_.find( id );
-     if ( iter == textures_.cend() )
+     if ( iter == textures_.end() )
      {
           throw std::runtime_error{ "cannot get texture with id "
                                    + std::to_string( id.file_id ) + ":"
@@ -68,10 +68,10 @@ const Texture& FileSceneReader::get_texture( ResourceID id ) const
 }
 
 
-const SoundBuffer& FileSceneReader::get_sound( ResourceID id ) const
+SoundBuffer& FileSceneReader::get_sound( ResourceID id )
 {
      auto iter = sounds_.find( id );
-     if ( iter == sounds_.cend() )
+     if ( iter == sounds_.end() )
      {
           throw std::runtime_error{ "cannot get sound buffer with id "
                                    + std::to_string( id.file_id ) + ":"
@@ -81,10 +81,10 @@ const SoundBuffer& FileSceneReader::get_sound( ResourceID id ) const
 }
 
 
-const Font& FileSceneReader::get_font( ResourceID id ) const
+Font& FileSceneReader::get_font( ResourceID id )
 {
      auto iter = fonts_.find( id );
-     if ( iter == fonts_.cend() )
+     if ( iter == fonts_.end() )
      {
           throw std::runtime_error{ "cannot get font with id "
                                    + std::to_string( id.file_id ) + ":"
@@ -94,10 +94,10 @@ const Font& FileSceneReader::get_font( ResourceID id ) const
 }
 
 
-const Shader& FileSceneReader::get_shader( ResourceID id ) const
+Shader& FileSceneReader::get_shader( ResourceID id )
 {
      auto iter = shaders_.find( id );
-     if ( iter == shaders_.cend() )
+     if ( iter == shaders_.end() )
      {
           throw std::runtime_error{ "cannot get shader with id "
                                    + std::to_string( id.file_id ) + ":"
@@ -170,6 +170,45 @@ void FileSceneReader::load_resources( const std::string& filename, uint16_t file
                          .loadFromMemory( raw.get(), signs[ res_ids[ i ] ].size ) )
                     {
                          throw std::runtime_error{ "cannot load font from file " + filename };
+                    }
+               }
+               break;
+               case ResourceType::VertexShader:
+               {
+                    std::string shader{ raw.get() };
+                    if ( !shaders_[ { file_id, res_ids[ i ] } ].loadFromMemory( shader, Shader::Vertex ) )
+                    {
+                         throw std::runtime_error{ "cannot load shader from file " + filename };
+                    }
+               }
+               break;
+               case ResourceType::GeometryShader:
+               {
+                    std::string shader{ raw.get() };
+                    if ( !shaders_[ { file_id, res_ids[ i ] } ].loadFromMemory( shader, Shader::Geometry ) )
+                    {
+                         throw std::runtime_error{ "cannot load shader from file " + filename };
+                    }
+               }
+               break;
+               case ResourceType::VFShader:
+               {
+                    std::string vshader{ raw.get() };
+                    std::string fshader{ raw.get() + vshader.size() + 1 };
+                    if ( !shaders_[ { file_id, res_ids[ i ] } ].loadFromMemory( vshader, fshader ) )
+                    {
+                         throw std::runtime_error{ "cannot load shader from file " + filename };
+                    }
+               }
+               break;
+               case ResourceType::VGFShader:
+               {
+                    std::string vshader{ raw.get() };
+                    std::string gshader{ raw.get() + vshader.size() + 1 };
+                    std::string fshader{ raw.get() + vshader.size() + gshader.size() + 2};
+                    if ( !shaders_[ { file_id, res_ids[ i ] } ].loadFromMemory( vshader, gshader, fshader ) )
+                    {
+                         throw std::runtime_error{ "cannot load shader from file " + filename };
                     }
                }
                break;
@@ -346,6 +385,14 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                          sp_node = new SpriteNode( &quad, textures_.at( info.sprite_inf.res ), texture_rect );
                     }
                }
+               sp_node->set_shader( check_resource( info.sprite_inf.shader ) ?
+                                                    &shaders_.at( info.sprite_inf.shader ) : nullptr );
+               sp_node->set_blend( { static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 0 ] ),
+                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 1 ] ),
+                                     static_cast< BlendMode::Equation >( info.sprite_inf.blend[ 2 ] ),
+                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 3 ] ),
+                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 4 ] ),
+                                     static_cast< BlendMode::Equation >( info.sprite_inf.blend[ 5 ] ) } );
                sp_node->set_layer( info.sprite_inf.layer );
                sp_node->set_visible( info.sprite_inf.visible );
                sp_node->set_color( Color( info.sprite_inf.color ) );
@@ -418,6 +465,14 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                {
                     t_node = new TextNode( &quad );
                }
+               t_node->set_shader( check_resource( info.sprite_inf.shader ) ?
+                                    &shaders_.at( info.sprite_inf.shader ) : nullptr );
+               t_node->set_blend( { static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 0 ] ),
+                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 1 ] ),
+                                     static_cast< BlendMode::Equation >( info.sprite_inf.blend[ 2 ] ),
+                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 3 ] ),
+                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 4 ] ),
+                                     static_cast< BlendMode::Equation >( info.sprite_inf.blend[ 5 ] ) } );
                t_node->set_layer( info.text_inf.layer );
                t_node->set_visible( info.text_inf.visible );
                t_node->set_color( Color( info.text_inf.color ) );

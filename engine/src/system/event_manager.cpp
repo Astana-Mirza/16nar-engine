@@ -107,9 +107,9 @@ const std::list< Event >& EventManager::get_events( Event::EventType type ) cons
 
 bool EventManager::is_pressed( int action, int joystick ) const
 {
-     bool keyboard = false;
      if ( joystick < 1 )
      {
+          bool keyboard = false;
           if ( pressed_actions_.find( 0 ) == pressed_actions_.cend() )
           {
                return false;
