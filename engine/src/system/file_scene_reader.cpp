@@ -465,14 +465,14 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                {
                     t_node = new TextNode( &quad );
                }
-               t_node->set_shader( check_resource( info.sprite_inf.shader ) ?
-                                    &shaders_.at( info.sprite_inf.shader ) : nullptr );
-               t_node->set_blend( { static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 0 ] ),
-                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 1 ] ),
-                                     static_cast< BlendMode::Equation >( info.sprite_inf.blend[ 2 ] ),
-                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 3 ] ),
-                                     static_cast< BlendMode::Factor >( info.sprite_inf.blend[ 4 ] ),
-                                     static_cast< BlendMode::Equation >( info.sprite_inf.blend[ 5 ] ) } );
+               t_node->set_shader( check_resource( info.text_inf.shader ) ?
+                                    &shaders_.at( info.text_inf.shader ) : nullptr );
+               t_node->set_blend( { static_cast< BlendMode::Factor >( info.text_inf.blend[ 0 ] ),
+                                     static_cast< BlendMode::Factor >( info.text_inf.blend[ 1 ] ),
+                                     static_cast< BlendMode::Equation >( info.text_inf.blend[ 2 ] ),
+                                     static_cast< BlendMode::Factor >( info.text_inf.blend[ 3 ] ),
+                                     static_cast< BlendMode::Factor >( info.text_inf.blend[ 4 ] ),
+                                     static_cast< BlendMode::Equation >( info.text_inf.blend[ 5 ] ) } );
                t_node->set_layer( info.text_inf.layer );
                t_node->set_visible( info.text_inf.visible );
                t_node->set_color( Color( info.text_inf.color ) );
