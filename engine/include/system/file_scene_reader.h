@@ -15,6 +15,8 @@
 namespace _16nar
 {
 
+class TilemapNode;
+
 /// @brief Class for reading compiled scene from .nar file.
 class ENGINE_API FileSceneReader : public SceneReader
 {
@@ -117,6 +119,12 @@ private:
      void make_quadrants( Quadrant& parent, const Vector2f& start,
                           float q_width, float q_height,
                           uint32_t wcount, uint32_t hcount );
+
+     /// @brief Makes tilemap node with all its tiles.
+     /// @param info record structure.
+     /// @param offset offset of the record in file.
+     /// @param quad quadrant where the node will be placed.
+     TilemapNode *make_tilemap( const NodeInfo& info, uint32_t offset, Quadrant& quad );
 
      /// @brief Reads ASCIIZ-string from file at given offset.
      /// @param offset offset of the string.

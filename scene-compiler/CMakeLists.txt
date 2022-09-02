@@ -18,12 +18,12 @@ set(SRC_DIR src)
 set(TS_DIR translations)
 set(INCLUDE_DIR include)
 set(COMMON_DIR ../common)
-set(TS_FILES ${TS_DIR}/scene-compiler_ru_RU.ts)
 
 add_executable(scene-compiler
-  ${SRC_DIR}/main.cpp
-  ${SRC_DIR}/compiler.cpp
-  ${TS_FILES}
+    ${SRC_DIR}/main.cpp
+    ${SRC_DIR}/compiler.cpp
+
+    ${TS_DIR}/scene-compiler_ru_RU.ts
 )
 
 target_include_directories(scene-compiler PRIVATE ${INCLUDE_DIR} ${COMMON_DIR})

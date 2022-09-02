@@ -32,7 +32,6 @@ public:
      /// @brief Gets current object's inverse transformation matrix.
      virtual const TransformMatrix& get_inv_transform_matr() const       = 0;
 
-
      /// @brief Sets current object position.
      /// @param x object's x coordinate.
      /// @param y object's y coordinate.

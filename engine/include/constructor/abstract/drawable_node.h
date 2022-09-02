@@ -11,22 +11,38 @@ namespace _16nar
 {
 
 /// @brief Abstract base class for nodes that have graphical representation.
-/// Every drawable object must be in minimal possible quadrant in
-/// scene's quadrant tree. The quadrant tree is used for space
-/// partitioning to make render faster, because only visible
-/// quadrants are checked for drawing.
 class ENGINE_API DrawableNode : public Node, public Drawable
 {
 public:
-     /// @brief Constructor which links node to quadrant.
-     /// @param quad pointer to quadrant of this node.
-     DrawableNode( Quadrant *quad );
+     using Drawable::Drawable;
 
-     /// @brief Destructor which removes node from quadrant.
-     ~DrawableNode();
+     /// @brief Checks if the object is visible.
+     bool is_visible() const;
 
-     /// @brief Sets this node to smallest quadrant, in which it fits.
-     void fix_quadrant();
+     /// @brief Sets visibility of the object.
+     /// @param visible visibility.
+     void set_visible( bool visible );
+
+     /// @brief Gets the scene layer of this object.
+     int get_layer() const;
+
+     /// @brief Sets scene layer of this object.
+     /// @param layer scene layer.
+     void set_layer( int layer );
+
+     /// @brief Sets shader of this object.
+     /// @param shader pointer to shader.
+     void set_shader( Shader *shader );
+
+     /// @brief Gets shader of this object.
+     Shader *get_shader() const;
+
+     /// @brief Sets the blend mode of this object.
+     /// @param blend blend mode of this object.
+     void set_blend( const BlendMode& blend );
+
+     /// @brief Gets the blend mode of this object.
+     const BlendMode& get_blend() const;
 
 protected:
      /// @brief Function that launches update loop recursively.
@@ -39,8 +55,11 @@ private:
      /// @param quad pointer to quadrant to be checked.
      bool check_quadrant( const Quadrant *quad ) const;
 
-protected:
-     Quadrant *quad_;         ///< pointer to quadrant, in which this node is located.
+private:
+     BlendMode blend_ = BlendAlpha;     ///< mode, defining how pixels of the object will be blended.
+     Shader* shader_ = nullptr;         ///< shader to be drawn with the object.
+     int layer_ = 0;                    ///< scene layer.
+     bool visible_ = true;              ///< visibility.
 };
 
 } // namespace _16nar

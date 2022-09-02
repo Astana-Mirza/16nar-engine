@@ -30,7 +30,8 @@ enum class NodeType : uint8_t
      Node2D,
      SpriteNode,
      SoundNode,
-     TextNode
+     TextNode,
+     TilemapNode
 };
 
 
@@ -99,6 +100,18 @@ struct ResourceID
      }
 };
 
+
+/// @brief Record about one tile type.
+/// @detail In scene file it must be followed by each vertex coordinates
+/// and positions of the tiles of this type.
+struct TileInfo
+{
+     uint32_t vertex_count;        ///< how many vertices are there in this tile.
+     uint32_t copy_count;          ///< how many tiles of such type are there in the tilemap.
+     uint8_t type;                 ///< type of primitive for tile drawing.
+};
+
+
 // ------------------------ NODE-SPECIFIC STRUCTS ------------------------------
 
 /// @brief Base structure for nodes that need resources.
@@ -153,6 +166,14 @@ struct TextNodeInfo : public DrawableNodeRecord
      float letter_spacing;         ///< letter spacing of the text.
 };
 
+
+/// @brief Record about tilemap node.
+struct TilemapNodeInfo : public DrawableNodeRecord
+{
+     uint32_t tiles_count;         ///< count of tile types in the tilemap.
+     uint32_t tiles_offset;        ///< offset of tiles of the tilemap.
+};
+
 // -----------------------------------------------------------------------------
 
 /// @brief Record about one node.
@@ -172,6 +193,7 @@ struct NodeInfo
           SpriteNodeInfo sprite_inf;    ///< sprite node record.
           SoundNodeInfo sound_inf;      ///< sound node record.
           TextNodeInfo text_inf;        ///< text node record.
+          TilemapNodeInfo tilemap_inf;  ///< tilemap node record.
      };
 };
 

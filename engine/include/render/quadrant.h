@@ -21,11 +21,12 @@ public:
      /// @brief Constant which represents this quadrant's children count.
      constexpr static size_t quad_count = 4;
 
-     using LayerMap = std::map< int, std::unordered_set< Drawable * > >;
+     using DrawableSet = std::unordered_set< Drawable * >;
+     using LayerMap = std::map< int, DrawableSet >;
      using QuadArray = std::array< Quadrant *, quad_count >;
 
      /// @brief Constructor sets area of this quadrant.
-     /// @param area area of the quadrant.
+     /// @param[in] area area of the quadrant.
      explicit Quadrant( const FloatRect& area = {} );
 
      /// @brief Destructor deletes all children quadrants recursively.
@@ -41,30 +42,30 @@ public:
      Quadrant *get_parent() const;
 
      /// @brief Add a child quadrant at given index.
-     /// @param child pointer to child quadrant to be added.
-     /// @index index at which child will be added.
+     /// @param[in] child pointer to child quadrant to be added.
+     /// @param[in] index at which child will be added.
      void add_child( Quadrant *child, int index );
 
      /// @brief Add a drawable object to this quadrant.
-     /// @param child pointer to drawable object to be added.
+     /// @param[in] child pointer to drawable object to be added.
      void add_draw_child( Drawable *child );
 
      /// @brief Delete a drawable object from this quadrant, memory will not be freed.
-     /// @param child pointer to drawable object to be deleted.
+     /// @param[in] child pointer to drawable object to be deleted.
      void delete_draw_child( Drawable *child );
 
      /// @brief Draw all visible objects that intersect with the area of the target.
-     /// @param target target where objects should be rendered.
+     /// @param[in] target target where objects should be rendered.
      void draw( RenderTarget& target ) const;
 
 private:
      /// @brief Recursively find objects in this quadrant, which intersect with given area.
-     /// @param target target where objects should be rendered.
-     /// @param area area for which we look for intersections.
-     /// @param layers layers where all found objects will be stored.
+     /// @param[in] target target where objects should be rendered.
+     /// @param[in] area area for which we look for intersections.
+     /// @param[out] layers layers and sets of all found objects on the layers.
      void find_objects( RenderTarget& target, IntRect area, LayerMap& layers ) const;
 
-     LayerMap draw_layers_;        ///< all drawable objects stored with their layers.
+     DrawableSet drawables_;       ///< all drawable objects stored with their layers.
      FloatRect area_;              ///< area of this quadrant.
      QuadArray children_;          ///< children of this quadrant.
      Quadrant *parent_;            ///< parent of this quadrant.

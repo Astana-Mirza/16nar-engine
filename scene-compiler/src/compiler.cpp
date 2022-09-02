@@ -31,16 +31,15 @@ uint32_t Compiler::save_data< QString >( const QString& data )
           return 0;
      }
      uint32_t ret = data_pos_;
-     data_.push_back( QSharedPointer< BaseData >{ new SceneData< QString >( data ) } );
-     data_pos_ += data_.constLast()->size();
+     data_.push_back( std::make_unique< SceneData< std::string > >( data.toStdString() ) );
+     data_pos_ += data_.back()->size();
      return ret;
 }
 
 
 void Compiler::compile_package( const QString& output_file )
 {
-     out_file_.setFileName( output_file );
-     out_file_.open( QIODevice::WriteOnly );
+     out_file_.open( output_file.toStdString(), std::ios_base::binary );
 
      _16nar::ResourceFileHeader hdr{};
      QJsonArray resources = main_object_[ "resources" ].toArray();
@@ -123,8 +122,9 @@ void Compiler::compile_package( const QString& output_file )
                          throw std::runtime_error{ ( QObject::tr( "cannot open file " ) +
                                                      json[ "file" ].toString() ).toStdString() };
                     }
-                    out_file_.write( res_file.readAll() );
-                    out_file_.putChar( '\0' );
+                    QByteArray content = res_file.readAll();
+                    out_file_.write( content.data(), content.size() );
+                    out_file_.put( '\0' );
                }
           }
           else
@@ -135,10 +135,11 @@ void Compiler::compile_package( const QString& output_file )
                     throw std::runtime_error{ ( QObject::tr( "cannot open file " ) +
                                                 json[ "file" ].toString() ).toStdString() };
                }
-               out_file_.write( res_file.readAll() );
+               QByteArray content = res_file.readAll();
+               out_file_.write( content.data(), content.size() );
                if ( type.endsWith( "Shader" ) )
                {
-                    out_file_.putChar( '\0' );
+                    out_file_.put( '\0' );
                }
           }
      }
@@ -159,8 +160,7 @@ void Compiler::compile_scene( const QString& output_file )
      hdr.setup_off = save_data( main_object_[ "setup_func" ].toString() );
      hdr.loop_off = save_data( main_object_[ "loop_func" ].toString() );
 
-     out_file_.setFileName( output_file );
-     out_file_.open( QIODevice::WriteOnly );
+     out_file_.open( output_file.toStdString(), std::ios_base::binary );
 
      out_file_.write( reinterpret_cast< char * >( &hdr ), sizeof( _16nar::SceneHeader ) );
      write_states();
@@ -238,7 +238,7 @@ void Compiler::write_nodes()
      QJsonArray state_infos = main_object_[ "states" ].toArray();
      for ( const auto& state : state_infos )
      {
-          uint32_t state_subtree_start = out_file_.pos();
+          uint32_t state_subtree_start = out_file_.tellp();
           QJsonArray node_array = state.toObject()[ "nodes" ].toArray();
           for ( const auto& node : node_array )
           {
@@ -279,8 +279,9 @@ void Compiler::write_code_files()
 void Compiler::write_resources()
 {
      QJsonArray package_infos = main_object_[ "resource_packages" ].toArray();
-     uint32_t res_array_offset = static_cast< uint32_t >( out_file_.pos() +
-                                 package_infos.size() * sizeof( _16nar::ResourceTableEntry ) );
+     uint32_t res_array_offset = static_cast< uint32_t >( out_file_.tellp() ) +
+                                 static_cast< uint32_t >( package_infos.size() *
+                                                          sizeof( _16nar::ResourceTableEntry ) );
      for ( const auto& package : package_infos )
      {
           _16nar::ResourceTableEntry info{};
@@ -381,6 +382,61 @@ void Compiler::fill_node_by_type( _16nar::NodeInfo& info, QJsonObject& json )
           info.text_inf.line_spacing = json[ "line_spacing" ].toDouble();
           info.text_inf.letter_spacing = json[ "letter_spacing" ].toDouble();
      }
+     else if ( type == "TilemapNode" )
+     {
+          QJsonArray blend = json[ "blend" ].toArray();
+          int file_id = json[ "res" ].toArray()[ 0 ].toInt();
+          int rsrc_id = json[ "res" ].toArray()[ 1 ].toInt();
+          info.node_type = _16nar::NodeType::TilemapNode;
+          info.tilemap_inf.res.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
+          info.tilemap_inf.res.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
+          file_id = json[ "shader" ].toArray()[ 0 ].toInt();
+          rsrc_id = json[ "shader" ].toArray()[ 1 ].toInt();
+          info.tilemap_inf.shader.file_id = ( file_id >= 0 && file_id < max_id ) ? file_id : max_id;
+          info.tilemap_inf.shader.rsrc_id = ( rsrc_id >= 0 && rsrc_id < max_id ) ? rsrc_id : max_id;
+          for ( size_t i = 0; i < sizeof( info.tilemap_inf.blend ) / sizeof( int ); i++ )
+          {
+               info.tilemap_inf.blend[ i ] = blend[ i ].toInt();
+          }
+          info.tilemap_inf.color = json[ "color" ].toString().toUInt( nullptr, 16 );        // number in hex
+          info.tilemap_inf.layer = json[ "layer" ].toInt();
+          info.tilemap_inf.visible = json[ "visible" ].toBool();
+          info.tilemap_inf.tiles_count = json[ "tiles" ].toArray().size();
+          info.tilemap_inf.tiles_offset = save_tiles( json );
+     }
+}
+
+
+uint32_t Compiler::save_tiles( QJsonObject& json )
+{
+     uint32_t ret = data_pos_;
+     QJsonArray tiles = json[ "tiles" ].toArray();
+     for ( const auto& tile_json_ref : tiles )
+     {
+          QJsonObject tile_json = tile_json_ref.toObject();
+          QJsonArray vertices = tile_json[ "vertices" ].toArray();
+          QJsonArray positions = tile_json[ "positions" ].toArray();
+          _16nar::TileInfo info{};
+          info.vertex_count = vertices.size();
+          info.copy_count = positions.size();
+          info.type = tile_json[ "type" ].toInt();
+          save_data( info );
+
+          auto vert_data = save_array< float[ 2 ] >( vertices.size() ).first;
+          for ( uint32_t i = 0; i < vertices.size(); i++ )
+          {
+               vert_data[ i ][ 0 ] = vertices[ i ].toArray()[ 0 ].toDouble();
+               vert_data[ i ][ 1 ] = vertices[ i ].toArray()[ 1 ].toDouble();
+          }
+
+          auto copy_data = save_array< float[ 2 ] >( positions.size() ).first;
+          for ( uint32_t i = 0; i < positions.size(); i++ )
+          {
+               copy_data[ i ][ 0 ] = positions[ i ].toArray()[ 0 ].toDouble();
+               copy_data[ i ][ 1 ] = positions[ i ].toArray()[ 1 ].toDouble();
+          }
+     }
+     return ret;
 }
 
 

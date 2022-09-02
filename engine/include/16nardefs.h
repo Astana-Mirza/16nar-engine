@@ -47,12 +47,15 @@ using sf::Text;
 using sf::Font;
 using sf::Shader;
 using sf::BlendMode;
+using sf::Vertex;
+using sf::VertexArray;
 using sf::Keyboard;
 using sf::Mouse;
 using sf::Joystick;
 using sf::Event;
 using sf::SoundBuffer;
 using sf::Sound;
+using sf::PrimitiveType;
 
 // globals
 using sf::BlendAdd;

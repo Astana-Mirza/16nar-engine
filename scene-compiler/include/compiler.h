@@ -8,8 +8,8 @@
 
 #include <QJsonObject>
 #include <QFile>
-#include <QList>
-#include <QSharedPointer>
+
+#include <fstream>
 
 /// @brief Class for main functionality of scene compiler.
 class Compiler
@@ -49,6 +49,11 @@ private:
      /// @brief Write all data to file.
      void write_data();
 
+     /// @brief Writes tiles from json object.
+     /// @param json object with tiles information.
+     /// @return offset of written array.
+     uint32_t save_tiles( QJsonObject& json );
+
      /// @brief Fills node information structure using given JSON object.
      /// @param info node information structure.
      /// @param json JSON object with node information.
@@ -60,10 +65,16 @@ private:
      template < typename T >
      uint32_t save_data( const T& data );
 
-     QJsonObject main_object_;                    ///< object that is read from input file.
-     QFile out_file_;                             ///< compiled object file.
-     QList< QSharedPointer< BaseData > > data_;   ///< all data that will be saved to file, in proper order.
-     uint32_t data_pos_;                          ///< offset of the next data structure to be written.
+     /// @brief Saves array which will be written to the file.
+     /// @param count count of elements in array.
+     /// @return pointer to array and offset of data in file.
+     template < typename T >
+     std::pair< std::shared_ptr< T[] >, uint32_t > save_array( uint32_t count );
+
+     QJsonObject main_object_;                         ///< object that is read from input file.
+     std::ofstream out_file_;                          ///< compiled object file.
+     std::list< std::unique_ptr< BaseData > > data_;   ///< all data that will be saved to file, in proper order.
+     uint32_t data_pos_;                               ///< offset of the next data structure to be written.
 };
 
 
@@ -71,9 +82,21 @@ template < typename T >
 uint32_t Compiler::save_data( const T& data )
 {
      uint32_t ret = data_pos_;
-     data_.push_back( { new SceneData< T >( data ) } );
-     data_pos_ += data_.constLast()->size();
+     data_.push_back( std::make_unique< SceneData< T > >( data ) );
+     data_pos_ += data_.back()->size();
      return ret;
+}
+
+
+template < typename T >
+std::pair< std::shared_ptr< T[] >, uint32_t > Compiler::save_array( uint32_t count )
+{
+     uint32_t ret = data_pos_;
+     auto ptr = std::make_unique< SceneData< T[] > >( count );
+     auto array = ptr->get_data();
+     data_.push_back( std::move( ptr ) );
+     data_pos_ += data_.back()->size();
+     return std::make_pair( array, ret );
 }
 
 

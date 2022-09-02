@@ -6,6 +6,7 @@
 #include <constructor/sprite_node.h>
 #include <constructor/sound_node.h>
 #include <constructor/text_node.h>
+#include <constructor/tilemap_node.h>
 
 namespace _16nar
 {
@@ -484,6 +485,11 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                node = t_node;
           }
           break;
+          case NodeType::TilemapNode:
+          {
+               node = make_tilemap( info, offset, quad );
+          }
+          break;
           case NodeType::Node2D:
           {
                if ( 0 != info.creator_name_off )
@@ -516,6 +522,66 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
      node->set_position( { info.pos[ 0 ], info.pos[ 1 ] } );
      node->set_rotation( info.rotation );
      node->set_scale( { info.scale[ 0 ], info.scale[ 1 ] } );
+}
+
+
+TilemapNode *FileSceneReader::make_tilemap( const NodeInfo& info, uint32_t offset, Quadrant& quad )
+{
+     TilemapNode* node = new TilemapNode{};
+     auto& settings = node->get_settings();
+     settings.texture = check_resource( info.tilemap_inf.res ) ?
+                        &textures_.at( info.tilemap_inf.res ) : nullptr;
+     settings.blend = { static_cast< BlendMode::Factor >( info.tilemap_inf.blend[ 0 ] ),
+                        static_cast< BlendMode::Factor >( info.tilemap_inf.blend[ 1 ] ),
+                        static_cast< BlendMode::Equation >( info.tilemap_inf.blend[ 2 ] ),
+                        static_cast< BlendMode::Factor >( info.tilemap_inf.blend[ 3 ] ),
+                        static_cast< BlendMode::Factor >( info.tilemap_inf.blend[ 4 ] ),
+                        static_cast< BlendMode::Equation >( info.tilemap_inf.blend[ 5 ] ) };
+     settings.shader = check_resource( info.tilemap_inf.shader ) ?
+                       &shaders_.at( info.tilemap_inf.shader ) : nullptr;
+     settings.color = Color( info.tilemap_inf.color );
+     settings.layer = info.tilemap_inf.layer;   
+     settings.visible = info.tilemap_inf.visible;
+
+     auto current_pos = file_stream_.tellg();
+     file_stream_.seekg( info.tilemap_inf.tiles_offset );
+     for ( uint32_t i = 0; i < info.tilemap_inf.tiles_count; i++ )
+     {
+          using float_vec2d = float[ 2 ];
+          TileInfo tile_inf{};
+          file_stream_.read( reinterpret_cast< char * >( &tile_inf ), sizeof( TileInfo ) );
+
+          VertexArray vertices{ static_cast< PrimitiveType >( tile_inf.type ), tile_inf.vertex_count };
+          auto texture_coords = std::make_unique< float_vec2d[] >( tile_inf.vertex_count );
+          file_stream_.read( reinterpret_cast< char * >( texture_coords.get() ), sizeof( float_vec2d ) * tile_inf.vertex_count );
+
+          for ( uint32_t j = 0; j < tile_inf.vertex_count; j++ )
+          {
+               vertices[ j ].texCoords = { texture_coords[ j ][ 0 ], texture_coords[ j ][ 1 ] };
+          }
+          texture_coords.reset();
+
+          auto start_coords = std::make_unique< float_vec2d[] >( tile_inf.copy_count );
+          file_stream_.read( reinterpret_cast< char * >( start_coords.get() ), sizeof( float_vec2d ) * tile_inf.copy_count );
+          for ( uint32_t j = 0; j < tile_inf.copy_count; j++ )
+          {
+               Tile& tile = node->make_tile( &quad, tile_inf.vertex_count );
+               tile.set_primitive_type( static_cast< PrimitiveType >( tile_inf.type ) );
+               for ( uint32_t k = 0; k < tile_inf.vertex_count; k++ )
+               {
+                    tile.get_vertex( k ).position.x = vertices[ k ].texCoords.x
+                                                    - vertices[ 0 ].texCoords.x
+                                                    + start_coords[ j ][ 0 ];
+                    tile.get_vertex( k ).position.y = vertices[ k ].texCoords.y
+                                                    - vertices[ 0 ].texCoords.y
+                                                    + start_coords[ j ][ 1 ];
+                    tile.get_vertex( k ).texCoords  = vertices[ k ].texCoords;
+               }
+               tile.fix_quadrant();     // call explicitly after setting vertices
+          }
+     }
+     file_stream_.seekg( current_pos );
+     return node;
 }
 
 

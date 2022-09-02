@@ -59,12 +59,14 @@ add_library(engine
     ${SRC_DIR}/constructor/abstract/drawable_node.cpp
     ${SRC_DIR}/constructor/abstract/node.cpp
     ${SRC_DIR}/constructor/states/scene_state.cpp
+    ${SRC_DIR}/constructor/tiles/tile.cpp
     ${SRC_DIR}/constructor/animations/animation.cpp
     ${SRC_DIR}/constructor/node_2d.cpp
     ${SRC_DIR}/constructor/sprite_node.cpp
     ${SRC_DIR}/constructor/sound_node.cpp
     ${SRC_DIR}/constructor/text_node.cpp
     ${SRC_DIR}/constructor/world_node.cpp
+    ${SRC_DIR}/constructor/tilemap_node.cpp
     ${SRC_DIR}/render/quadrant.cpp
     ${SRC_DIR}/system/dynamic_lib.cpp
     ${SRC_DIR}/system/file_scene_reader.cpp

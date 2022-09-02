@@ -4,46 +4,61 @@
 #define _16NAR_DRAWABLE_H
 
 #include <16nardefs.h>
+#include <render/quadrant.h>
 
 namespace _16nar
 {
 
+class Quadrant;
+
 /// @brief Abstract base class, providing interface for basic drawing functionality.
+/// @detail Every drawable object must be in minimal possible quadrant in
+/// scene's quadrant tree. The quadrant tree is used for space
+/// partitioning to make render faster, because only visible
+/// quadrants are checked for drawing.
 class ENGINE_API Drawable
 {
 public:
-     virtual ~Drawable() = default;
+     /// @brief Constructor which links object to quadrant.
+     /// @param quad pointer to quadrant of this object.
+     Drawable( Quadrant *quad );
+
+     /// @brief Destructor which removes object from quadrant.
+     virtual ~Drawable();
+
+     /// @brief Sets this object to smallest quadrant, in which it fits.
+     void fix_quadrant();
 
      /// @brief Checks if the object is visible.
-     bool is_visible() const;
+     virtual bool is_visible() const = 0;
 
      /// @brief Sets visibility of the object.
      /// @param visible visibility.
-     void set_visible( bool visible );
+     virtual void set_visible( bool visible ) = 0;
 
      /// @brief Gets the scene layer of this object.
-     int get_layer() const;
+     virtual int get_layer() const = 0;
 
      /// @brief Sets scene layer of this object.
      /// @param layer scene layer.
-     void set_layer( int layer );
+     virtual void set_layer( int layer ) = 0;
 
      /// @brief Sets shader of this object.
      /// @param shader pointer to shader.
-     void set_shader( Shader *shader );
+     virtual void set_shader( Shader *shader ) = 0;
 
      /// @brief Gets shader of this object.
-     Shader *get_shader() const;
+     virtual Shader *get_shader() const = 0;
 
      /// @brief Sets the blend mode of this object.
      /// @param blend blend mode of this object.
-     void set_blend( const BlendMode& blend );
+     virtual void set_blend( const BlendMode& blend ) = 0;
 
      /// @brief Gets the blend mode of this object.
-     const BlendMode& get_blend() const;
+     virtual const BlendMode& get_blend() const = 0;
 
      /// @brief Sets color of an object.
-     /// @param color color of an object
+     /// @param color color of an object.
      virtual void set_color( const Color& color ) = 0;
 
      /// @brief Gets color of an object.
@@ -56,11 +71,12 @@ public:
      /// @param target render target where the object should be drawn.
      virtual void draw( RenderTarget& target ) const = 0;
 
-private:
-     BlendMode blend_ = BlendAlpha;     ///< mode, defining how pixels of the object will be blended.
-     Shader *shader_ = nullptr;         ///< shader to be drawn with the object.
-     int layer_ = 0;                    ///< scene layer.
-     bool visible_ = true;              ///< visibility.
+protected:
+     /// @brief Check if this object fits in specified quadrant.
+     /// @param quad pointer to quadrant to be checked.
+     virtual bool check_quadrant( const Quadrant *quad ) const = 0;
+
+     Quadrant *quad_;         ///< pointer to quadrant, in which this object is located.
 };
 
 } // namespace _16nar

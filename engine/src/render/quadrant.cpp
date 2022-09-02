@@ -43,18 +43,13 @@ void Quadrant::add_child( Quadrant* child, int index )
 
 void Quadrant::add_draw_child( Drawable *child )
 {
-     draw_layers_[ child->get_layer() ].insert( child );
+     drawables_.insert( child );
 }
 
 
 void Quadrant::delete_draw_child( Drawable *child )
 {
-     auto& layer = draw_layers_[ child->get_layer() ];
-     layer.erase( child );
-     if ( layer.empty() )
-     {
-          draw_layers_.erase( child->get_layer() );
-     }
+     drawables_.erase( child );
 }
 
 
@@ -64,9 +59,9 @@ void Quadrant::find_objects( RenderTarget& target, IntRect area, LayerMap& layer
                      { ( int ) area_.width, ( int ) area_.height } );
      if ( mapped.intersects( area ) )
      {
-          for ( const auto& pair : draw_layers_ )
+          for ( const auto& ptr : drawables_ )
           {
-               layers.insert( pair );
+               layers[ ptr->get_layer() ].insert( ptr );
           }
           for ( const auto ptr : children_ )
           {
