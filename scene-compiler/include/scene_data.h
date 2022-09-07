@@ -77,7 +77,7 @@ public:
      /// @param count count of elements of the array.
      SceneData( uint32_t count ):
           data_{ std::make_shared_for_overwrite< T[] >( count ) },
-          size_{ count * sizeof( T ) } {}
+          size_{ count * static_cast< uint32_t >( sizeof( T ) ) } {}
 
 
      /// @brief Gets stored array.
