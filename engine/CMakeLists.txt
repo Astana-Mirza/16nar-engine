@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
+include(FetchContent)
+
 macro(set_option var default type docstring)
     if(NOT DEFINED ${var})
         set(${var} ${default})
@@ -31,9 +33,17 @@ endif()
 
 
 if (USE_SFML)
-    set_option(SFML_INCLUDE_DIR . PATH "Path to SFML headers")
-    set_option(SFML_LIB_DIR . PATH "Path to SFML libraries")
-    set_option(SFML_DEP_LIB_DIR . PATH "Path to SFML dependencies libraries")
+    # On linux requires libudev-dev, libopenal-dev, libvorbis-dev, libflac-dev
+    FetchContent_Declare(
+        SFML
+        GIT_REPOSITORY "https://github.com/SFML/SFML.git"
+        GIT_TAG        "2f11710abc5aa478503a7ff3f9e654bd2078ebab"
+    )
+    FetchContent_MakeAvailable(SFML)
+
+    set(SFML_INCLUDE_DIR "${PROJECT_BINARY_DIR}/_deps/sfml-src/include")
+    set(SFML_LIB_DIR "${PROJECT_BINARY_DIR}/_deps/sfml-build/lib")
+    set(SFML_DEP_LIB_DIR "${PROJECT_BINARY_DIR}/_deps/sfml-build/lib")
 
     set(EXTRA_INCLUDE_DIRS ${SFML_INCLUDE_DIR})
     set(EXTRA_LINK_DIRS ${SFML_LIB_DIR} ${SFML_DEP_LIB_DIR})
@@ -86,5 +96,5 @@ if (WIN32)
     install(FILES ${PROJECT_BINARY_DIR}/engine.lib DESTINATION lib)
     install(FILES ${PROJECT_BINARY_DIR}/engine.dll DESTINATION bin)
 else()
-    install(TARGETS engine DESTINATION bin)
+    install(TARGETS engine DESTINATION lib)
 endif()
