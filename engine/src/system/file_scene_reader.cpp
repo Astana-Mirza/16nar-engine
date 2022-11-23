@@ -1,12 +1,12 @@
-#include <system/file_scene_reader.h>
-#include <render/quadrant.h>
-#include <game.h>
+#include <16nar/system/file_scene_reader.h>
+#include <16nar/render/quadrant.h>
+#include <16nar/game.h>
 
-#include <constructor/node_2d.h>
-#include <constructor/sprite_node.h>
-#include <constructor/sound_node.h>
-#include <constructor/text_node.h>
-#include <constructor/tilemap_node.h>
+#include <16nar/constructor/node_2d.h>
+#include <16nar/constructor/sprite_node.h>
+#include <16nar/constructor/sound_node.h>
+#include <16nar/constructor/text_node.h>
+#include <16nar/constructor/tilemap_node.h>
 
 namespace _16nar
 {
@@ -540,7 +540,7 @@ TilemapNode *FileSceneReader::make_tilemap( const NodeInfo& info, uint32_t offse
      settings.shader = check_resource( info.tilemap_inf.shader ) ?
                        &shaders_.at( info.tilemap_inf.shader ) : nullptr;
      settings.color = Color( info.tilemap_inf.color );
-     settings.layer = info.tilemap_inf.layer;   
+     settings.layer = info.tilemap_inf.layer;
      settings.visible = info.tilemap_inf.visible;
 
      auto current_pos = file_stream_.tellg();

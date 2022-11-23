@@ -3,7 +3,7 @@
 #ifndef _16NAR_COMPILER_H
 #define _16NAR_COMPILER_H
 
-#include <scene_file.h>
+#include <16nar/scene_file.h>
 #include <scene_data.h>
 
 #include <QJsonObject>

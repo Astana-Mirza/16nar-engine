@@ -11,9 +11,9 @@ project(engine LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(BUILD_SHARED_LIBS ON)
 
+set(NAME 16nar)
 set(SRC_DIR src)
 set(INCLUDE_DIR include)
 set(COMMON_DIR ../common)
@@ -50,7 +50,7 @@ if (USE_SFML)
     endif() # if (WIN32)
 endif() # if (USE_SFML)
 
-configure_file(${INCLUDE_DIR}/16narconfig.h.in 16narconfig.h)
+configure_file(${INCLUDE_DIR}/${NAME}config.h.in ${NAME}/${NAME}config.h)
 
 add_library(engine
     ${SRC_DIR}/game.cpp
@@ -79,9 +79,9 @@ target_compile_definitions(engine PRIVATE ${EXTRA_COMPILER_DEFS})
 target_link_directories(engine PRIVATE ${EXTRA_LINK_DIRS})
 target_link_libraries(engine PRIVATE ${EXTRA_LINK_LIBS})
 
-install(DIRECTORY ${INCLUDE_DIR} DESTINATION .)
-install(FILES ${PROJECT_BINARY_DIR}/16narconfig.h DESTINATION include)
-install(FILES ${COMMON_DIR}/scene_file.h DESTINATION include)
+install(DIRECTORY ${INCLUDE_DIR}/${NAME} DESTINATION include)
+install(FILES ${PROJECT_BINARY_DIR}/${NAME}/${NAME}config.h DESTINATION include/${NAME})
+install(FILES ${COMMON_DIR}/${NAME}/scene_file.h DESTINATION include/${NAME})
 if (WIN32)
     install(FILES ${PROJECT_BINARY_DIR}/engine.lib DESTINATION lib)
     install(FILES ${PROJECT_BINARY_DIR}/engine.dll DESTINATION bin)
