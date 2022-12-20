@@ -1,7 +1,7 @@
 */out/*
-bin/*
 */bin/*
 */build/*
 .vs/*
 *.user
+install
 CMakeSettings.json
