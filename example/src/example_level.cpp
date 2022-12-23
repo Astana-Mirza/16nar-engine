@@ -8,5 +8,5 @@
 
 extern "C" EXAMPLE_SCRIPT void example_setup()
 {
-	std::cout << "Setting up example scene!" << std::endl;
+	 std::cout << "Setting up example scene!" << std::endl;
 }
