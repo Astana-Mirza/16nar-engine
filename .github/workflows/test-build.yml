@@ -13,7 +13,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ windows-latest, ubuntu-latest ]
+        os: [ windows-latest ] # TODO: add ubuntu-latest, but need to install many libraries for SFML
 
     runs-on: ${{ matrix.os }}
 
