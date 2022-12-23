@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(BUILD_SHARED_LIBS ON)
 
-set(SRC_DIR src)
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(ENGINE_DIR ../install/x64-Debug)
 
 

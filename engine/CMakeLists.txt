@@ -15,9 +15,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(BUILD_SHARED_LIBS ON)
 
 set(NAME 16nar)
-set(SRC_DIR src)
-set(INCLUDE_DIR include)
-set(COMMON_DIR ../common)
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../common)
 
 set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug or Release)")
 set_option(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/install" STRING "Choose the install directory")
