@@ -1,4 +1,4 @@
-#include <system/dynamic_lib.h>
+#include <16nar/system/dynamic_lib.h>
 
 #include <stdexcept>
 

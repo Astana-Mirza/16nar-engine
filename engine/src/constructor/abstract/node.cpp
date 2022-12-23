@@ -1,6 +1,6 @@
-#include <constructor/abstract/node.h>
+#include <16nar/constructor/abstract/node.h>
+#include <16nar/game.h>
 
-#include <game.h>
 #include <stdexcept>
 
 namespace _16nar

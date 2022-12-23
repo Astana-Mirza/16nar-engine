@@ -1,47 +1,53 @@
-#include <constructor/abstract/drawable_node.h>
+#include <16nar/constructor/abstract/drawable_node.h>
 
 namespace _16nar
 {
 
-DrawableNode::DrawableNode( Quadrant *quad ) : quad_{ quad }
+bool DrawableNode::is_visible() const
 {
-     quad_->add_draw_child( this );
+     return visible_;
 }
 
 
-DrawableNode::~DrawableNode()
+void DrawableNode::set_visible( bool visible )
 {
-     quad_->delete_draw_child( this );
+     visible_ = visible;
 }
 
 
-void DrawableNode::fix_quadrant()
+int DrawableNode::get_layer() const
 {
-     bool found = false;
-     Quadrant *prev = quad_;
-     while ( quad_->get_parent() && !check_quadrant( quad_ ) )
-     {
-          quad_ = quad_->get_parent();
-     }
-     do
-     {                        // go to the lowest possible level
-          found = false;
-          const auto& children = quad_->get_children();
-          for ( size_t i = 0; i < Quadrant::quad_count && !found; i++ )
-          {
-               if ( children[ i ] && check_quadrant( children[ i ] ) )
-               {
-                    quad_ = children[ i ];
-                    found = true;
-               }
-          }
-     }
-     while ( found );
-     if ( prev != quad_ )
-     {
-          prev->delete_draw_child( this );
-          quad_->add_draw_child( this );
-     }
+     return layer_;
+}
+
+
+void DrawableNode::set_layer( int layer )
+{
+     layer_ = layer;
+}
+
+
+void DrawableNode::set_shader( Shader *shader )
+{
+     shader_ = shader;
+}
+
+
+Shader *DrawableNode::get_shader() const
+{
+     return shader_;
+}
+
+
+void DrawableNode::set_blend( const BlendMode& blend )
+{
+     blend_ = blend;
+}
+
+
+const BlendMode& DrawableNode::get_blend() const
+{
+     return blend_;
 }
 
 
@@ -65,7 +71,7 @@ void DrawableNode::loop_call( bool update, float delta )
 }
 
 
-bool DrawableNode::check_quadrant( const Quadrant* quad ) const
+bool DrawableNode::check_quadrant( const Quadrant *quad ) const
 {
      auto transform = get_global_transform_matr();
      auto rect = transform.transformRect( get_local_bounds() );

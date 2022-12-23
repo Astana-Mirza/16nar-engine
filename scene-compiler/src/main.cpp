@@ -1,71 +1,47 @@
-#include <QCoreApplication>
-#include <QLocale>
-#include <QTranslator>
-#include <QTextStream>
+#include <iostream>
+#include <string>
+#include <cstdlib>
 
 #include <compiler.h>
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-namespace Qt
+void usage( const std::string& prog_name )
 {
-    static auto endl = ::endl;
-    static auto SkipEmptyParts = QString::SkipEmptyParts;
-}
-#endif
-
-void usage( const QString& prog_name )
-{
-     QTextStream( stdout ) << QObject::tr( "Usage:\n" ) << prog_name
-                           << QObject::tr(" OPTION <input_file> <output_file>\n\n" )
-                           << QObject::tr( "Options:\n\t-s\tcompile a scene,\n" )
-                           << QObject::tr( "\t-r\tcompile a resource package." ) << Qt::endl;
+     std::cout << "Usage:\n" << prog_name
+                           << " OPTION <input_file> <output_file>\n\n"
+                           << "Options:\n\t-s\tcompile a scene,\n"
+                           << "\t-r\tcompile a resource package." << std::endl;
 }
 
 
 int main( int argc, char *argv[] )
 {
-     QCoreApplication a( argc, argv );
-
-     QTranslator translator;
-     const QStringList uiLanguages = QLocale::system().uiLanguages();
-     for ( const QString &locale : uiLanguages )
+     if ( argc != 4 )
      {
-          const QString baseName = "scene-compiler_" + QLocale( locale ).name();
-          if ( translator.load( ":/i18n/" + baseName ) )
-          {
-               a.installTranslator( &translator );
-               break;
-          }
-     }
-
-     QStringList arg_list = a.arguments();
-     if ( arg_list.size() != 4 )
-     {
-          usage( arg_list.at( 0 ) );
-          return 1;
+          usage( argv[ 0 ] );
+          return EXIT_FAILURE;
      }
      try
      {
-          Compiler compiler( arg_list[ 2 ] );
-          if ( arg_list[ 1 ] == "-r" )
+          Compiler compiler( argv[ 2 ] );
+          if ( std::string( argv[ 1 ] ) == "-r" )
           {
-               compiler.compile_package( arg_list[ 3 ] );
+               compiler.compile_package( argv[ 3 ] );
           }
-          else if ( arg_list[ 1 ] == "-s" )
+          else if ( std::string( argv[ 1 ] ) == "-s" )
           {
-               compiler.compile_scene( arg_list[ 3 ] );
+               compiler.compile_scene( argv[ 3 ] );
           }
           else
           {
-               usage( arg_list.at( 0 ) );
-               return 1;
+               usage( argv[ 0 ] );
+               return EXIT_FAILURE;
           }
      }
      catch ( std::exception& ex )
      {
-          QTextStream( stderr ) << QObject::tr( "Error: " ) << ex.what() << Qt::endl;
-          return 1;
+          std::cerr << "Error: " << ex.what() << std::endl;
+          return EXIT_FAILURE;
      }
 
-     return 0;
+     return EXIT_SUCCESS;
 }

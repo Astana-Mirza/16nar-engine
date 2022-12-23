@@ -1,5 +1,5 @@
-#include <constructor/world_node.h>
-#include <abstract/scene_reader.h>
+#include <16nar/constructor/world_node.h>
+#include <16nar/abstract/scene_reader.h>
 
 namespace _16nar
 {

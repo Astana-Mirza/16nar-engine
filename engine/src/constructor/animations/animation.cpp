@@ -1,6 +1,6 @@
-#include <constructor/animations/animation.h>
+#include <16nar/constructor/animations/animation.h>
 
-#include <constructor/abstract/node.h>
+#include <16nar/constructor/abstract/node.h>
 
 namespace _16nar
 {

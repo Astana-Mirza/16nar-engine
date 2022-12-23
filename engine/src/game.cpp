@@ -1,6 +1,6 @@
-#include <game.h>
+#include <16nar/game.h>
 
-#include <system/file_scene_reader.h>
+#include <16nar/system/file_scene_reader.h>
 
 namespace _16nar
 {
