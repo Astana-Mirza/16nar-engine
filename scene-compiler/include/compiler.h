@@ -9,6 +9,7 @@
 #include <fstream>
 #include <string>
 #include <functional>
+#include <list>
 
 #include <nlohmann/json.hpp>
 

@@ -4,4 +4,5 @@
 .vs/*
 *.user
 install
+build
 CMakeSettings.json

@@ -6,9 +6,9 @@ project(scene-compiler LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SRC_DIR src)
-set(INCLUDE_DIR include)
-set(COMMON_DIR ../common)
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../common)
 
 FetchContent_Declare(
     nlohmann_json
