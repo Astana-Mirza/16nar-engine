@@ -11,7 +11,7 @@ endmacro()
 project(engine LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 set(BUILD_SHARED_LIBS ON)
 
 set(NAME 16nar)
@@ -82,6 +82,7 @@ if (USE_SFML)
             set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system sfml-graphics sfml-window sfml-audio)
         endif()
     else()
+        include_directories(/usr/include/freetype2)
         set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} sfml-system sfml-graphics sfml-window sfml-audio)
     endif() # if (WIN32)
 
