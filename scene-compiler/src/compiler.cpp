@@ -1,6 +1,7 @@
 #include <compiler.h>
 
 #include <numeric>
+#include <array>
 
 namespace
 {
@@ -416,14 +417,14 @@ uint32_t Compiler::save_tiles( const nl::json& node )
           info.type = tile_json[ "type" ].get< int >();
           save_data( info );
 
-          auto vert_data = save_array< float[ 2 ] >( static_cast< uint32_t >( vertices.size() ) ).first;
+          auto vert_data = save_array< std::array< float, 2 > >( static_cast< uint32_t >( vertices.size() ) ).first;
           for ( uint32_t i = 0; i < vertices.size(); i++ )
           {
                vert_data[ i ][ 0 ] = vertices[ i ].get< std::vector< float > >()[ 0 ];
                vert_data[ i ][ 1 ] = vertices[ i ].get< std::vector< float > >()[ 1 ];
           }
 
-          auto copy_data = save_array< float[ 2 ] >( static_cast< uint32_t >( positions.size() ) ).first;
+          auto copy_data = save_array< std::array< float, 2 > >( static_cast< uint32_t >( positions.size() ) ).first;
           for ( uint32_t i = 0; i < positions.size(); i++ )
           {
                copy_data[ i ][ 0 ] = positions[ i ].get< std::vector< float > >()[ 0 ];

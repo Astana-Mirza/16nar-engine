@@ -76,7 +76,11 @@ public:
      /// @brief Constructor.
      /// @param count count of elements of the array.
      SceneData( uint32_t count ):
+#if __cplusplus == 202002L
           data_{ std::make_shared_for_overwrite< T[] >( count ) },
+#else
+          data_{ new T[ count ] },
+#endif
           size_{ count * static_cast< uint32_t >( sizeof( T ) ) } {}
 
 
@@ -85,6 +89,7 @@ public:
      {
           return data_;
      }
+
 
      /// @brief Gets the size of stored data.
      uint32_t size() const
