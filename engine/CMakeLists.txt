@@ -51,6 +51,7 @@ add_library(engine
     ${SRC_DIR}/system/file_scene_reader.cpp
     ${SRC_DIR}/system/event_manager.cpp
     ${SRC_DIR}/system/listener.cpp
+    ${SRC_DIR}/system/profiles/single_thread_profile.cpp
 )
 
 if (USE_SFML)
