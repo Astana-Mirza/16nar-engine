@@ -25,6 +25,16 @@ void FileSceneReader::load_scene( WorldNode& world,
      SceneHeader hdr{};
      file_stream_.read( reinterpret_cast< char * >( &hdr ), sizeof( SceneHeader ) );
 
+     if ( hdr.signature != SCENE_FILE_SIGNATURE )
+     {
+          throw std::runtime_error{ "wrong signature of scene file" };
+     }
+     if ( hdr.format_version != 1 )
+     {
+          throw std::runtime_error{ "version " + std::to_string( hdr.format_version )
+                                    + " of scene file is unsupported" };
+     }
+
      auto states = std::make_unique< StateInfo[] >( hdr.state_count );
      file_stream_.seekg( hdr.sections.state_off );
      file_stream_.read( reinterpret_cast< char * >( states.get() ), sizeof( StateInfo ) * hdr.state_count );

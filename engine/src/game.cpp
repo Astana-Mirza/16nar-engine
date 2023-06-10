@@ -41,14 +41,13 @@ void Game::run()
      }
      current_task_ = TaskType::Running;
      profile_->set_finish( false );
-     world_.setup();
      while ( current_task_ != TaskType::Exiting )
      {
           if ( current_task_ == TaskType::Loading )
           {
                world_.load( *scene_reader_ );
-               world_.setup();
                current_task_ = TaskType::Running;
+               profile_->set_finish( false );
           }
           profile_->run();
           if ( current_task_ == TaskType::Exiting )
