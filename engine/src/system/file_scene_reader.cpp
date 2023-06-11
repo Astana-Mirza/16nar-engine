@@ -8,6 +8,8 @@
 #include <16nar/constructor/text_node.h>
 #include <16nar/constructor/tilemap_node.h>
 
+#include <16nar/render/qtree_render_system.h>
+
 namespace _16nar
 {
 
@@ -47,19 +49,19 @@ void FileSceneReader::load_scene( WorldNode& world,
      {
           FloatRect rect{ states[ i ].view_rect_pos[ 0 ], states[ i ].view_rect_pos[ 1 ],
                           states[ i ].view_rect_size[ 0 ], states[ i ].view_rect_size[ 1 ] };
-          auto state_ptr = std::make_unique< SceneState >( rect, states[ i ].updating, states[ i ].rendering );
 
           FloatRect area( { states[ i ].q_start[ 0 ], states[ i ].q_start[ 1 ],
                     states[ i ].scene_size[ 0 ] * states[ i ].q_size[ 0 ],
                     states[ i ].scene_size[ 1 ] * states[ i ].q_size[ 1 ] } );
-          Quadrant& root = state_ptr->get_root_quadrant();
-          root = Quadrant( area );
 
-          make_quadrants( root, Vector2f{ area.left, area.top },
+          auto render_system = std::make_unique< QTreeRenderSystem >( Quadrant{ area } );
+          make_quadrants( render_system->get_root(), Vector2f{area.left, area.top},
                     states[ i ].q_size[ 0 ], states[ i ].q_size[ 1 ],
                     states[ i ].scene_size[ 0 ], states[ i ].scene_size[ 1 ] );
+          auto state_ptr = std::make_unique< SceneState >( std::move( render_system ), rect,
+                                                           states[ i ].updating, states[ i ].rendering );
 
-          load_state_nodes( states[i].node_count, root, *state_ptr );
+          load_state_nodes( states[ i ].node_count, &state_ptr->get_render_system(), *state_ptr );
           world.register_state( states[ i ].order, std::move( state_ptr ) );
      }
      node_offsets_.clear();
@@ -263,14 +265,14 @@ void FileSceneReader::load_code( const SceneHeader& hdr,
 }
 
 
-void FileSceneReader::load_state_nodes( uint32_t count, Quadrant& quad, SceneState& state )
+void FileSceneReader::load_state_nodes( uint32_t count, RenderSystem *render_system, SceneState& state )
 {
      auto nodes = std::make_unique< NodeInfo[] >( count );
      file_stream_.read( reinterpret_cast< char * >( nodes.get() ), sizeof( NodeInfo ) * count );
      for ( uint32_t i = 0; i < count; i++ )
      {
           create_node( nodes[ i ], static_cast< uint32_t >( file_stream_.tellg() ) +
-                                   i * sizeof( NodeInfo ), quad, state );
+                                   i * sizeof( NodeInfo ), render_system, state );
      }
 }
 
@@ -355,7 +357,7 @@ void FileSceneReader::make_quadrants( Quadrant& parent, const Vector2f& start,
 }
 
 
-void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadrant& quad, SceneState& state )
+void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, RenderSystem *render_system, SceneState& state )
 {
      Node *node = nullptr;
      switch ( info.node_type )
@@ -370,30 +372,30 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                     void *func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
                     if ( check_resource( info.sprite_inf.res ) )
                     {
-                         auto creator = reinterpret_cast< SpriteNode * ( * )( Quadrant *,
+                         auto creator = reinterpret_cast< SpriteNode * ( * )( RenderSystem *,
                                                                               const Texture&,
                                                                               const IntRect& ) >( func );
-                         sp_node = creator( &quad, textures_.at( info.sprite_inf.res ), texture_rect );
+                         sp_node = creator( render_system, textures_.at( info.sprite_inf.res ), texture_rect );
                     }
                     else
                     {
-                         auto creator = reinterpret_cast< SpriteNode * ( * )( Quadrant * ) >( func );
-                         sp_node = creator( &quad );
+                         auto creator = reinterpret_cast< SpriteNode * ( * )( RenderSystem * ) >( func );
+                         sp_node = creator( render_system );
                     }
                }
                else
                {
                     if ( !check_resource( info.sprite_inf.res ) )
                     {
-                         sp_node = new SpriteNode( &quad );
+                         sp_node = new SpriteNode( render_system );
                     }
                     else if ( texture_rect.height == 0 || texture_rect.width == 0 )
                     {
-                         sp_node = new SpriteNode( &quad, textures_.at( info.sprite_inf.res ) );
+                         sp_node = new SpriteNode( render_system, textures_.at( info.sprite_inf.res ) );
                     }
                     else
                     {
-                         sp_node = new SpriteNode( &quad, textures_.at( info.sprite_inf.res ), texture_rect );
+                         sp_node = new SpriteNode( render_system, textures_.at( info.sprite_inf.res ), texture_rect );
                     }
                }
                sp_node->set_shader( check_resource( info.sprite_inf.shader ) ?
@@ -454,27 +456,27 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
                     void* func = libs_.at( info.code_file_num ).get_symbol( read_string( info.creator_name_off ) );
                     if ( check_resource( info.text_inf.res ) )
                     {
-                         auto creator = reinterpret_cast< TextNode * ( * )( Quadrant *, const std::string&,
+                         auto creator = reinterpret_cast< TextNode * ( * )( RenderSystem *, const std::string&,
                                                                             const Font&, uint32_t ) >( func );
-                         t_node = creator( &quad, read_string( info.text_inf.string_offset ),
+                         t_node = creator( render_system, read_string( info.text_inf.string_offset ),
                                            fonts_.at( info.text_inf.res ),
                                            info.text_inf.char_size );
                     }
                     else
                     {
-                         auto creator = reinterpret_cast< TextNode * ( * )( Quadrant * )>( func );
-                         t_node = creator( &quad );
+                         auto creator = reinterpret_cast< TextNode * ( * )( RenderSystem * )>( func );
+                         t_node = creator( render_system );
                     }
                }
                else if ( check_resource( info.text_inf.res ) )
                {
-                    t_node = new TextNode( &quad, read_string( info.text_inf.string_offset ),
+                    t_node = new TextNode( render_system, read_string( info.text_inf.string_offset ),
                                            fonts_.at( info.text_inf.res ),
                                            info.text_inf.char_size );
                }
                else
                {
-                    t_node = new TextNode( &quad );
+                    t_node = new TextNode( render_system );
                }
                t_node->set_shader( check_resource( info.text_inf.shader ) ?
                                     &shaders_.at( info.text_inf.shader ) : nullptr );
@@ -497,7 +499,7 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
           break;
           case NodeType::TilemapNode:
           {
-               node = make_tilemap( info, offset, quad );
+               node = make_tilemap( info, offset, render_system );
           }
           break;
           case NodeType::Node2D:
@@ -535,7 +537,7 @@ void FileSceneReader::create_node( const NodeInfo& info, uint32_t offset, Quadra
 }
 
 
-TilemapNode *FileSceneReader::make_tilemap( const NodeInfo& info, uint32_t offset, Quadrant& quad )
+TilemapNode *FileSceneReader::make_tilemap( const NodeInfo& info, uint32_t offset, RenderSystem *render_system )
 {
      TilemapNode* node = new TilemapNode{};
      auto& settings = node->get_settings();
@@ -575,7 +577,7 @@ TilemapNode *FileSceneReader::make_tilemap( const NodeInfo& info, uint32_t offse
           file_stream_.read( reinterpret_cast< char * >( start_coords.get() ), sizeof( float_vec2d ) * tile_inf.copy_count );
           for ( uint32_t j = 0; j < tile_inf.copy_count; j++ )
           {
-               Tile& tile = node->make_tile( &quad, tile_inf.vertex_count );
+               Tile& tile = node->make_tile( render_system, tile_inf.vertex_count );
                tile.set_primitive_type( static_cast< PrimitiveType >( tile_inf.type ) );
                for ( uint32_t k = 0; k < tile_inf.vertex_count; k++ )
                {
@@ -587,7 +589,7 @@ TilemapNode *FileSceneReader::make_tilemap( const NodeInfo& info, uint32_t offse
                                                     + start_coords[ j ][ 1 ];
                     tile.get_vertex( k ).texCoords  = vertices[ k ].texCoords;
                }
-               tile.fix_quadrant();     // call explicitly after setting vertices
+               tile.get_render_system().handle_change( &tile );   // call explicitly after setting vertices
           }
      }
      file_stream_.seekg( current_pos );

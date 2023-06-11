@@ -32,7 +32,8 @@ void SingleThreadProfile::run()
 void SingleThreadProfile::render()
 {
      window_->clear();
-     world_.render( *window_ );
+     world_.start_render( *window_ );   // single thread, so wait for all to be drawn
+     world_.finish_render();
      window_->display();
 }
 

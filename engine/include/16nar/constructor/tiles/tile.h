@@ -19,10 +19,10 @@ class ENGINE_API Tile : public Drawable
 {
 public:
      /// @brief Constructor.
-     /// @param[in] quad pointer to quadrant of this object.
+     /// @param[in] render_system render system used to draw this object.
      /// @param[in] tilemap tilemap node keeping this tile.
      /// @param[in] vertex_count count of vertices of the tile.
-     Tile( Quadrant *quad, TilemapNode& tilemap, size_t vertex_count );
+     Tile( RenderSystem *render_system, TilemapNode& tilemap, size_t vertex_count );
 
      /// @brief Copy constructor.
      /// @param[in] other tile, which will be copied.
@@ -43,51 +43,50 @@ public:
      PrimitiveType get_primitive_type() const;
 
      /// @brief Checks if the object is visible.
-     bool is_visible() const;
+     bool is_visible() const override;
 
      /// @brief Sets visibility of the object.
      /// @param[in] visible visibility.
-     void set_visible( bool visible );
+     void set_visible( bool visible ) override;
 
      /// @brief Gets the scene layer of this object.
-     int get_layer() const;
+     int get_layer() const override;
 
      /// @brief Sets scene layer of this object.
      /// @param[in] layer scene layer.
-     void set_layer( int layer );
+     void set_layer( int layer ) override;
 
      /// @brief Sets shader of this object.
      /// @param[in] shader pointer to shader.
-     void set_shader( Shader *shader );
+     void set_shader( Shader *shader ) override;
 
      /// @brief Gets shader of this object.
-     Shader *get_shader() const;
+     Shader *get_shader() const override;
 
      /// @brief Sets the blend mode of this object.
      /// @param[in] blend blend mode of this object.
-     void set_blend( const BlendMode& blend );
+     void set_blend( const BlendMode& blend ) override;
 
      /// @brief Gets the blend mode of this object.
-     const BlendMode& get_blend() const;
+     const BlendMode& get_blend() const override;
 
      /// @brief Gets local bounds of an object (in its own coordinates).
-     FloatRect get_local_bounds() const;
+     FloatRect get_local_bounds() const override;
+
+     /// @brief Gets global bounds of an object (in world coordinates).
+     FloatRect get_global_bounds() const override;
 
 protected:
      /// @brief Draws an object on a given target.
      /// @param[in] target render target where the object should be drawn.
-     void draw( RenderTarget& target ) const;
+     void draw( RenderTarget& target ) const override;
 
      /// @brief Sets color of an object.
      /// @param[in] color color of an object.
-     void set_color( const Color& color );
+     void set_color( const Color& color ) override;
 
      /// @brief Gets color of an object.
-     const Color& get_color() const;
-
-     /// @brief Check if this object fits in specified quadrant.
-     /// @param[in] quad pointer to quadrant to be checked.
-     bool check_quadrant( const Quadrant *quad ) const;
+     const Color& get_color() const override;
 
 private:
      TilemapNode& tilemap_;   ///< tilemap node keeping this tile.

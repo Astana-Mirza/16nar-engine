@@ -14,13 +14,13 @@ class Slot : public BasicSlot
 {
 public:
      /// @brief Constructor, taking handler.
-     /// @param handler Handler of a signal.
+     /// @param[in] handler Handler of a signal.
      Slot( const Handler& handler ) : handler_{ handler } {}
 
 
      /// @brief Accept an emitted signal.
-     /// @param sig Signal being accepted.
-     void accept_signal( const Signal& sig )
+     /// @param[in] sig Signal being accepted.
+     void accept_signal( const Signal& sig ) override
      {
           handler_( static_cast< const SignalType& >( sig ) );
      }

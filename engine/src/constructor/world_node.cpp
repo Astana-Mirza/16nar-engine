@@ -47,13 +47,25 @@ void WorldNode::loop( float delta )
 }
 
 
-void WorldNode::render( RenderTarget& target )
+void WorldNode::start_render( RenderTarget& target )
 {
      for ( auto& [ order, state ] : states_ )
      {
           if ( state->get_rendering() )
           {
-               state->render( target );
+               state->start_render( target );
+          }
+     }
+}
+
+
+void WorldNode::finish_render()
+{
+     for ( auto& [ order, state ] : states_ )
+     {
+          if ( state->get_rendering() )
+          {
+               state->finish_render();
           }
      }
 }

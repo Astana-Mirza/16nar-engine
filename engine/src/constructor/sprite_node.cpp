@@ -5,12 +5,12 @@ namespace _16nar
 
 #ifdef USE_SFML
 
-SpriteNode::SpriteNode( Quadrant *quad, const Texture& tex ):
-     DrawableNode::DrawableNode( quad ), sprite_( tex ) {}
+SpriteNode::SpriteNode( RenderSystem *render_system, const Texture& tex ):
+     DrawableNode::DrawableNode( render_system ), sprite_( tex ) {}
 
 
-SpriteNode::SpriteNode( Quadrant *quad, const Texture& tex, const IntRect& rect ):
-     DrawableNode::DrawableNode( quad ), sprite_( tex, rect ) {}
+SpriteNode::SpriteNode( RenderSystem *render_system, const Texture& tex, const IntRect& rect ):
+     DrawableNode::DrawableNode( render_system ), sprite_( tex, rect ) {}
 
 
 void SpriteNode::draw( RenderTarget& target ) const

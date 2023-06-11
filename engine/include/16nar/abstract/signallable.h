@@ -29,7 +29,7 @@ namespace _16nar
 {
 
 /// @brief A base class which can send and accept signals.
-/// Acts as both sender and receiver of signals.
+/// @detail Acts as both sender and receiver of signals.
 class ENGINE_API Signallable
 {
 public:
@@ -38,8 +38,8 @@ public:
      /// @brief Sets a handler for a signal of given type from specified sender.
      /// @tparam SignalType type of a signal being handled.
      /// @tparam Handler type of a handler, must be callable.
-     /// @param sender pointer to an object which emits signals.
-     /// @param handle handler for the signal.
+     /// @param[in] sender pointer to an object which emits signals.
+     /// @param[in] handle handler for the signal.
      template < typename SignalType, typename Handler >
      void connect( Signallable *sender, const Handler& handle )
      {
@@ -53,7 +53,7 @@ public:
 
      /// @brief Deletes a handler for a signal of given type from specified sender.
      /// @tparam SignalType type of a signal being handled.
-     /// @param sender pointer to an object which emits signals.
+     /// @param[in] sender pointer to an object which emits signals.
      template < typename SignalType >
      void disconnect( Signallable *sender )
      {
@@ -66,7 +66,7 @@ public:
 
      /// @brief Emits a signal, making all acceptors to handle it
      /// @tparam signalType type of a signal being emitted.
-     /// @param sig signal object.
+     /// @param[in] sig signal object.
 	template < typename SignalType >
 	void emit( const SignalType& sig )
      {

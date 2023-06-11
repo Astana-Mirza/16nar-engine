@@ -6,7 +6,7 @@
 #include <16nar/constructor/node_2d.h>
 #include <16nar/constructor/tiles/tile.h>
 
-#include <vector>
+#include <forward_list>
 
 namespace _16nar
 {
@@ -29,24 +29,22 @@ public:
      using Node2D::Node2D;
 
      /// @brief Make a tile with given vertices and return reference to it.
-     /// @detail Warning: reference can be invalidated after making more tiles,
-     /// because vector of tiles will be resized and all its contents will be moved.
-     /// @param quad quadrant for rendering.
-     /// @param vertex_count number of vertices of a tile.
-     Tile& make_tile( Quadrant *quad, size_t vertex_count );
+     /// @param[in] render_system render system used to draw the tile.
+     /// @param[in] vertex_count number of vertices of a tile.
+     Tile& make_tile( RenderSystem *render_system, size_t vertex_count );
 
      /// @brief Gets tile rendering settings.
      TileDrawSettings& get_settings();
 
 protected:
      /// @brief Function that launches update loop recursively.
-     /// @detail If transformed, launches quadrant fixing for all tile, which may be expensive operation.
-     /// @param upd value, telling if this branch of scene tree has to be updated.
-     /// @param delta time since last update, in seconds.
+     /// @detail If transformed, launches render system updates for all tiles, which may be expensive operation.
+     /// @param[in] upd value, telling if this branch of scene tree has to be updated.
+     /// @param[in] delta time since last update, in seconds.
      void loop_call( bool update, float delta );
 
 private:
-     std::vector< Tile > tiles_;             ///< tiles of this tilemap.
+     std::forward_list< Tile > tiles_;       ///< tiles of this tilemap.
      TileDrawSettings settings_;             ///< settings for rendering all tiles.
 };
 

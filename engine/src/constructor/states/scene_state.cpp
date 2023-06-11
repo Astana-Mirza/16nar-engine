@@ -3,8 +3,11 @@
 namespace _16nar
 {
 
-SceneState::SceneState( const FloatRect& view_rect, bool updating, bool rendering ):
-     view_{ view_rect }, updating_{ updating }, rendering_{ rendering } {}
+SceneState::SceneState( std::unique_ptr< RenderSystem >&& render_system,
+                        const FloatRect& view_rect,
+                        bool updating, bool rendering ):
+     render_system_{ std::move( render_system ) }, view_{ view_rect },
+     updating_{ updating }, rendering_{ rendering } {}
 
 
 SceneState::~SceneState()
@@ -46,9 +49,13 @@ View& SceneState::get_view()
 }
 
 
-Quadrant& SceneState::get_root_quadrant()
+RenderSystem& SceneState::get_render_system()
 {
-     return root_;
+     if ( !render_system_ )
+     {
+          throw std::runtime_error{ "render system not set" };
+     }
+     return *render_system_;
 }
 
 
@@ -82,10 +89,16 @@ void SceneState::loop( float delta )
 }
 
 
-void SceneState::render( RenderTarget& target )
+void SceneState::start_render( RenderTarget& target )
 {
      target.setView( view_ );
-     root_.draw( target );
+     render_system_->start_render( target );
+}
+
+
+void SceneState::finish_render()
+{
+     render_system_->finish_render();
 }
 
 } // namespace _16nar

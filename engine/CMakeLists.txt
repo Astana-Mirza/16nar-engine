@@ -33,7 +33,6 @@ endif()
 
 add_library(engine
     ${SRC_DIR}/game.cpp
-    ${SRC_DIR}/abstract/drawable.cpp
     ${SRC_DIR}/abstract/signallable.cpp
     ${SRC_DIR}/constructor/abstract/drawable_node.cpp
     ${SRC_DIR}/constructor/abstract/node.cpp
@@ -47,6 +46,7 @@ add_library(engine
     ${SRC_DIR}/constructor/world_node.cpp
     ${SRC_DIR}/constructor/tilemap_node.cpp
     ${SRC_DIR}/render/quadrant.cpp
+    ${SRC_DIR}/render/qtree_render_system.cpp
     ${SRC_DIR}/system/dynamic_lib.cpp
     ${SRC_DIR}/system/file_scene_reader.cpp
     ${SRC_DIR}/system/event_manager.cpp

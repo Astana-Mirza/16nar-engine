@@ -3,32 +3,43 @@
 #ifndef _16NAR_RENDER_SYSTEM_H
 #define _16NAR_RENDER_SYSTEM_H
 
+#include <16nar/16nardefs.h>
+
 namespace _16nar
 {
 
 class Drawable;
 
-/// @brief Interface for world rendering system.
+/// @brief Interface for world state rendering system.
 /// @detail Rendering system defines an algorithm for drawing.
 /// It is library-agnostic, so algorithm must not care about OpenGL, DirectX, Vulkan etc.
-class RenderSystem
+class ENGINE_API RenderSystem
 {
 public:
+     RenderSystem()                      = default;
+     RenderSystem( const RenderSystem& ) = delete;
+     RenderSystem( RenderSystem&& )      = delete;
+
      virtual ~RenderSystem() = default;
 
      /// @brief Start rendering a frame.
-     virtual void start_render() = 0;
+     /// @param[in] target target where objects should be rendered.
+     virtual void start_render( RenderTarget& target ) = 0;
 
      /// @brief Finish rendering a frame.
      virtual void finish_render() = 0;
 
-     /// @brief Add a drawable object to this quadrant.
+     /// @brief Add a drawable object to this system.
      /// @param[in] child pointer to drawable object to be added.
-     virtual void add_draw_child( Drawable* child ) = 0;
+     virtual void add_draw_child( Drawable *child ) = 0;
 
-     /// @brief Delete a drawable object from this quadrant, memory will not be freed.
+     /// @brief Delete a drawable object from this system, memory will not be freed.
      /// @param[in] child pointer to drawable object to be deleted.
-     virtual void delete_draw_child( Drawable* child ) = 0;
+     virtual void delete_draw_child( Drawable *child ) = 0;
+
+     /// @brief Handle change of object and adjust for future redrawing.
+     /// @param[in] child changed object.
+     virtual void handle_change( Drawable *child ) = 0;
 };
 
 } // namespace _16nar

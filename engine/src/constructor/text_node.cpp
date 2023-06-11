@@ -5,8 +5,8 @@ namespace _16nar
 
 #ifdef USE_SFML
 
-TextNode::TextNode( Quadrant *quad, const std::string& string, const Font& font, uint32_t char_size ):
-     DrawableNode::DrawableNode( quad ), text_( string, font, char_size ) {}
+TextNode::TextNode( RenderSystem *render_system, const std::string& string, const Font& font, uint32_t char_size ):
+     DrawableNode::DrawableNode( render_system ), text_( string, font, char_size ) {}
 
 
 void TextNode::draw( RenderTarget& target ) const

@@ -13,8 +13,6 @@
 namespace _16nar
 {
 
-class Drawable;
-
 /// @brief Class for space partitioning with quadrant tree.
 class ENGINE_API Quadrant
 {
@@ -55,17 +53,13 @@ public:
      /// @param[in] child pointer to drawable object to be deleted.
      void delete_draw_child( Drawable *child );
 
-     /// @brief Draw all visible objects that intersect with the area of the target.
-     /// @param[in] target target where objects should be rendered.
-     void draw( RenderTarget& target ) const;
-
-private:
      /// @brief Recursively find objects in this quadrant, which intersect with given area.
      /// @param[in] target target where objects should be rendered.
      /// @param[in] area area for which we look for intersections.
      /// @param[out] layers layers and sets of all found objects on the layers.
-     void find_objects( RenderTarget& target, IntRect area, LayerMap& layers ) const;
+     void find_objects( const RenderTarget& target, IntRect area, LayerMap& layers ) const;
 
+private:
      DrawableSet drawables_;       ///< all drawable objects stored with their layers.
      FloatRect area_;              ///< area of this quadrant.
      QuadArray children_;          ///< children of this quadrant.
