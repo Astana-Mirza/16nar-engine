@@ -21,8 +21,8 @@ public:
      using CallbackMap = std::map< float, AnimationCallback >;
 
      /// @brief Constructor.
-     /// @param node node controlled by the animation.
-     /// @param duration duration of the animation, in seconds.
+     /// @param[in] node node controlled by the animation.
+     /// @param[in] duration duration of the animation, in seconds.
      Animation( Node *node, float duration );
 
      Animation( Animation&& other ) = delete;
@@ -30,23 +30,23 @@ public:
      virtual ~Animation()           = default;
 
      /// @brief Advances animation execution, returns true if animation continued, false otherwise.
-     /// @param delta time elapsed since last update, in seconds.
+     /// @param[in] delta time elapsed since last update, in seconds.
      virtual bool advance( float delta );
 
      /// @brief Adds callback function for specified time point.
-     /// @param point time point for calling the function, in seconds since start of animation.
-     /// @param callback function to be called at the time point.
+     /// @param[in] point time point for calling the function, in seconds since start of animation.
+     /// @param[in] callback function to be called at the time point.
      void add_callback( float point, AnimationCallback&& callback );
 
      /// @brief Starts the animation.
      void start();
 
      /// @brief Pauses or continues animation.
-     /// @param paused will the animation be paused or not.
+     /// @param[in] paused will the animation be paused or not.
      void set_paused( bool paused );
 
      /// @brief Sets or disables replaying of the animation after it finishes.
-     /// @param replay will the animation be replayed or not.
+     /// @param[in] replay will the animation be replayed or not.
      void set_replay( bool replay );
 
      /// @brief Will the animation be replayed.

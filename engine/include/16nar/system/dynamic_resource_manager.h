@@ -30,7 +30,7 @@ public:
      void operator=( const DynamicResourceManager& )         = delete;
 
      /// @brief Load (reload) a resource from storage.
-     /// @param name relative path to a resource, aka its name.
+     /// @param[in] name relative path to a resource, aka its name.
      void load( const std::string& name )
      {
 #ifdef USE_SFML
@@ -43,7 +43,7 @@ public:
 
 
      /// @brief Get resource with given name, load if needed.
-     /// @param name relative path to a resource, aka its name.
+     /// @param[in] name relative path to a resource, aka its name.
      const T& get( const std::string& name )
      {
           auto it = resources_.find( name );
@@ -57,7 +57,7 @@ public:
 
 
      /// @brief Free resource memory.
-     /// @param name relative path to a resource, aka its name.
+     /// @param[in] name relative path to a resource, aka its name.
      void free( const std::string& name )
      {
           resources_.erase( name );

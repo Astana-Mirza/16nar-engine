@@ -34,7 +34,7 @@ Quadrant *Quadrant::get_parent() const
 }
 
 
-void Quadrant::add_child( Quadrant* child, int index )
+void Quadrant::add_child( Quadrant *child, int index )
 {
      child->parent_ = this;
      children_[ index ] = child;
@@ -53,13 +53,11 @@ void Quadrant::delete_draw_child( Drawable *child )
 }
 
 
-void Quadrant::find_objects( RenderTarget& target, IntRect area, LayerMap& layers ) const
+void Quadrant::find_objects( const FloatRect& area, LayerMap& layers ) const
 {
-     IntRect mapped( target.mapCoordsToPixel( { area_.left, area_.top } ),
-                     { ( int ) area_.width, ( int ) area_.height } );
-     if ( mapped.intersects( area ) )
+     if ( area_.intersects( area ) )
      {
-          for ( const auto& ptr : drawables_ )
+          for ( const auto ptr : drawables_ )
           {
                layers[ ptr->get_layer() ].insert( ptr );
           }
@@ -67,24 +65,7 @@ void Quadrant::find_objects( RenderTarget& target, IntRect area, LayerMap& layer
           {
                if ( ptr )
                {
-                    ptr->find_objects( target, area, layers );
-               }
-          }
-     }
-}
-
-
-void Quadrant::draw( RenderTarget& target ) const
-{
-     LayerMap layers;
-     find_objects( target, target.getViewport( target.getView() ), layers );
-     for ( const auto& [ lay, objs ] : layers )
-     {
-          for ( const auto drawable : objs )
-          {
-               if ( drawable->is_visible() )
-               {
-                    drawable->draw( target );
+                    ptr->find_objects( area, layers );
                }
           }
      }

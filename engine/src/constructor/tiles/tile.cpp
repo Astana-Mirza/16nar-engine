@@ -5,13 +5,13 @@
 namespace _16nar
 {
 
-Tile::Tile( Quadrant* quad, TilemapNode& tilemap, size_t vertex_count ):
-     Drawable::Drawable( quad ), tilemap_{ tilemap },
+Tile::Tile( RenderSystem *render_system, TilemapNode& tilemap, size_t vertex_count ):
+     Drawable::Drawable( render_system ), tilemap_{ tilemap },
      vertices_{ PrimitiveType::TriangleStrip, vertex_count } {}
 
 
 Tile::Tile( const Tile& other ):
-     Drawable::Drawable( other.quad_ ),
+     Drawable::Drawable( other.render_system_ ),
      tilemap_{ other.tilemap_ },
      vertices_{ other.vertices_ } {}
 
@@ -94,11 +94,10 @@ FloatRect Tile::get_local_bounds() const
 }
 
 
-void Tile::draw( RenderTarget& target ) const
+RenderData Tile::get_render_data() const
 {
-     RenderStates states{ get_blend(), tilemap_.get_global_transform_matr(),
-                          tilemap_.get_settings().texture, get_shader() };
-     target.draw( vertices_, states );
+     return RenderData{ get_blend(), tilemap_.get_global_transform_matr(),
+                        tilemap_.get_settings().texture, get_shader() };
 }
 
 
@@ -114,16 +113,10 @@ const Color& Tile::get_color() const
 }
 
 
-bool Tile::check_quadrant( const Quadrant* quad ) const
+FloatRect Tile::get_global_bounds() const
 {
      auto transform = tilemap_.get_global_transform_matr();
-     auto rect = transform.transformRect( get_local_bounds() );
-     if ( quad->get_area().contains( rect.left, rect.top ) &&
-          quad->get_area().contains( rect.left + rect.width - 1, rect.top + rect.height - 1 ) )
-     {
-          return true;
-     }
-     return false;
+     return transform.transformRect( get_local_bounds() );
 }
 
 } // namespace _16nar

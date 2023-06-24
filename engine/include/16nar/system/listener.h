@@ -14,20 +14,20 @@ namespace listener
 #ifdef USE_SFML
 
 /// @brief Sets global volume, from 0 to 100.
-/// @param volume global volume.
+/// @param[in] volume global volume.
 void ENGINE_API set_global_volume( float volume );
 
 /// @brief Sets position of the listener.
-/// @param position listener's coordinate vector.
+/// @param[in] position listener's coordinate vector.
 void ENGINE_API set_position( const Vector2f& position );
 
 /// @brief Sets position of the listener.
-/// @param x listener's x coordinate.
-/// @param y listener's y coordinate.
+/// @param[in] x listener's x coordinate.
+/// @param[in] y listener's y coordinate.
 void ENGINE_API set_position( float x, float y );
 
 /// @brief Sets z coordinate for 3D sound.
-/// @param value value of z coordinate.
+/// @param[in] value value of z coordinate.
 void ENGINE_API set_z( float value );
 
 /// @brief Gets global volume, from 0 to 100.

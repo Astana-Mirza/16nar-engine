@@ -13,7 +13,7 @@ class ENGINE_API BasicSlot
 {
 public:
      /// @brief Accept an emitted signal.
-     /// @param sig signal being accepted.
+     /// @param[in] sig signal being accepted.
      virtual void accept_signal( const Signal& sig ) = 0;
      virtual ~BasicSlot()                            = default;
 };

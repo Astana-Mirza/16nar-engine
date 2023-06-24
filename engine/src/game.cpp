@@ -1,16 +1,22 @@
 #include <16nar/game.h>
 
 #include <16nar/system/file_scene_reader.h>
+#define USE_SINGLE_THREAD_PROFILE
+#ifdef USE_SINGLE_THREAD_PROFILE
+#    include <16nar/system/profiles/single_thread_profile.h>
+#endif
 
 namespace _16nar
 {
 
 
 Game::Game():
-     window_{ std::make_unique< RenderWindow >() },
+     window_{ std::make_shared< RenderWindow >() },
+#ifdef USE_SINGLE_THREAD_PROFILE
+     profile_{ std::make_unique< SingleThreadProfile >( world_, window_ ) },
+#endif
      scene_reader_{ std::make_unique< FileSceneReader >() },
      event_manager_{ std::make_unique< EventManager >() },
-     time_per_frame_{ 1.f / 60.f },
      current_task_{ TaskType::Running } {}
 
 
@@ -34,29 +40,21 @@ void Game::run()
           world_.load( *scene_reader_ );
      }
      current_task_ = TaskType::Running;
-     std::chrono::steady_clock clock;
-     world_.setup();
-     auto prev_time = clock.now();
+     profile_->set_finish( false );
      while ( current_task_ != TaskType::Exiting )
      {
           if ( current_task_ == TaskType::Loading )
           {
                world_.load( *scene_reader_ );
-               world_.setup();
                current_task_ = TaskType::Running;
-               prev_time = clock.now();
+               profile_->set_finish( false );
           }
-          while ( clock.now() - prev_time >= time_per_frame_ )
-          {
-               read_events();
-               world_.loop( time_per_frame_.count() );
-               prev_time = clock.now();
-          }
-          render();
+          profile_->run();
           if ( current_task_ == TaskType::Exiting )
           {
                window_->close();
                world_.clear();
+               profile_.reset();
                scene_reader_.reset();
                event_manager_.reset();
                window_.reset();
@@ -68,6 +66,7 @@ void Game::run()
 void Game::exit()
 {
      current_task_ = TaskType::Exiting;
+     profile_->set_finish( true );
 }
 
 
@@ -76,6 +75,25 @@ void Game::load_scene( const std::string& name )
      scene_reader_ = std::move( std::make_unique< FileSceneReader >() );
      scene_reader_->set_scene( name );
      current_task_ = TaskType::Loading;
+     profile_->set_finish( true );
+}
+
+
+void Game::read_events()
+{
+     event_manager_->clear_events();
+     Event event;
+     while (window_->pollEvent(event))
+     {
+          if (event.type != Event::Closed)
+          {
+               event_manager_->handle_event(event);
+          }
+          else
+          {
+               exit();
+          }
+     }
 }
 
 
@@ -113,32 +131,5 @@ Shader& Game::get_shader( ResourceID id )
 {
      return scene_reader_->get_shader( id );
 }
-
-
-void Game::render()
-{
-     window_->clear();
-     world_.render( *window_ );
-     window_->display();
-}
-
-
-void Game::read_events()
-{
-     event_manager_->clear_events();
-     Event event;
-     while ( window_->pollEvent( event ) )
-     {
-          if ( event.type != Event::Closed )
-          {
-               event_manager_->handle_event( event );
-          }
-          else
-          {
-               exit();
-          }
-     }
-}
-
 
 } // namespace _16nar

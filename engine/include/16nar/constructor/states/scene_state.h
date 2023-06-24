@@ -4,7 +4,8 @@
 #define _16NAR_SCENE_STATE_H
 
 #include <16nar/constructor/abstract/node.h>
-#include <16nar/render/quadrant.h>
+#include <16nar/abstract/render_system.h>
+#include <16nar/render/view.h>
 
 namespace _16nar
 {
@@ -14,20 +15,23 @@ class ENGINE_API SceneState
 {
 public:
      /// @brief Constructor sets updating and rendering of the state.
-     /// @param view_rect rectangular area of a scene, which is displayed by a view.
-     /// @param updating set if this state will be updated in game loop.
-     /// @param rendering set if this state will be rendered in game loop.
-     SceneState( const FloatRect& view_rect, bool updating = true, bool rendering = true );
+     /// @param[in] render_system render system for the state.
+     /// @param[in] view_rect rectangular area of a scene, which is displayed by a view.
+     /// @param[in] updating set if this state will be updated in game loop.
+     /// @param[in] rendering set if this state will be rendered in game loop.
+     SceneState( std::unique_ptr< RenderSystem >&& render_system,
+                 const FloatRect& view_rect,
+                 bool updating = true, bool rendering = true );
 
      /// @brief Destructor deletes all nodes of this state.
      ~SceneState();
 
      /// @brief Sets the updating option.
-     /// @param rendering set if this state will be rendered in game loop.
+     /// @param[in] rendering set if this state will be rendered in game loop.
      void set_rendering( bool rendering );
 
      /// @brief Sets the updating option.
-     /// @param updating set if this state will be updated in game loop.
+     /// @param[in] updating set if this state will be updated in game loop.
      void set_updating( bool updating );
 
      /// @brief Gets the updating option.
@@ -39,32 +43,36 @@ public:
      /// @brief Gets view of the state.
      View& get_view();
 
-     /// @brief Gets reference to the root quadrant.
-     Quadrant& get_root_quadrant();
+     /// @brief Gets reference to the render system.
+     RenderSystem& get_render_system();
 
      /// @brief Adds the node, it will have no parent.
-     /// @param node pointer to node to be added.
+     /// @param[in] node pointer to node to be added.
      void add_node( Node *node );
 
      /// @brief Removes the node, memory will not be freed.
-     /// @param node pointer to node to be removed.
+     /// @param[in] node pointer to node to be removed.
      void remove_node( Node *node );
 
      /// @brief Function to be executed at scene startup.
      void setup();
 
      /// @brief Function to be executed at scene update.
-     /// @param delta time since last update, in seconds.
+     /// @param[in] delta time since last update, in seconds.
      void loop( float delta );
 
-     /// @brief Renders this state on the target.
-     /// @param target target on which everething will be drawn.
-     void render( RenderTarget& target );
+     /// @brief Start rendering this state on the target.
+     /// @param[in] device device with which everething will be rendered.
+     void start_render( RenderDevice& device );
+
+     /// @brief Finish rendering this state.
+     /// @param[in] device device with which everething will be rendered.
+     void finish_render( RenderDevice& device );
 
 protected:
-     Quadrant root_;                ///< root quadrant of scene state.
-     std::set< Node * > nodes_;     ///< set of this state's direct children nodes.
-     View view_;                    ///< view of the state.
+     std::unique_ptr< RenderSystem > render_system_; ///< render system of this state.
+     std::set< Node * > nodes_;                      ///< set of this state's direct children nodes.
+     View view_;                                     ///< view of the state.
 
 private:
      bool updating_;                ///< set if this state will be rendered in game loop.

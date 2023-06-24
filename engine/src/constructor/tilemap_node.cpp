@@ -3,9 +3,9 @@
 namespace _16nar
 {
 
-Tile& TilemapNode::make_tile(Quadrant *quad, size_t vertex_count)
+Tile& TilemapNode::make_tile( RenderSystem *render_system, size_t vertex_count )
 {
-     return tiles_.emplace_back( quad, *this, vertex_count );
+     return tiles_.emplace_front( render_system, *this, vertex_count );
 }
 
 
@@ -28,7 +28,7 @@ void TilemapNode::loop_call( bool update, float delta )
      {
           for ( Tile& tile : tiles_ )
           {
-               tile.fix_quadrant();
+               tile.get_render_system().handle_change( &tile );
           }
      }
      for ( auto child : get_children() )

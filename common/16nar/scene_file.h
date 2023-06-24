@@ -8,7 +8,12 @@
 namespace _16nar
 {
 
+static_assert( sizeof( float ) == 4 );
 #pragma pack ( push, 1 )
+
+/// @brief signature for checking file format validity.
+constexpr uint32_t SCENE_FILE_SIGNATURE = 0x72616e16;
+
 
 /// @brief Type of a resource packed in a file.
 enum class ResourceType : uint8_t
@@ -48,6 +53,8 @@ struct SectionTable
 /// @brief Header of a scene file.
 struct SceneHeader
 {
+     uint32_t signature;           ///< signature for identification of file format.
+     uint32_t format_version;      ///< version of file format.
      uint32_t main_code_file;      ///< number of dynamic library with setup and update functions.
      uint32_t setup_off;           ///< offset of the setup function's name.
      uint32_t loop_off;            ///< offset of the loop function's name.
@@ -126,8 +133,8 @@ struct DrawableNodeRecord : public ResourceNodeRecord
 {
      ResourceID shader;            ///< identifier of a shader.
      uint32_t color;               ///< color of the node.
-     int blend[ 6 ];               ///< blend mode of the node.
-     int layer;                    ///< draw layer.
+     int32_t blend[ 6 ];           ///< blend mode of the node.
+     int32_t layer;                ///< draw layer.
      uint8_t visible;              ///< 1 if it is visible, 0 otherwise.
 };
 
@@ -135,8 +142,8 @@ struct DrawableNodeRecord : public ResourceNodeRecord
 /// @brief Record about sprite node.
 struct SpriteNodeInfo : public DrawableNodeRecord
 {
-     int rect_coords[ 2 ];         ///< coordinates of sprite rectangle in the texture.
-     int rect_size[ 2 ];           ///< size of sprite rectangle in the texture.
+     int32_t rect_coords[ 2 ];     ///< coordinates of sprite rectangle in the texture.
+     int32_t rect_size[ 2 ];       ///< size of sprite rectangle in the texture.
 };
 
 
@@ -209,7 +216,7 @@ struct StateInfo
      float pixels_per_meter;       ///< how many pixels are considered as one meter.
      uint32_t scene_size[ 2 ];     ///< number of quadrants that should be made in width and in height.
      uint32_t node_count;          ///< count of nodes in this state.
-     int order;                    ///< order of this state.
+     int32_t order;                ///< order of this state.
      uint8_t updating;             ///< is this state is initially updating.
      uint8_t rendering;            ///< is this state is initially rendering.
 };

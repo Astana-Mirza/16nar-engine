@@ -5,18 +5,17 @@ namespace _16nar
 
 #ifdef USE_SFML
 
-SpriteNode::SpriteNode( Quadrant *quad, const Texture& tex ):
-     DrawableNode::DrawableNode( quad ), sprite_( tex ) {}
+SpriteNode::SpriteNode( RenderSystem *render_system, const Texture& tex ):
+     DrawableNode::DrawableNode( render_system ), sprite_( tex ) {}
 
 
-SpriteNode::SpriteNode( Quadrant *quad, const Texture& tex, const IntRect& rect ):
-     DrawableNode::DrawableNode( quad ), sprite_( tex, rect ) {}
+SpriteNode::SpriteNode( RenderSystem *render_system, const Texture& tex, const IntRect& rect ):
+     DrawableNode::DrawableNode( render_system ), sprite_( tex, rect ) {}
 
 
-void SpriteNode::draw( RenderTarget& target ) const
+RenderData SpriteNode::get_render_data() const
 {
-     RenderStates states{ get_blend(), get_global_transform_matr( false ), nullptr, get_shader() };
-     target.draw( sprite_, states );
+     return RenderData{ get_blend(), get_global_transform_matr( false ), get_texture(), get_shader()};
 }
 
 
