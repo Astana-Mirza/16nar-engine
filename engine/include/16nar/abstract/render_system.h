@@ -9,6 +9,7 @@ namespace _16nar
 {
 
 class Drawable;
+class RenderDevice;
 
 /// @brief Interface for world state rendering system.
 /// @detail Rendering system defines an algorithm for drawing.
@@ -23,11 +24,13 @@ public:
      virtual ~RenderSystem() = default;
 
      /// @brief Start rendering a frame.
-     /// @param[in] target target where objects should be rendered.
-     virtual void start_render( RenderTarget& target ) = 0;
+     /// @param[in] view view used to define rendering area.
+     /// @param[in] device device used for rendering.
+     virtual void start_render( const View& view, RenderDevice& device ) = 0;
 
      /// @brief Finish rendering a frame.
-     virtual void finish_render() = 0;
+     /// @param[in] device device used for rendering.
+     virtual void finish_render( RenderDevice& device ) = 0;
 
      /// @brief Add a drawable object to this system.
      /// @param[in] child pointer to drawable object to be added.

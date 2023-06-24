@@ -1,18 +1,18 @@
 /// @file
-/// @brief Header file with Transformable abstract class definition.
-#ifndef _16NAR_TRANSFORMABLE_H
-#define _16NAR_TRANSFORMABLE_H
+/// @brief Header file with Transformable2D abstract class definition.
+#ifndef _16NAR_TRANSFORMABLE_2D_H
+#define _16NAR_TRANSFORMABLE_2D_H
 
 #include <16nar/16nardefs.h>
 
 namespace _16nar
 {
 
-/// @brief Abstract base class providing functionality for transformations
-class ENGINE_API Transformable
+/// @brief Abstract base class providing functionality for 2D transformations
+class ENGINE_API Transformable2D
 {
 public:
-     virtual ~Transformable()                           = default;
+     virtual ~Transformable2D()                         = default;
 
      /// @brief Gets current object position.
      virtual const Vector2f& get_position() const             = 0;
@@ -91,4 +91,4 @@ protected:
 
 } // namespace _16nar
 
-#endif // #ifndef _16NAR_TRANSFORMABLE_H
+#endif // #ifndef _16NAR_TRANSFORMABLE_2D_H

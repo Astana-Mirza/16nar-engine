@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 set(BUILD_SHARED_LIBS ON)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(ENGINE_DIR ../install/x64-Debug)
+set(ENGINE_DIR ../out/install/x64-Debug)
 
 
 add_executable(example-game

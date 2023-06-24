@@ -27,12 +27,13 @@ public:
      QTreeRenderSystem( Quadrant&& root );
 
      /// @brief Start rendering a frame.
-     /// @param[in] target target where objects should be rendered.
-     void start_render( RenderTarget& target ) override;
+     /// @param[in] view view used to define rendering area.
+     /// @param[in] device device used for rendering.
+     void start_render( const View& view, RenderDevice& device ) override;
 
      /// @brief Finish rendering a frame.
-     /// @detail Does nothing, because for regular quadrants there is nothing to finalize.
-     void finish_render() override {}
+     /// @param[in] device device used for rendering.
+     void finish_render( RenderDevice& device ) override;
 
      /// @brief Add a drawable object to this quadrant.
      /// @param[in] child pointer to drawable object to be added.

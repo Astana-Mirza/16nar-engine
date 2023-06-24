@@ -5,6 +5,7 @@
 
 #include <16nar/constructor/abstract/node.h>
 #include <16nar/abstract/render_system.h>
+#include <16nar/render/view.h>
 
 namespace _16nar
 {
@@ -61,11 +62,12 @@ public:
      void loop( float delta );
 
      /// @brief Start rendering this state on the target.
-     /// @param[in] target target on which everething will be drawn.
-     void start_render( RenderTarget& target );
+     /// @param[in] device device with which everething will be rendered.
+     void start_render( RenderDevice& device );
 
      /// @brief Finish rendering this state.
-     void finish_render();
+     /// @param[in] device device with which everething will be rendered.
+     void finish_render( RenderDevice& device );
 
 protected:
      std::unique_ptr< RenderSystem > render_system_; ///< render system of this state.

@@ -9,7 +9,7 @@
 #include <memory>
 
 #include <16nar/constructor/animations/animation.h>
-#include <16nar/abstract/transformable.h>
+#include <16nar/abstract/transformable_2d.h>
 #include <16nar/abstract/signallable.h>
 
 namespace _16nar
@@ -18,7 +18,7 @@ namespace _16nar
 class Animation;
 
 /// @brief Abstract base class for all nodes in the engine.
-class ENGINE_API Node : public Signallable, public Transformable
+class ENGINE_API Node : public Signallable, public Transformable2D
 {
 public:
      using AnimationMap = std::unordered_map< std::string, std::unique_ptr< Animation > >;

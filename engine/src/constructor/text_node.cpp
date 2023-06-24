@@ -9,10 +9,9 @@ TextNode::TextNode( RenderSystem *render_system, const std::string& string, cons
      DrawableNode::DrawableNode( render_system ), text_( string, font, char_size ) {}
 
 
-void TextNode::draw( RenderTarget& target ) const
+RenderData TextNode::get_render_data() const
 {
-     RenderStates states{ get_blend(), get_global_transform_matr( false ), nullptr, get_shader() };
-     target.draw( text_, states );
+     return RenderData{ get_blend(), get_global_transform_matr( false ), nullptr, get_shader() };
 }
 
 

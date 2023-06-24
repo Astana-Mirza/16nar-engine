@@ -94,11 +94,10 @@ FloatRect Tile::get_local_bounds() const
 }
 
 
-void Tile::draw( RenderTarget& target ) const
+RenderData Tile::get_render_data() const
 {
-     RenderStates states{ get_blend(), tilemap_.get_global_transform_matr(),
-                          tilemap_.get_settings().texture, get_shader() };
-     target.draw( vertices_, states );
+     return RenderData{ get_blend(), tilemap_.get_global_transform_matr(),
+                        tilemap_.get_settings().texture, get_shader() };
 }
 
 

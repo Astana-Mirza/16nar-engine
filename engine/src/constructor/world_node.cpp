@@ -1,5 +1,6 @@
 #include <16nar/constructor/world_node.h>
 #include <16nar/abstract/scene_reader.h>
+#include <16nar/abstract/render_device.h>
 
 namespace _16nar
 {
@@ -47,25 +48,25 @@ void WorldNode::loop( float delta )
 }
 
 
-void WorldNode::start_render( RenderTarget& target )
+void WorldNode::start_render( RenderDevice& device )
 {
      for ( auto& [ order, state ] : states_ )
      {
           if ( state->get_rendering() )
           {
-               state->start_render( target );
+               state->start_render( device );
           }
      }
 }
 
 
-void WorldNode::finish_render()
+void WorldNode::finish_render( RenderDevice& device )
 {
      for ( auto& [ order, state ] : states_ )
      {
           if ( state->get_rendering() )
           {
-               state->finish_render();
+               state->finish_render( device );
           }
      }
 }

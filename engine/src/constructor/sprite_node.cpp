@@ -13,10 +13,9 @@ SpriteNode::SpriteNode( RenderSystem *render_system, const Texture& tex, const I
      DrawableNode::DrawableNode( render_system ), sprite_( tex, rect ) {}
 
 
-void SpriteNode::draw( RenderTarget& target ) const
+RenderData SpriteNode::get_render_data() const
 {
-     RenderStates states{ get_blend(), get_global_transform_matr( false ), nullptr, get_shader() };
-     target.draw( sprite_, states );
+     return RenderData{ get_blend(), get_global_transform_matr( false ), get_texture(), get_shader()};
 }
 
 

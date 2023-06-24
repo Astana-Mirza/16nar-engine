@@ -23,9 +23,7 @@ public:
 
      /// @brief Constructor.
      /// @param[in] world world node for which the profile will work.
-     /// @param[in] window pointer to main window of the game.
-     Profile( WorldNode& world, const std::shared_ptr< RenderWindow >& window ):
-          world_{ world }, window_{ window } {}
+     Profile( WorldNode& world ) : world_{ world } {}
 
      virtual ~Profile() = default;
 
@@ -49,8 +47,7 @@ public:
      inline Time get_time_per_frame() { return time_per_frame_; }
 
 protected:
-     std::shared_ptr< RenderWindow > window_;    ///< pointer to main window of the game.
-     WorldNode& world_;                          ///< world node for which the profile works.
+     WorldNode& world_;                              ///< world node for which the profile works.
 
 private:
      Time time_per_frame_ = Time{ 1.f / 60.f };  ///< minimal time of one rendering frame.

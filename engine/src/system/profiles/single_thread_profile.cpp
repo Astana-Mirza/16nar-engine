@@ -1,12 +1,14 @@
 #include <16nar/system/profiles/single_thread_profile.h>
 
 #include <16nar/game.h>
+#include <16nar/abstract/render_device.h>
+#include <16nar/render/frame_render_device.h>
 
 namespace _16nar
 {
 
 SingleThreadProfile::SingleThreadProfile( WorldNode& world, const std::shared_ptr< RenderWindow >& window ):
-     Profile{ world, window } {}
+     Profile{ world }, render_device_{ std::make_unique< FrameRenderDevice >( window ) } {}
 
 
 void SingleThreadProfile::run()
@@ -31,10 +33,8 @@ void SingleThreadProfile::run()
 
 void SingleThreadProfile::render()
 {
-     window_->clear();
-     world_.start_render( *window_ );   // single thread, so wait for all to be drawn
-     world_.finish_render();
-     window_->display();
+     world_.start_render( *render_device_ );   // single thread, so wait for all to be drawn
+     world_.finish_render( *render_device_ );
 }
 
 } // namespace _16nar

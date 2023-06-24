@@ -25,9 +25,8 @@ public:
      /// @param[in] rect rectangular area of texture displayed by the sprite.
      SpriteNode( RenderSystem *render_system, const Texture& tex, const IntRect& rect );
 
-     /// @brief Draw this object on the target.
-     /// @param[in] target target where object should be rendered.
-     void draw( RenderTarget& target ) const override;
+     /// @brief Get render data of the object.
+     RenderData get_render_data() const override;
 
      /// @brief Set texture for the sprite.
      /// @param[in] texture texture (picture) for the sprite.

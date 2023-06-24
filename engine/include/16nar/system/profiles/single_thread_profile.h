@@ -4,6 +4,7 @@
 #define _16NAR_SINGLE_THREAD_PROFILE_H
 
 #include <16nar/abstract/profile.h>
+#include <16nar/abstract/render_device.h>
 
 namespace _16nar
 {
@@ -22,6 +23,9 @@ public:
 
      /// @brief Renders one frame on the window.
      void render();
+
+private:
+     std::unique_ptr< RenderDevice > render_device_; ///< device used for rendering.
 };
 
 } // namespace _16nar

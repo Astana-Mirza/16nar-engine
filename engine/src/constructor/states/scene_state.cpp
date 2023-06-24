@@ -89,16 +89,15 @@ void SceneState::loop( float delta )
 }
 
 
-void SceneState::start_render( RenderTarget& target )
+void SceneState::start_render( RenderDevice& device )
 {
-     target.setView( view_ );
-     render_system_->start_render( target );
+     render_system_->start_render( view_, device );
 }
 
 
-void SceneState::finish_render()
+void SceneState::finish_render( RenderDevice& device )
 {
-     render_system_->finish_render();
+     render_system_->finish_render( device );
 }
 
 } // namespace _16nar

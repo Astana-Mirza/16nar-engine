@@ -1,4 +1,6 @@
 #include <16nar/render/qtree_render_system.h>
+#include <16nar/abstract/render_device.h>
+#include <16nar/render/view.h>
 
 namespace _16nar
 {
@@ -6,20 +8,36 @@ namespace _16nar
 QTreeRenderSystem::QTreeRenderSystem( Quadrant&& root ): root_{ root } {}
 
 
-void QTreeRenderSystem::start_render( RenderTarget& target )
+void QTreeRenderSystem::start_render( const View& view, RenderDevice& device )
 {
      Quadrant::LayerMap layers;
-     root_.find_objects( target, target.getViewport( target.getView() ), layers );
+     root_.find_objects( view.get_global_bounds(), layers );
+     if ( !layers.empty() )
+     {
+          RenderDevice::DeviceData data{};
+          data.type = RenderDevice::DeviceDataType::View;
+          data.view = view;
+          device.add_data( data );
+     }
      for ( const auto& [ lay, objs ] : layers )
      {
           for ( const auto drawable : objs )
           {
                if ( drawable->is_visible() )
                {
-                    drawable->draw( target );
+                    RenderDevice::DeviceData data{};
+                    data.type = RenderDevice::DeviceDataType::View;
+                    data.render_data = drawable->get_render_data();
+                    device.add_data( data );
                }
           }
      }
+}
+
+
+void QTreeRenderSystem::finish_render( RenderDevice& device )
+{
+     device.flush();
 }
 
 
@@ -56,7 +74,7 @@ void QTreeRenderSystem::handle_change( Drawable *child )
           current = current->get_parent();
      }
      do
-     {                        // go to the lowest possible level
+     {    // go to the lowest possible level
           const auto& children = current->get_children();
           for ( size_t i = 0; i < Quadrant::quad_count && !found; i++ )
           {

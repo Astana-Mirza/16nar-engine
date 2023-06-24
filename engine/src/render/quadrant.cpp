@@ -53,11 +53,9 @@ void Quadrant::delete_draw_child( Drawable *child )
 }
 
 
-void Quadrant::find_objects( const RenderTarget& target, IntRect area, LayerMap& layers ) const
+void Quadrant::find_objects( const FloatRect& area, LayerMap& layers ) const
 {
-     IntRect mapped( target.mapCoordsToPixel( { area_.left, area_.top } ),
-                     { ( int ) area_.width, ( int ) area_.height } );
-     if ( mapped.intersects( area ) )
+     if ( area_.intersects( area ) )
      {
           for ( const auto ptr : drawables_ )
           {
@@ -67,7 +65,7 @@ void Quadrant::find_objects( const RenderTarget& target, IntRect area, LayerMap&
           {
                if ( ptr )
                {
-                    ptr->find_objects( target, area, layers );
+                    ptr->find_objects( area, layers );
                }
           }
      }

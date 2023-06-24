@@ -77,9 +77,8 @@ public:
      FloatRect get_global_bounds() const override;
 
 protected:
-     /// @brief Draws an object on a given target.
-     /// @param[in] target render target where the object should be drawn.
-     void draw( RenderTarget& target ) const override;
+     /// @brief Get render data of the object.
+     RenderData get_render_data() const override;
 
      /// @brief Sets color of an object.
      /// @param[in] color color of an object.

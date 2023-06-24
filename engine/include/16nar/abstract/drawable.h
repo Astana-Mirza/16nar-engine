@@ -28,50 +28,49 @@ public:
 
      inline RenderSystem& get_render_system() { return *render_system_; }
 
-     /// @brief Checks if the object is visible.
+     /// @brief Check if the object is visible.
      virtual bool is_visible() const = 0;
 
-     /// @brief Sets visibility of the object.
+     /// @brief Set visibility of the object.
      /// @param[in] visible visibility.
      virtual void set_visible( bool visible ) = 0;
 
-     /// @brief Gets the scene layer of this object.
+     /// @brief Get the scene layer of this object.
      virtual int get_layer() const = 0;
 
-     /// @brief Sets scene layer of this object.
+     /// @brief Set scene layer of this object.
      /// @param[in] layer scene layer.
      virtual void set_layer( int layer ) = 0;
 
-     /// @brief Sets shader of this object.
+     /// @brief Set shader of this object.
      /// @param[in] shader pointer to shader.
      virtual void set_shader( Shader *shader ) = 0;
 
-     /// @brief Gets shader of this object.
+     /// @brief Get shader of this object.
      virtual Shader *get_shader() const = 0;
 
-     /// @brief Sets the blend mode of this object.
+     /// @brief Set the blend mode of this object.
      /// @param[in] blend blend mode of this object.
      virtual void set_blend( const BlendMode& blend ) = 0;
 
-     /// @brief Gets the blend mode of this object.
+     /// @brief Get the blend mode of this object.
      virtual const BlendMode& get_blend() const = 0;
 
-     /// @brief Sets color of an object.
+     /// @brief Set color of an object.
      /// @param[in] color color of an object.
      virtual void set_color( const Color& color ) = 0;
 
-     /// @brief Gets color of an object.
+     /// @brief Get color of an object.
      virtual const Color& get_color() const = 0;
 
-     /// @brief Gets local bounds of an object (in its own coordinates).
+     /// @brief Get local bounds of an object (in its own coordinates).
      virtual FloatRect get_local_bounds() const = 0;
 
-     /// @brief Gets global bounds of an object (in world coordinates).
+     /// @brief Get global bounds of an object (in world coordinates).
      virtual FloatRect get_global_bounds() const = 0;
 
-     /// @brief Draws an object on a given target.
-     /// @param[in] target render target where the object should be drawn.
-     virtual void draw( RenderTarget& target ) const = 0;
+     /// @brief Get render data of the object.
+     virtual RenderData get_render_data() const = 0;
 
 protected:
      RenderSystem *render_system_;         ///< render system which draws this object.

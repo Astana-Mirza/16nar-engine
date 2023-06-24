@@ -11,6 +11,7 @@ namespace _16nar
 {
 
 class SceneReader;
+class RenderDevice;
 
 /// @brief The world, root of the scene tree.
 /// @detail The world is a finite state machine, game states (e.g. main game, pause, hp bar)
@@ -40,11 +41,12 @@ public:
      void loop( float delta );
 
      /// @brief Start rendering of all states on the target.
-     /// @param[in] target target on which everething will be drawn.
-     void start_render( RenderTarget& target );
+     /// @param[in] device device with which everething will be rendered.
+     void start_render( RenderDevice& device );
 
      /// @brief Finish rendering of all states on the target.
-     void finish_render();
+     /// @param[in] device device with which everething will be rendered.
+     void finish_render( RenderDevice& device );
 
      /// @brief Register new simple scene state.
      /// @param[in] order order value which defines order of state updating.

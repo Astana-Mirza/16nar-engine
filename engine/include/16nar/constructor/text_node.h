@@ -21,9 +21,8 @@ public:
      /// @param[in] char_size size of a character.
      TextNode( RenderSystem *render_system, const std::string& string, const Font& font, uint32_t char_size = 30 );
 
-     /// @brief Draw this object on the target.
-     /// @param[in] target target where object should be rendered.
-     void draw( RenderTarget& target ) const override;
+     /// @brief Get render data of the object.
+     RenderData get_render_data() const override;
 
      /// @brief Sets the string to be displayed.
      /// @param[in] string string of a text.

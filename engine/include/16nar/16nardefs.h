@@ -26,20 +26,21 @@
 namespace _16nar
 {
 
+class View;
+
 #ifdef USE_SFML
 
 namespace Style = sf::Style;
 
 using Transform = sf::Transformable;
 using TransformMatrix = sf::Transform;
+using RenderData = sf::RenderStates;
 
 using sf::Vector2f;
 using sf::IntRect;
 using sf::FloatRect;
 using sf::RenderTarget;
-using sf::RenderStates;
 using sf::RenderWindow;
-using sf::View;
 using sf::Color;
 using sf::Sprite;
 using sf::Texture;

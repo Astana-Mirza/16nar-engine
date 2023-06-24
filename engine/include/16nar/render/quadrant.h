@@ -54,10 +54,9 @@ public:
      void delete_draw_child( Drawable *child );
 
      /// @brief Recursively find objects in this quadrant, which intersect with given area.
-     /// @param[in] target target where objects should be rendered.
      /// @param[in] area area for which we look for intersections.
      /// @param[out] layers layers and sets of all found objects on the layers.
-     void find_objects( const RenderTarget& target, IntRect area, LayerMap& layers ) const;
+     void find_objects( const FloatRect& area, LayerMap& layers ) const;
 
 private:
      DrawableSet drawables_;       ///< all drawable objects stored with their layers.
