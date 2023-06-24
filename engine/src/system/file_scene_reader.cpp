@@ -301,12 +301,12 @@ void FileSceneReader::make_quadrants( Quadrant& parent, const Vector2f& start,
      }
 
      uint32_t current_wcount = wcount, current_hcount = hcount;
+     uint32_t enlarge = 0;
      while ( current_wcount > 2 || current_hcount > 2 )
      {
           uint32_t x = 0, y = 0;             // indexes of bigger quadrants in 2-dim. array
           uint32_t new_wcount = ( current_wcount + 1 ) / 2;
           uint32_t new_hcount = ( current_hcount + 1 ) / 2;
-          uint32_t enlarge = 0;
           for ( size_t i = 0; i < current_hcount; i += 2 )
           {
                for ( size_t j = 0; j < current_wcount; j += 2 )
