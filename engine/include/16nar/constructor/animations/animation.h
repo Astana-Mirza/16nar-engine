@@ -3,7 +3,7 @@
 #ifndef _16NAR_ANIMATION_H
 #define _16NAR_ANIMATION_H
 
-#include <16nar/16nardefs.h>
+#include <16nar/common/16nardefs.h>
 
 #include <map>
 #include <functional>

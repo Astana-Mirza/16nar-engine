@@ -3,7 +3,7 @@
 #ifndef _16NAR_TRANSFORMABLE_2D_H
 #define _16NAR_TRANSFORMABLE_2D_H
 
-#include <16nar/16nardefs.h>
+#include <16nar/common/16nardefs.h>
 
 namespace _16nar
 {

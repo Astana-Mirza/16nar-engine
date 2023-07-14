@@ -7,7 +7,7 @@
 #include <array>
 #include <unordered_set>
 
-#include <16nar/16nardefs.h>
+#include <16nar/common/16nardefs.h>
 #include <16nar/abstract/drawable.h>
 
 namespace _16nar

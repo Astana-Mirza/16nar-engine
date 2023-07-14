@@ -6,7 +6,7 @@
 #include <chrono>
 #include <memory>
 
-#include <16nar/16nardefs.h>
+#include <16nar/common/16nardefs.h>
 
 namespace _16nar
 {

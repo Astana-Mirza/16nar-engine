@@ -5,7 +5,7 @@
 
 #include <16nar/constructor/abstract/node.h>
 #include <16nar/abstract/render_system.h>
-#include <16nar/render/view.h>
+#include <16nar/common/render/view.h>
 
 namespace _16nar
 {

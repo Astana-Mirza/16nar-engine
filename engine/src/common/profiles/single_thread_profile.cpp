@@ -1,8 +1,8 @@
-#include <16nar/system/profiles/single_thread_profile.h>
+#include <16nar/common/profiles/single_thread_profile.h>
 
-#include <16nar/game.h>
+#include <16nar/common/game.h>
 #include <16nar/abstract/render_device.h>
-#include <16nar/render/frame_render_device.h>
+#include <16nar/common/render/frame_render_device.h>
 
 namespace _16nar
 {

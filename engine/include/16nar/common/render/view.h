@@ -3,7 +3,7 @@
 #ifndef _16NAR_VIEW_H
 #define _16NAR_VIEW_H
 
-#include <16nar/16nardefs.h>
+#include <16nar/common/16nardefs.h>
 
 namespace _16nar
 {

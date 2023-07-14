@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <typeindex>
 
-#include <16nar/signals/slot.h>
+#include <16nar/common/signals/slot.h>
 
 namespace _16nar
 {

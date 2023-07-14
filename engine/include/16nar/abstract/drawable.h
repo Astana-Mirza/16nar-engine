@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-#include <16nar/16nardefs.h>
+#include <16nar/common/16nardefs.h>
 #include <16nar/abstract/render_system.h>
 
 namespace _16nar

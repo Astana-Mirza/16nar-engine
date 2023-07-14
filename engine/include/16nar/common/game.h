@@ -7,11 +7,11 @@
 #include <vector>
 #include <string>
 
-#include <16nar/render/quadrant.h>
-#include <16nar/constructor/world_node.h>
+#include <16nar/common/render/quadrant.h>
+#include <16nar/common/system/event_manager.h>
 #include <16nar/abstract/scene_reader.h>
-#include <16nar/system/event_manager.h>
 #include <16nar/abstract/profile.h>
+#include <16nar/constructor/world_node.h>
 
 namespace _16nar
 {

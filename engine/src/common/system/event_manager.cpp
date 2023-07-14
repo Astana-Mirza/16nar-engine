@@ -1,4 +1,4 @@
-#include <16nar/system/event_manager.h>
+#include <16nar/common/system/event_manager.h>
 
 namespace _16nar
 {

@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include <16nar/abstract/render_system.h>
-#include <16nar/render/quadrant.h>
+#include <16nar/common/render/quadrant.h>
 
 namespace _16nar
 {

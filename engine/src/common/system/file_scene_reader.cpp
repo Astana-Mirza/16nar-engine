@@ -1,6 +1,6 @@
-#include <16nar/system/file_scene_reader.h>
-#include <16nar/render/quadrant.h>
-#include <16nar/game.h>
+#include <16nar/common/system/file_scene_reader.h>
+#include <16nar/common/render/quadrant.h>
+#include <16nar/common/game.h>
 
 #include <16nar/constructor/node_2d.h>
 #include <16nar/constructor/sprite_node.h>
@@ -8,7 +8,7 @@
 #include <16nar/constructor/text_node.h>
 #include <16nar/constructor/tilemap_node.h>
 
-#include <16nar/render/qtree_render_system.h>
+#include <16nar/common/render/qtree_render_system.h>
 
 namespace _16nar
 {

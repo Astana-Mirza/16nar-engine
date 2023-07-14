@@ -1,2 +1,2 @@
-#cmakedefine USE_SFML
-#cmakedefine WIN_EXPORT
+#cmakedefine NARENGINE_RENDER_OPENGL
+#cmakedefine NARENGINE_WIN_EXPORT

@@ -4,7 +4,7 @@
 #define _16NAR_SCENE_READER_H
 
 #include <16nar/constructor/world_node.h>
-#include <16nar/render/quadrant.h>
+#include <16nar/common/render/quadrant.h>
 
 #include <16nar/scene_file.h>
 

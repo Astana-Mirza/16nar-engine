@@ -3,8 +3,8 @@
 #ifndef _16NAR_RENDER_DEVICE_H
 #define _16NAR_RENDER_DEVICE_H
 
-#include <16nar/16nardefs.h>
-#include <16nar/render/view.h>
+#include <16nar/common/16nardefs.h>
+#include <16nar/common/render/view.h>
 
 namespace _16nar
 {

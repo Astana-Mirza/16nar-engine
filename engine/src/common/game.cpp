@@ -1,9 +1,9 @@
-#include <16nar/game.h>
+#include <16nar/common/game.h>
 
-#include <16nar/system/file_scene_reader.h>
+#include <16nar/common/system/file_scene_reader.h>
 #define USE_SINGLE_THREAD_PROFILE
 #ifdef USE_SINGLE_THREAD_PROFILE
-#    include <16nar/system/profiles/single_thread_profile.h>
+#    include <16nar/common/profiles/single_thread_profile.h>
 #endif
 
 namespace _16nar
