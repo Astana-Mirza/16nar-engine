@@ -3,7 +3,7 @@
 #ifndef _16NAR_TILE_H
 #define _16NAR_TILE_H
 
-#include <16nar/common/16nardefs.h>
+#include <16nar/16nardefs.h>
 #include <16nar/abstract/drawable.h>
 
 namespace _16nar

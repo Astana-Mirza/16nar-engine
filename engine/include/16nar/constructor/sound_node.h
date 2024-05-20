@@ -3,7 +3,7 @@
 #ifndef _16NAR_SOUND_NODE_H
 #define _16NAR_SOUND_NODE_H
 
-#include <16nar/common/16nardefs.h>
+#include <16nar/16nardefs.h>
 #include <16nar/constructor/node_2d.h>
 
 namespace _16nar

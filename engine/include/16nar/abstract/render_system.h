@@ -3,46 +3,45 @@
 #ifndef _16NAR_RENDER_SYSTEM_H
 #define _16NAR_RENDER_SYSTEM_H
 
-#include <16nar/common/16nardefs.h>
+#include <16nar/16nardefs.h>
+#include <16nar/render/render_defs.h>
 
 namespace _16nar
 {
 
+class Camera;
 class Drawable;
-class RenderDevice;
 
 /// @brief Interface for world state rendering system.
-/// @detail Rendering system defines an algorithm for drawing.
+/// @details Rendering system defines an algorithm for drawing.
 /// It is library-agnostic, so algorithm must not care about OpenGL, DirectX, Vulkan etc.
 class ENGINE_API RenderSystem
 {
 public:
-     RenderSystem()                      = default;
-     RenderSystem( const RenderSystem& ) = delete;
-     RenderSystem( RenderSystem&& )      = delete;
+     RenderSystem()                                                = default;
+     RenderSystem( const RenderSystem& )                            = delete;
+     RenderSystem( RenderSystem&& )                                 = delete;
 
-     virtual ~RenderSystem() = default;
+     virtual ~RenderSystem()                                       = default;
 
      /// @brief Start rendering a frame.
-     /// @param[in] view view used to define rendering area.
-     /// @param[in] device device used for rendering.
-     virtual void start_render( const View& view, RenderDevice& device ) = 0;
+     /// @param[in] camera camera used to define rendering area.
+     virtual void start_render( const Camera& camera )                   = 0;
 
      /// @brief Finish rendering a frame.
-     /// @param[in] device device used for rendering.
-     virtual void finish_render( RenderDevice& device ) = 0;
+     virtual void finish_render()                                        = 0;
 
      /// @brief Add a drawable object to this system.
      /// @param[in] child pointer to drawable object to be added.
-     virtual void add_draw_child( Drawable *child ) = 0;
+     virtual void add_draw_child( Drawable *child )                      = 0;
 
      /// @brief Delete a drawable object from this system, memory will not be freed.
      /// @param[in] child pointer to drawable object to be deleted.
-     virtual void delete_draw_child( Drawable *child ) = 0;
+     virtual void delete_draw_child( Drawable *child )                   = 0;
 
      /// @brief Handle change of object and adjust for future redrawing.
      /// @param[in] child changed object.
-     virtual void handle_change( Drawable *child ) = 0;
+     virtual void handle_change( Drawable *child )                       = 0;
 };
 
 } // namespace _16nar

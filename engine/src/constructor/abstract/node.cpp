@@ -1,5 +1,5 @@
 #include <16nar/constructor/abstract/node.h>
-#include <16nar/common/game.h>
+#include <16nar/game.h>
 
 #include <stdexcept>
 

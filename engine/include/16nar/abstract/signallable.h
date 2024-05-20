@@ -3,25 +3,29 @@
 #ifndef _16NAR_SIGNALLABLE_H
 #define _16NAR_SIGNALLABLE_H
 
+#include <16nar/signals/slot.h>
+
 #include <unordered_map>
 #include <typeindex>
 
-#include <16nar/common/signals/slot.h>
-
 namespace _16nar
 {
-     class Signallable;
+
+class Signallable;
+
 }
 
 
 namespace std
 {
-     /// @brief Definition of hash for pair of std::type_index and pointer, needed for signals.
-     template<>
-     struct hash< std::pair< std::type_index, _16nar::Signallable * > >
-     {
-          size_t operator()( const std::pair< std::type_index, _16nar::Signallable * >& id ) const;
-     };
+
+/// @brief Definition of hash for pair of std::type_index and pointer, needed for signals.
+template<>
+struct hash< std::pair< std::type_index, _16nar::Signallable * > >
+{
+     size_t operator()( const std::pair< std::type_index, _16nar::Signallable * >& id ) const;
+};
+
 }
 
 
@@ -29,7 +33,7 @@ namespace _16nar
 {
 
 /// @brief A base class which can send and accept signals.
-/// @detail Acts as both sender and receiver of signals.
+/// @details Acts as both sender and receiver of signals.
 class ENGINE_API Signallable
 {
 public:

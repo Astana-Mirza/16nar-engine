@@ -3,10 +3,10 @@
 #ifndef _16NAR_PROFILE_H
 #define _16NAR_PROFILE_H
 
+#include <16nar/16nardefs.h>
+
 #include <chrono>
 #include <memory>
-
-#include <16nar/common/16nardefs.h>
 
 namespace _16nar
 {
@@ -15,7 +15,7 @@ class WorldNode;
 class RenderWindow;
 
 /// @brief Interface for game running profile.
-/// @detail A profile specifies how the game is updating and rendering.
+/// @details A profile specifies how the game is updating and rendering.
 class ENGINE_API Profile
 {
 public:
@@ -47,7 +47,7 @@ public:
      inline Time get_time_per_frame() { return time_per_frame_; }
 
 protected:
-     WorldNode& world_;                              ///< world node for which the profile works.
+     WorldNode& world_;                          ///< world node for which the profile works.
 
 private:
      Time time_per_frame_ = Time{ 1.f / 60.f };  ///< minimal time of one rendering frame.
