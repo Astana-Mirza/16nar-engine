@@ -2,6 +2,7 @@
 #define _16NAR_OPENGL_ST_RESOURCE_MANAGER_INL
 
 #include <16nar/system/exceptions.h>
+#include <16nar/logger/logger.h>
 
 namespace _16nar::opengl
 {
@@ -50,6 +51,10 @@ void StResourceManager< T >::unload( ResID id )
                throw ResourceException{ "cannot unload resource ", id };
           }
      }
+     else
+     {
+          LOG_16NAR_WARNING( "Resource with id " << id << " does not exist, won't unload" );
+     }
 }
 
 
@@ -61,7 +66,7 @@ void StResourceManager< T >::clear()
      {
           if ( !T::unload( res ) )
           {
-               // todo: log
+               LOG_16NAR_ERROR( "Unable to unload resource with id " << id );
           }
      }
      resources_.clear();

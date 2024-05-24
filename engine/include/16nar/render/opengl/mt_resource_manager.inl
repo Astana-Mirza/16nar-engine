@@ -2,6 +2,7 @@
 #define _16NAR_OPENGL_MT_RESOURCE_MANAGER_INL
 
 #include <16nar/system/exceptions.h>
+#include <16nar/logger/logger.h>
 
 namespace _16nar::opengl
 {
@@ -47,7 +48,7 @@ void MtResourceManager< T >::clear()
      {
           if ( !T::unload( res ) )
           {
-               // todo: log
+               LOG_16NAR_ERROR( "Unable to unload resource with id " << id );
           }
      }
      resources_.clear();
@@ -88,6 +89,7 @@ void MtResourceManager< T >::process_unload_queue()
           auto iter = resources_.find( id );
           if ( iter == resources_.end() )
           {
+               LOG_16NAR_WARNING( "Resource with id " << id << " does not exist, won't unload" );
                continue;
           }
           bool ok = T::unload( iter->second );

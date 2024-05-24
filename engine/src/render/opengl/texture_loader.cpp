@@ -1,15 +1,18 @@
 #include <16nar/render/opengl/texture_loader.h>
+
+#include <16nar/system/exceptions.h>
+#include <16nar/logger/logger.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <glad/gl.h>
-
-#include <16nar/system/exceptions.h>
 
 namespace _16nar::opengl
 {
 
 bool TextureLoader::unload( TextureLoader::Handler handler )
 {
+     LOG_16NAR_DEBUG( "Texture " << handler.descriptor << " was unloaded" );
      return true;
 }
 
@@ -21,7 +24,7 @@ TextureLoader::TextureLoader( const LoadParams& params ):
 
 bool TextureLoader::load_impl() const
 {
-     
+     LOG_16NAR_DEBUG( "Texture " << handler_.descriptor << " was loaded" );
      return true;
 }
 

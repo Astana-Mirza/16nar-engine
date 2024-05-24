@@ -1,4 +1,4 @@
-#include <16nar/abstract/signallable.h>
+#include <16nar/signals/signallable.h>
 
 namespace std
 {

@@ -1,4 +1,7 @@
 #include <16nar/game.h>
+
+#include <16nar/logger/logger.h>
+
 /*
 #include <16nar/system/file_scene_reader.h>
 #define USE_SINGLE_THREAD_PROFILE
@@ -59,12 +62,14 @@ void Game::init()
      {
           throw std::runtime_error{ "GLFW error: failed to initialize" };
      }
+     LOG_16NAR_INFO( "16nar engine was initialized" );
 }
 
 
 void Game::deinit()
 {
      glfwTerminate();
+     LOG_16NAR_INFO( "16nar engine was deinitialized" );
 }
 
 /*

@@ -1,5 +1,7 @@
 #include <16nar/system/monitor.h>
 
+#include <16nar/logger/logger.h>
+
 #include <stdexcept>
 #include <GLFW/glfw3.h>
 
@@ -133,6 +135,7 @@ void Monitor::set_gamma_ramp( const Monitor::GammaRamp& ramp )
      glfw_ramp.blue = ramp.blue;
      glfw_ramp.size = static_cast< int >( ramp.size );
      glfwSetGammaRamp( monitor_, &glfw_ramp );
+     LOG_16NAR_DEBUG( "Monitor gamma ramp was set (size: " << ramp.size << ")" );
 }
 
 
@@ -162,6 +165,7 @@ Monitor::ConnectCallback Monitor::set_connect_callback( Monitor::ConnectCallback
 {
      ConnectCallback prev = connect_callback_;
      connect_callback_ = callback;
+     LOG_16NAR_DEBUG( "Monitor connect callback was set" );
      return prev;
 }
 
@@ -170,6 +174,7 @@ Monitor::ConnectCallback Monitor::set_disconnect_callback( Monitor::ConnectCallb
 {
      ConnectCallback prev = disconnect_callback_;
      disconnect_callback_ = callback;
+     LOG_16NAR_DEBUG( "Monitor disconnect callback was set" );
      return prev;
 }
 
@@ -181,10 +186,12 @@ void Monitor::glfw_monitor_callback( GLFWmonitor *monitor, int event )
 {
      if ( event == GLFW_CONNECTED && connect_callback_ )
      {
+          LOG_16NAR_INFO( "Monitor was connected" );
           connect_callback_( Monitor{ monitor } );
      }
      else if ( event == GLFW_DISCONNECTED && disconnect_callback_ )
      {
+          LOG_16NAR_INFO( "Monitor was disconnected" );
           disconnect_callback_( Monitor{ monitor } );
      }
 }

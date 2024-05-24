@@ -39,6 +39,7 @@ narengine_set_option(NARENGINE_WINDOW_WAYLAND OFF BOOL "Use Wayland instead of X
 narengine_set_option(NARENGINE_RENDER_OPENGL ON BOOL "Use OpenGL for rendering (uses GLM + GLFW + glad)")
 narengine_set_option(NARENGINE_RENDER_VULKAN OFF BOOL "Use Vulkan for rendering (uses GLM + GLFW)") # not implemented
 narengine_set_option(NARENGINE_RENDER_OPENGL_ES OFF BOOL "Use OpenGL ES for rendering (uses GLM + GLFW + glad)") # not implemented
+narengine_set_option(NARENGINE_LOG_LEVEL "9" STRING "Maximum log level of engine logging library")
 narengine_set_option(NARENGINE_BUILD_TESTS ON BOOL "Build tests for 16nar engine")
 
 # Basic settings
@@ -56,6 +57,22 @@ set(NARENGINE_COMMON_INCLUDE_DIRS
 configure_file("${NARENGINE_INCLUDE_DIR}/${NAME}config.h.in" "${NAME}/${NAME}config.h")
 
 
+# Logger library
+set(NARENGINE_LOGGER_COMPILER_DEFS
+     "NARENGINE_LOG_LEVEL=${NARENGINE_LOG_LEVEL}"
+     ${NARENGINE_COMMON_COMPILER_DEFS}
+)
+set(NARENGINE_LOGGER_INCLUDE_DIRS ${NARENGINE_COMMON_INCLUDE_DIRS})
+set(NARENGINE_LOGGER_SOURCES
+    ${NARENGINE_SRC_DIR}/logger/logger.cpp
+    ${NARENGINE_SRC_DIR}/logger/base_log_writer.cpp
+    ${NARENGINE_SRC_DIR}/logger/terminal_log_writer.cpp
+)
+add_library(engine_logger ${NARENGINE_LOGGER_SOURCES})
+target_include_directories(engine_logger PUBLIC ${NARENGINE_LOGGER_INCLUDE_DIRS})
+target_compile_definitions(engine_logger PUBLIC ${NARENGINE_LOGGER_COMPILER_DEFS})
+
+
 # Math library
 narengine_git_dependency(GLM https://github.com/g-truc/glm "bf71a83" "glm-src")
 set(NARENGINE_MATH_COMPILER_DEFS ${NARENGINE_COMMON_COMPILER_DEFS}
@@ -69,9 +86,11 @@ set(NARENGINE_MATH_SOURCES
     ${NARENGINE_SRC_DIR}/math/math_functions.cpp
     ${NARENGINE_SRC_DIR}/math/transform_matrix.cpp
 )
+set(NARENGINE_MATH_LINK_LIBS engine_logger)
 add_library(engine_math ${NARENGINE_MATH_SOURCES})
 target_include_directories(engine_math PUBLIC ${NARENGINE_MATH_INCLUDE_DIRS})
 target_compile_definitions(engine_math PUBLIC ${NARENGINE_MATH_COMPILER_DEFS})
+target_link_libraries(engine_math PUBLIC ${NARENGINE_MATH_LINK_LIBS})
 
 
 # Main engine library

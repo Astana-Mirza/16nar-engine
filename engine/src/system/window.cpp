@@ -1,6 +1,8 @@
 #include <16nar/system/window.h>
 
 #include <16nar/system/monitor.h>
+#include <16nar/logger/logger.h>
+
 #include <GLFW/glfw3.h>
 
 #include <utility>
@@ -35,6 +37,7 @@ Window::Window( Vec2i size, const std::string& title, const OpenSettings& settin
 {
      init_glfw_hints( settings );
      window_ = glfwCreateWindow( size.x(), size.y(), title.c_str(), nullptr, nullptr );
+     LOG_16NAR_INFO( "Created " << size.x() << "x" << size.y() << " non-fullscreen window" );
      glfwDefaultWindowHints();
 }
 
@@ -44,6 +47,7 @@ Window::Window( Vec2i size, const std::string& title, const Monitor& monitor, co
 {
      init_glfw_hints( settings );
      window_ = glfwCreateWindow( size.x(), size.y(), title.c_str(), monitor.monitor_, nullptr );
+     LOG_16NAR_INFO( "Created " << size.x() << "x" << size.y() << " fullscreen window" );
      glfwDefaultWindowHints();
 }
 
@@ -55,6 +59,7 @@ Window::Window( Vec2i size, const std::string& title, const Window& other, const
 {
      init_glfw_hints( settings );
      window_ = glfwCreateWindow( size.x(), size.y(), title.c_str(), nullptr, other.window_ );
+     LOG_16NAR_INFO( "Created " << size.x() << "x" << size.y() << " non-fullscreen window with shared context" );
      glfwDefaultWindowHints();
 }
 
@@ -67,6 +72,7 @@ Window::Window( Vec2i size, const std::string& title,
 {
      init_glfw_hints( settings );
      window_ = glfwCreateWindow( size.x(), size.y(), title.c_str(), monitor.monitor_, other.window_ );
+     LOG_16NAR_INFO( "Created " << size.x() << "x" << size.y() << " fullscreen window with shared context" );
      glfwDefaultWindowHints();
 }
 
@@ -85,6 +91,7 @@ void Window::close()
      {
           glfwDestroyWindow( window_ );
           window_ = nullptr;
+          LOG_16NAR_INFO( "Closed window" );
      }
 }
 
@@ -129,6 +136,7 @@ void Window::make_fullscreen( const Monitor& monitor )
      check_window_open( window_ );
      const GLFWvidmode* mode = glfwGetVideoMode( monitor.monitor_ );
      glfwSetWindowMonitor( window_, monitor.monitor_, 0, 0, mode->width, mode->height, mode->refreshRate );
+     LOG_16NAR_DEBUG( "Window was made fullscreen" );
 }
 
 
@@ -136,6 +144,7 @@ void Window::make_not_fullscreen( const Vec2i& pos, const Vec2i& size )
 {
      check_window_open( window_ );
      glfwSetWindowMonitor( window_, nullptr, pos.x(), pos.y(), size.x(), size.y(), 0 );
+     LOG_16NAR_DEBUG( "Window was made non-fullscreen" );
 }
 
 
@@ -143,6 +152,7 @@ void Window::iconify()
 {
      check_window_open( window_ );
      glfwIconifyWindow( window_ );
+     LOG_16NAR_DEBUG( "Window was iconified" );
 }
 
 
@@ -150,6 +160,7 @@ void Window::maximize()
 {
      check_window_open( window_ );
      glfwMaximizeWindow( window_ );
+     LOG_16NAR_DEBUG( "Window was maximized" );
 }
 
 
@@ -157,6 +168,7 @@ void Window::restore()
 {
      check_window_open( window_ );
      glfwRestoreWindow( window_ );
+     LOG_16NAR_DEBUG( "Window was restored" );
 }
 
 
@@ -171,6 +183,7 @@ void Window::request_attention()
 {
      check_window_open( window_ );
      glfwRequestWindowAttention( window_ );
+     LOG_16NAR_DEBUG( "Window requested attention" );
 }
 
 
