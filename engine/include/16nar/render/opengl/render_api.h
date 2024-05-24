@@ -5,7 +5,7 @@
 
 #include <16nar/16nardefs.h>
 
-#include <16nar/abstract/resources/iresource_manager.h>
+#include <16nar/render/iresource_manager.h>
 #include <16nar/render/render_defs.h>
 #include <16nar/system/exceptions.h>
 

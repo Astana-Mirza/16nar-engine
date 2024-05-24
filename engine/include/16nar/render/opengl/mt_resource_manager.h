@@ -4,7 +4,7 @@
 #define _16NAR_OPENGL_MT_RESOURCE_MANAGER_H
 
 #include <16nar/render/render_defs.h>
-#include <16nar/abstract/resources/iresource_manager.h>
+#include <16nar/render/iresource_manager.h>
 
 #include <unordered_map>
 #include <array>
@@ -45,20 +45,26 @@ public:
      /// @copydoc IResourceManager::clear()
      virtual void clear() override;
 
-     /// @copydoc IMtResourceManager::process_load_queue()
+     /// @copydoc IResourceManager::process_load_queue()
      virtual void process_load_queue() override;
 
-     /// @copydoc IMtResourceManager::process_unload_queue()
+     /// @copydoc IResourceManager::process_unload_queue()
      virtual void process_unload_queue() override;
 
-     /// @copydoc IMtResourceManager::end_frame()
+     /// @copydoc IResourceManager::end_frame()
      virtual void end_frame() override;
 
 private:
-     /// @brief Element of load or unload queue.
-     using Request = std::pair< ResID, T >;
+     /// @brief Handler of the resource.
+     using Handler = typename T::Handler;
 
-     std::unordered_map< ResID, typename T::Handler > resources_;          ///< resources loaded in previous frames.
+     /// @brief Loading parameters of the resource.
+     using LoadParams = typename T::LoadParams;
+
+     /// @brief Element of load queue.
+     using Request = std::pair< ResID, LoadParams >;
+
+     std::unordered_map< ResID, Handler > resources_;                      ///< resources loaded in previous frames.
      std::array< std::queue< Request >, _16nar_saved_frames > load_queue_; ///< requests to load resources.
      std::array< std::queue< ResID >, _16nar_saved_frames > unload_queue_; ///< requests to unload resources.
      ResID next_ = 1;                                                      ///< next ID to be assigned.

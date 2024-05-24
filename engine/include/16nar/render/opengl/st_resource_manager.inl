@@ -17,16 +17,17 @@ StResourceManager< T >::~StResourceManager()
 template < typename T >
 ResID StResourceManager< T >::load( const std::any& params )
 {
-     const T& loader = std::any_cast< const T& >( params );
+     const LoadParams& load_params = std::any_cast< const LoadParams& >( params );
+     Handler handler;
      ResID id = next_;
-     if ( !loader.load() )
+     if ( !T::load( load_params, handler ) )
      {
           throw ResourceException{ "cannot load resource ", id };
      }
-     auto [ it, result ] = resources_.try_emplace( id, loader.get_handler() );
+     auto [ it, result ] = resources_.try_emplace( id, handler );
      if ( !result )
      {
-          T::unload( loader.get_handler() );
+          T::unload( handler );
           throw ExceededIdException{};
      }
      ++next_;

@@ -4,7 +4,7 @@
 #define _16NAR_OPENGL_ST_RESOURCE_MANAGER_H
 
 #include <16nar/render/render_defs.h>
-#include <16nar/abstract/resources/iresource_manager.h>
+#include <16nar/render/iresource_manager.h>
 
 #include <unordered_map>
 
@@ -32,8 +32,14 @@ public:
      virtual void clear() override;
 
 private:
-     std::unordered_map< ResID, typename T::Handler > resources_;    ///< resources loaded in previous frames.
-     ResID next_ = 1;                                       ///< next ID to be assigned.
+     /// @brief Handler of the resource.
+     using Handler = typename T::Handler;
+
+     /// @brief Loading parameters of the resource.
+     using LoadParams = typename T::LoadParams;
+
+     std::unordered_map< ResID, Handler > resources_;  ///< resources loaded in previous frames.
+     ResID next_ = 1;                                  ///< next ID to be assigned.
 };
 
 } // namespace _16nar::opengl

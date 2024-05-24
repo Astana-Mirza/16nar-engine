@@ -19,7 +19,7 @@ ResID MtResourceManager< T >::load( const std::any& params )
 {
      ResID id = next_++;
      size_t next_index = ( frame_index_ + 1 ) % _16nar_saved_frames;
-     load_queue_[ next_index ].push( std::make_pair( id, std::any_cast< const T& >( params ) ) );
+     load_queue_[ next_index ].push( std::make_pair( id, std::any_cast< const LoadParams& >( params ) ) );
      return id;
 }
 
@@ -62,14 +62,15 @@ void MtResourceManager< T >::process_load_queue()
      while ( !queue.empty() )
      {
           auto& request = queue.front();
-          if ( !request.second.load() )
+          Handler handler;
+          if ( !T::load( request.second, handler ) )
           {
                throw ResourceException{ "cannot load resource ", request.first };
           }
-          auto [ it, result ] = resources_.try_emplace( request.first, request.second.get_handler() );
+          auto [ it, result ] = resources_.try_emplace( request.first, handler );
           if ( !result )
           {
-               T::unload( request.second.get_handler() );
+               T::unload( handler );
                queue.pop();
                throw ExceededIdException{};
           }

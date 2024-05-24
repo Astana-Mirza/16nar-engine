@@ -193,6 +193,15 @@ if (${NARENGINE_BUILD_TESTS})
     target_link_directories(math_test PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
     target_link_libraries(math_test PRIVATE engine_math Catch2::Catch2WithMain)
     add_test(NAME math_test COMMAND math_test)
+
+    add_executable(render_opengl_test
+        ${NARENGINE_SRC_DIR}/render/opengl/test/st_resource_manager_test.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/test/mt_resource_manager_test.cpp
+    )
+    target_include_directories(render_opengl_test PRIVATE ${NARENGINE_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
+    target_link_directories(render_opengl_test PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
+    target_link_libraries(render_opengl_test PRIVATE engine_render_gl Catch2::Catch2WithMain)
+    add_test(NAME render_opengl_test COMMAND render_opengl_test)
 endif()
 
 
