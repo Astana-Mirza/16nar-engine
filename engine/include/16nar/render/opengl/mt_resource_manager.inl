@@ -56,6 +56,18 @@ void MtResourceManager< T >::clear()
 
 
 template < typename T >
+std::any MtResourceManager< T >::get_handler( ResID id ) const
+{
+     const auto iter = resources_.find( id );
+     if ( iter == resources_.cend() )
+     {
+          throw ResourceException{ "no resource with such id ", id };
+     }
+     return iter->second;
+}
+
+
+template < typename T >
 void MtResourceManager< T >::process_load_queue()
 {
      auto& queue = load_queue_[ frame_index_ ];

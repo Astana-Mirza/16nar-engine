@@ -31,6 +31,9 @@ public:
      /// @copydoc IResourceManager::clear()
      virtual void clear() override;
 
+     /// @copydoc IResourceManager::get_handler(ResID)
+     virtual std::any get_handler( ResID id ) const override;
+
 private:
      /// @brief Handler of the resource.
      using Handler = typename T::Handler;

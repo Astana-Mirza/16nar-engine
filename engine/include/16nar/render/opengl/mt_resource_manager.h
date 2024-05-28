@@ -45,10 +45,15 @@ public:
      /// @copydoc IResourceManager::clear()
      virtual void clear() override;
 
+     /// @copydoc IResourceManager::get_handler(ResID)
+     virtual std::any get_handler( ResID id ) const override;
+
      /// @copydoc IResourceManager::process_load_queue()
+     /// @details Throws ResourceException if unable to load a resource.
      virtual void process_load_queue() override;
 
      /// @copydoc IResourceManager::process_unload_queue()
+     /// @details Throws ResourceException if unable to unload a resource.
      virtual void process_unload_queue() override;
 
      /// @copydoc IResourceManager::end_frame()

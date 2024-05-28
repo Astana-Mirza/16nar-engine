@@ -3,13 +3,23 @@
 #ifndef _16NAR_RENDER_DEFS_H
 #define _16NAR_RENDER_DEFS_H
 
+#include <16nar/16nardefs.h>
 #include <16nar/math/vec.h>
+#include <16nar/render/iresource_manager.h>
 
 #include <string>
 #include <vector>
+#include <functional>
+#include <unordered_map>
+#include <memory>
 
 namespace _16nar
 {
+
+class IShader; // forward declaration
+
+/// @brief Map of resource types to respective resource manager.
+using ResourceManagerMap = std::unordered_map< ResourceType, std::unique_ptr< IResourceManager > >;
 
 /// @brief Frames saved for profiles with multiple threads.
 constexpr std::size_t _16nar_saved_frames = 2;
@@ -83,6 +93,21 @@ enum class BufferType
      DynamicDraw,   ///< will be modified by app many times, drawn by library many times.
      DynamicRead,   ///< will be modified by library many times, read by app many times.
      DynamicCopy    ///< will be modified by library many times, drawn by library many times.
+};
+
+
+/// @brief Type of render primitive.
+enum class PrimitiveType
+{
+     Points,        ///< separate points.
+
+     Lines,         ///< separate lines.
+     LineStrip,     ///< connected lines.
+     LineLoop,      ///< connected lines, and the first vertex is connected with the last one.
+
+     Triangles,     ///< separate triangles.
+     TriangleStrip, ///< triangles connected with common edges.
+     TriangleFan,   ///< triangles connected with common vertex.
 };
 
 
@@ -166,6 +191,20 @@ struct LoadParams< ResourceType::VertexBuffer >
      std::vector< AttribParams > attributes;      ///< parameters of attributes.
      BufferParams buffer;                         ///< buffer with data, interpreted with help of attributes.
      BufferParams index_buffer;                   ///< buffer with index data, contains array of indexes.
+};
+
+
+/// @brief Parameters of a render call.
+struct RenderParams
+{
+     std::vector< Texture > textures;                  ///< textures to be used (binded) during the draw call.
+     std::function< void( const IShader& ) > setup;    ///< function for setting uniforms,
+                                                       ///< may be called in other thread and in other frame,
+                                                       ///< so it must not capture context by reference.
+     Shader shader;                                    ///< shader which will be used in render.
+     FrameBuffer frame_buffer;                         ///< framebuffer for rendering.
+     VertexBuffer vertex_buffer;                       ///< vertex buffer for rendering.
+     PrimitiveType primitive;                          ///< type of primitive to draw.
 };
 
 } // namespace _16nar

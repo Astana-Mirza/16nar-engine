@@ -29,12 +29,16 @@ public:
      /// @brief Unload all resources.
      virtual void clear() = 0;
 
+     /// @brief Get handler of the resource.
+     /// @details Throws ResourceException if resource with given ID does not exist.
+     /// @param[in] id ID of resource.
+     /// @return handler of the resource.
+     virtual std::any get_handler( ResID id ) const = 0;
+
      /// @brief Process all requests in unload queue.
-     /// @details Throws ResourceException if unable to load a resource.
      virtual void process_load_queue() {}
 
      /// @brief Process all requests in unload queue.
-     /// @details Throws ResourceException if unable to unload a resource.
      virtual void process_unload_queue() {}
 
      /// @brief Swap queues and prepare for new frame.

@@ -61,10 +61,11 @@ struct TypedResource : public Resource
 };
 
 
-using Shader      = TypedResource< ResourceType::Shader      >;
-using Texture     = TypedResource< ResourceType::Texture     >;
-using Buffer      = TypedResource< ResourceType::Buffer      >;
-using FrameBuffer = TypedResource< ResourceType::FrameBuffer >;
+using Shader       = TypedResource< ResourceType::Shader       >;
+using Texture      = TypedResource< ResourceType::Texture      >;
+using Buffer       = TypedResource< ResourceType::Buffer       >;
+using FrameBuffer  = TypedResource< ResourceType::FrameBuffer  >;
+using VertexBuffer = TypedResource< ResourceType::VertexBuffer >;
 
 } // nmespace _16nar
 

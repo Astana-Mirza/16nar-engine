@@ -73,6 +73,18 @@ void StResourceManager< T >::clear()
      resources_.clear();
 }
 
+
+template < typename T >
+std::any StResourceManager< T >::get_handler( ResID id ) const
+{
+     const auto iter = resources_.find( id );
+     if ( iter == resources_.cend() )
+     {
+          throw ResourceException{ "no resource with such id ", id };
+     }
+     return iter->second;
+}
+
 } // namespace _16nar::opengl
 
 #endif // #ifndef _16NAR_OPENGL_ST_RESOURCE_MANAGER_INL

@@ -23,42 +23,21 @@ public:
      RenderApi();
 
      /// @brief Load a resource with given parameters.
-     /// @tparam T type of a resource.
+     /// @param[in] type type of the resource.
      /// @param[in] params parameters for loading a resource.
-     /// @return typed identifier of a resource.
-     template < ResourceType T >
-     TypedResource< T > load( const LoadParams< T >& params )
-     {
-          const auto iter = managers_.find( T );
-          if ( iter == managers_.cend() )
-          {
-               throw ResourceException{ "wrong resource type" };
-          }
-          return iter->second->load( params );
-     }
+     /// @return identifier of a resource with type.
+     Resource load( ResourceType type, const std::any& params );
 
      /// @brief Unload a resource.
-     /// @tparam T type of a resource.
-     /// @param[in] resource typed identifier of a resource.
-     template < ResourceType T >
-     void unload( const TypedResource< T >& resource )
-     {
-          const auto iter = managers_.find( T );
-          if ( iter == managers_.cend() )
-          {
-               throw ResourceException{ "wrong resource type" };
-          }
-          iter->second->unload( resource.id );
-     }
+     /// @param[in] resource identifier of a resource with type.
+     void unload( const Resource& resource );
 
 private:
-     using ManagerMap = std::unordered_map< ResourceType, std::unique_ptr< IResourceManager > >;
-
      RenderApi( const RenderApi& ) = delete;
      RenderApi& operator=( const RenderApi& ) = delete;
 
 private:
-     ManagerMap managers_;    ///< all resource managers.
+     ResourceManagerMap managers_;      ///< all resource managers.
 };
 
 } // namespace _16nar::opengl

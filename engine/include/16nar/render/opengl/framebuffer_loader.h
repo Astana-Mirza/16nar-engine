@@ -3,7 +3,7 @@
 #ifndef _16NAR_OPENGL_FRAMEBUFFER_LOADER_H
 #define _16NAR_OPENGL_FRAMEBUFFER_LOADER_H
 
-#include <16nar/render/render_defs.h>
+#include <16nar/render/opengl/gl_render_defs.h>
 
 #include <vector>
 
@@ -18,11 +18,7 @@ public:
      using LoadParams = LoadParams< ResourceType::FrameBuffer >;
 
      /// @brief Handler of loaded framebuffer and its attachments.
-     struct Handler
-     {
-          std::vector< unsigned int > attachments;     ///< attachments descriptors.
-          unsigned int descriptor = 0;                 ///< framebuffer descriptor.
-     };
+     using Handler = Handler< ResourceType::FrameBuffer >;
 
      /// @brief Load framebuffer to OpenGL and fill its handler.
      /// @param[in] params parameters of framebuffer loading.

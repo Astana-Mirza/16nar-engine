@@ -12,4 +12,27 @@ RenderApi::RenderApi()
      managers_.emplace( ResourceType::Texture, std::make_unique< StResourceManager< TextureLoader > >() );
 }
 
+
+Resource RenderApi::load( ResourceType type, const std::any& params )
+{
+     const auto iter = managers_.find( type );
+     if ( iter == managers_.cend() )
+     {
+          throw ResourceException{ "wrong resource type" };
+     }
+     return Resource{ type, iter->second->load( params ) };
+}
+
+
+void RenderApi::unload( const Resource& resource )
+{
+     const auto iter = managers_.find( resource.type );
+     if ( iter == managers_.cend() )
+     {
+          throw ResourceException{ "wrong resource type" };
+     }
+     iter->second->unload( resource.id );
+}
+
+
 } // namespace _16nar::opengl

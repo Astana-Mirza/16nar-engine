@@ -3,10 +3,7 @@
 #ifndef _16NAR_OPENGL_TEXTURE_LOADER_H
 #define _16NAR_OPENGL_TEXTURE_LOADER_H
 
-#include <16nar/render/render_defs.h>
-
-#include <string_view>
-#include <memory>
+#include <16nar/render/opengl/gl_render_defs.h>
 
 namespace _16nar::opengl
 {
@@ -19,10 +16,7 @@ public:
      using LoadParams = LoadParams< ResourceType::Texture >;
 
      /// @brief Handler of texture.
-     struct Handler
-     {
-          unsigned int descriptor; ///< texture descriptor.
-     };
+    using Handler = Handler< ResourceType::Texture >;
 
      /// @brief Load texture to OpenGL and fill its handler.
      /// @param[in] params parameters of texture loading.

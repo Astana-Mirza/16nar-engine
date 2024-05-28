@@ -5,7 +5,6 @@
 
 #include <glad/gl.h>
 
-
 namespace _16nar::opengl
 {
 

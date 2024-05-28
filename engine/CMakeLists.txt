@@ -161,7 +161,11 @@ if (${NARENGINE_RENDER_OPENGL} OR ${NARENGINE_RENDER_OPENGL_ES})
     set(NARENGINE_GL_SOURCES
         ${NARENGINE_SRC_DIR}/render/opengl/framebuffer_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/texture_loader.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/shader_loader.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/vertex_buffer_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/render_api.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/st_render_device.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/mt_render_device.cpp
     )
 
     add_library(engine_render_gl ${NARENGINE_GL_SOURCES})
