@@ -3,8 +3,8 @@
 #ifndef _16NAR_SINGLE_THREAD_PROFILE_H
 #define _16NAR_SINGLE_THREAD_PROFILE_H
 
-#include <16nar/abstract/profile.h>
-#include <16nar/abstract/render_device.h>
+#include <16nar/profiles/profile.h>
+#include <16nar/render/irender_device.h>
 
 namespace _16nar
 {

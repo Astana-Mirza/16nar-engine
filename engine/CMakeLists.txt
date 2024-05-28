@@ -159,7 +159,7 @@ if (${NARENGINE_RENDER_OPENGL} OR ${NARENGINE_RENDER_OPENGL_ES})
     set(NARENGINE_GL_LINK_LIBS engine ${OPENGL_LIBRARIES})
 
     set(NARENGINE_GL_SOURCES
-        ${NARENGINE_SRC_DIR}/render/opengl/framebuffer_loader.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/frame_buffer_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/texture_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/shader_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/vertex_buffer_loader.cpp

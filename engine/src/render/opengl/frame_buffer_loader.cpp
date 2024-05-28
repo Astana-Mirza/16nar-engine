@@ -1,4 +1,4 @@
-#include <16nar/render/opengl/framebuffer_loader.h>
+#include <16nar/render/opengl/frame_buffer_loader.h>
 
 #include <16nar/system/exceptions.h>
 #include <16nar/logger/logger.h>

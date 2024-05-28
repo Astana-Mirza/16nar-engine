@@ -3,11 +3,11 @@
 #ifndef _16NAR_OPENGL_RENDER_API_H
 #define _16NAR_OPENGL_RENDER_API_H
 
-#include <16nar/16nardefs.h>
+#include <16nar/render/irender_api.h>
 
 #include <16nar/render/iresource_manager.h>
+#include <16nar/render/irender_device.h>
 #include <16nar/render/render_defs.h>
-#include <16nar/system/exceptions.h>
 
 #include <unordered_map>
 #include <memory>
@@ -16,28 +16,31 @@ namespace _16nar::opengl
 {
 
 /// @brief Class for rendering primitives with OpenGL.
-class ENGINE_API RenderApi
+class ENGINE_API RenderApi : public IRenderApi
 {
 public:
      /// @brief Constructor.
-     RenderApi();
+     /// @param[in] profile type of profile used in application.
+     RenderApi( ProfileType profile );
 
-     /// @brief Load a resource with given parameters.
-     /// @param[in] type type of the resource.
-     /// @param[in] params parameters for loading a resource.
-     /// @return identifier of a resource with type.
-     Resource load( ResourceType type, const std::any& params );
+     /// @copydoc IRenderApi::load(ResourceType, const std::any&)
+     virtual Resource load( ResourceType type, const std::any& params ) override;
 
-     /// @brief Unload a resource.
-     /// @param[in] resource identifier of a resource with type.
-     void unload( const Resource& resource );
+     /// @copydoc IRenderApi::unload(const Resource&)
+     virtual void unload( const Resource& resource ) override;
+
+     /// @copydoc IRenderApi::render(const RenderParams&)
+     virtual void render( const RenderParams& params ) override;
+
+     /// @copydoc IRenderApi::process()
+     virtual void process() override;
+
+     /// @copydoc IRenderApi::end_frame()
+     virtual void end_frame() override;
 
 private:
-     RenderApi( const RenderApi& ) = delete;
-     RenderApi& operator=( const RenderApi& ) = delete;
-
-private:
-     ResourceManagerMap managers_;      ///< all resource managers.
+     ResourceManagerMap managers_;                ///< all resource managers.
+     std::unique_ptr< IRenderDevice > device_;    ///< render device used to draw graphics.
 };
 
 } // namespace _16nar::opengl

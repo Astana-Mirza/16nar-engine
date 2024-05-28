@@ -23,6 +23,14 @@ namespace _16nar
 using ResID = uint32_t;
 
 
+/// @brief Type of application profile, representing its execution method.
+enum class ProfileType
+{
+     SingleThreaded,     ///< executing application in single thread. 
+     MultiThreaded       ///< executing appliction in multiple threads, each having its own purpose.
+};
+
+
 /// @brief Type of resource used for render.
 enum class ResourceType
 {
