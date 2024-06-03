@@ -8,33 +8,41 @@
 #include <16nar/render/opengl/vertex_buffer_loader.h>
 #include <16nar/render/opengl/texture_loader.h>
 #include <16nar/render/opengl/shader_loader.h>
+#include <16nar/render/opengl/glad.h>
 
 #include <16nar/system/exceptions.h>
 #include <16nar/logger/logger.h>
+
+#include <GLFW/glfw3.h>
 
 namespace _16nar::opengl
 {
 
 RenderApi::RenderApi( ProfileType profile )
 {
+     if ( !gladLoadGLLoader( reinterpret_cast< GLADloadproc >( glfwGetProcAddress ) ) )
+     {
+          throw std::runtime_error{ "cannot create OpenGL render API, failed to initialize GLAD" };
+     }
+
      switch ( profile )
      {
           case ProfileType::SingleThreaded:
           {
-               managers_.emplace( ResourceType::Texture, std::make_unique< StResourceManager< FrameBufferLoader > >() );
-               managers_.emplace( ResourceType::Texture, std::make_unique< StResourceManager< VertexBufferLoader > >() );
+               managers_.emplace( ResourceType::FrameBuffer, std::make_unique< StResourceManager< FrameBufferLoader > >() );
+               managers_.emplace( ResourceType::VertexBuffer, std::make_unique< StResourceManager< VertexBufferLoader > >() );
                managers_.emplace( ResourceType::Texture, std::make_unique< StResourceManager< TextureLoader > >() );
-               managers_.emplace( ResourceType::Texture, std::make_unique< StResourceManager< ShaderLoader > >() );
+               managers_.emplace( ResourceType::Shader, std::make_unique< StResourceManager< ShaderLoader > >() );
 
                device_ = std::make_unique< StRenderDevice >( managers_ );
           }
           break;
           case ProfileType::MultiThreaded:
           {
-               managers_.emplace( ResourceType::Texture, std::make_unique< MtResourceManager< FrameBufferLoader > >() );
-               managers_.emplace( ResourceType::Texture, std::make_unique< MtResourceManager< VertexBufferLoader > >() );
+               managers_.emplace( ResourceType::FrameBuffer, std::make_unique< MtResourceManager< FrameBufferLoader > >() );
+               managers_.emplace( ResourceType::VertexBuffer, std::make_unique< MtResourceManager< VertexBufferLoader > >() );
                managers_.emplace( ResourceType::Texture, std::make_unique< MtResourceManager< TextureLoader > >() );
-               managers_.emplace( ResourceType::Texture, std::make_unique< MtResourceManager< ShaderLoader > >() );
+               managers_.emplace( ResourceType::Shader, std::make_unique< MtResourceManager< ShaderLoader > >() );
 
                device_ = std::make_unique< MtRenderDevice >( managers_ );
           }

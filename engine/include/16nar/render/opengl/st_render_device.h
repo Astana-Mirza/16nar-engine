@@ -4,7 +4,7 @@
 #define _16NAR_OPENGL_ST_RENDER_DEVICE_H
 
 #include <16nar/render/render_defs.h>
-#include <16nar/render/opengl/gl_render_defs.h>
+#include <16nar/render/opengl/utils.h>
 #include <16nar/render/irender_device.h>
 
 namespace _16nar::opengl

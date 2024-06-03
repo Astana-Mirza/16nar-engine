@@ -158,6 +158,7 @@ if (${NARENGINE_RENDER_OPENGL} OR ${NARENGINE_RENDER_OPENGL_ES})
     set(NARENGINE_GL_COMPILER_DEFS ${NARENGINE_COMMON_COMPILER_DEFS})
     set(NARENGINE_GL_LINK_LIBS engine ${OPENGL_LIBRARIES})
 
+    set_source_files_properties(${NARENGINE_SRC_DIR}/render/opengl/glad.c PROPERTIES LANGUAGE CXX)
     set(NARENGINE_GL_SOURCES
         ${NARENGINE_SRC_DIR}/render/opengl/frame_buffer_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/texture_loader.cpp
@@ -166,6 +167,9 @@ if (${NARENGINE_RENDER_OPENGL} OR ${NARENGINE_RENDER_OPENGL_ES})
         ${NARENGINE_SRC_DIR}/render/opengl/render_api.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/st_render_device.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/mt_render_device.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/shader.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/utils.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/glad.c
     )
 
     add_library(engine_render_gl ${NARENGINE_GL_SOURCES})
@@ -206,6 +210,16 @@ if (${NARENGINE_BUILD_TESTS})
     target_link_directories(render_opengl_test PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
     target_link_libraries(render_opengl_test PRIVATE engine_render_gl Catch2::Catch2WithMain)
     add_test(NAME render_opengl_test COMMAND render_opengl_test)
+
+    if (${NARENGINE_RENDER_OPENGL} OR ${NARENGINE_RENDER_OPENGL_ES})
+        add_executable(opengl_st_render_api_test
+            ${NARENGINE_SRC_DIR}/test/opengl_st_render_api_test.cpp
+        )
+        target_include_directories(opengl_st_render_api_test PRIVATE ${NARENGINE_COMMON_INCLUDE_DIRS})
+        target_link_directories(opengl_st_render_api_test PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
+        target_link_libraries(opengl_st_render_api_test PRIVATE engine_render_gl)
+        add_test(NAME opengl_st_render_api_test COMMAND opengl_st_render_api_test)
+    endif()
 endif()
 
 

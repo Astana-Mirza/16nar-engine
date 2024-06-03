@@ -76,6 +76,21 @@ Window::Window( Vec2i size, const std::string& title,
      glfwDefaultWindowHints();
 }
 
+
+void Window::make_context_current()
+{
+     check_window_open( window_ );
+     glfwMakeContextCurrent( window_ );
+     LOG_16NAR_DEBUG( "Context made current for window" );
+}
+
+
+void Window::swap_buffers()
+{
+     check_window_open( window_ );
+     glfwSwapBuffers( window_ );
+}
+
 #endif // NARENGINE_RENDER_OPENGL || NARENGINE_RENDER_OPENGL_ES
 
 

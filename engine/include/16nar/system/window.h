@@ -108,6 +108,14 @@ public:
              const Monitor& monitor,
              const Window& other,
              const OpenSettings& settings = OpenSettings{} );
+
+     /// @brief Make context of the window to be current for OpenGL rendering.
+     void make_context_current();
+
+     /// @brief Switch buffers for OpenGL rendering.
+     /// @details Throws std::runtime_error if there is no current context on the window.
+     void swap_buffers();
+
 #endif // NARENGINE_RENDER_OPENGL || NARENGINE_RENDER_OPENGL_ES
 
      /// @brief Destructor, closes the window.

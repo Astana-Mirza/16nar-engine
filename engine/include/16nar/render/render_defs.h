@@ -70,12 +70,21 @@ enum class DataType
 };
 
 
-/// @brief Type of attachment to OpenGL framebuffer.
-enum class AttachmentType
+/// @brief Type of graphics data storage.
+enum class StorageType
 {
      RenderBuffer,       ///< renderbuffer, cannot be read from.
      Texture2D,          ///< simple 2D texture.
      Texture3D           ///< cubemap.
+};
+
+
+/// @brief Type of attachment to framebuffer.
+enum class AttachmentType
+{
+     Color,
+     Depth,
+     DepthStencil
 };
 
 
@@ -107,7 +116,16 @@ enum class PrimitiveType
 
      Triangles,     ///< separate triangles.
      TriangleStrip, ///< triangles connected with common edges.
-     TriangleFan,   ///< triangles connected with common vertex.
+     TriangleFan    ///< triangles connected with common vertex.
+};
+
+
+/// @brief Type of shader.
+enum class ShaderType
+{
+     Vertex,        ///< shader operating on single vertices.
+     Geometry,      ///< shader operating on sets of vertices of primitives.
+     Fragment       ///< shader operating on primitives.
 };
 
 
@@ -125,12 +143,10 @@ struct LoadParams< ResourceType::Texture >
      TextureFilter    mag_filter = TextureFilter::Linear;   ///< filter used when magnifying the image.
      TextureWrap      wrap_x = TextureWrap::ClampToEdge;    ///< wrap method for horizontal coordinate.
      TextureWrap      wrap_y = TextureWrap::ClampToEdge;    ///< wrap method for vertical coordinate.
-     TextureWrap      wrap_z = TextureWrap::ClampToEdge;    ///< wrap method for z coordinate (for cubemaps only).
      DataType         data_type = DataType::Byte;           ///< type of pixels data.
      Vec4f            border_color;                         ///< color of the border, for ClampToBorder wrapping only.
      Vec2i            size;                                 ///< size of texture in texels.
-     std::size_t      samples = 0;                          ///< count of samples, 0 if not used.
-     void*            data = nullptr;                       ///< data of a texture.
+     const void*            data = nullptr;                 ///< data of a texture.
 };
 
 
@@ -141,7 +157,8 @@ struct LoadParams< ResourceType::FrameBuffer >
      /// @brief Parameters of loading a framebuffer attachment.
      struct AttachmentParams
      {
-          AttachmentType   attachment = AttachmentType::Texture2D;    ///< type of framebuffer attachment.
+          StorageType      storage = StorageType::Texture2D;          ///< type of framebuffer attachment storage.
+          AttachmentType   attachment = AttachmentType::Color;        ///< type of framebuffer attachment.
           BufferDataFormat format = BufferDataFormat::Rgb;            ///< format of texel data.
           TextureFilter    min_filter = TextureFilter::Linear;        ///< filter used when minifying the image.
           TextureFilter    mag_filter = TextureFilter::Linear;        ///< filter used when magnifying the image.
@@ -152,18 +169,27 @@ struct LoadParams< ResourceType::FrameBuffer >
           Vec4f            border_color;                              ///< color of the border, for ClampToBorder wrapping only.
           Vec2i            size;                                      ///< size of attachment in texels.
           std::size_t      samples = 0;                               ///< count of samples, 0 if not used.
+          std::size_t      order = 0;                                 ///< order of attachment (for texture color attachments only).
      };
 
      std::vector< AttachmentParams > attachments;                     ///< parameters of attachments loading.
 };
 
 
-/// @brief Parameters of shader loading.
+/// @brief Parameters of shader program loading.
 template <>
 struct LoadParams< ResourceType::Shader >
 {
-     std::string entrypoint;       ///< name of entry function.
-     void *data;                   ///< data of the shader.
+     /// @brief Parameters of single shader loading.
+     struct ShaderParams
+     {
+          std::string entrypoint;                 ///< name of entry function.
+          std::size_t size = 0;                   ///< size of shader data.
+          const void *data = nullptr;             ///< data of shader.
+          ShaderType type = ShaderType::Vertex;   ///< type of shader.
+          bool from_source = false;               ///< compile shader from source code instead of loading binary.
+     };
+     std::vector< ShaderParams > shaders;    ///< parameters of all shaders of a shader program.
 };
 
 
@@ -172,18 +198,18 @@ template <>
 struct LoadParams< ResourceType::VertexBuffer >
 {
      /// @brief Parameters of a buffer attribute.
+     /// @details Attributes are always tightly packed.
      struct AttribParams
      {
           std::size_t size = Vec4f::size;         ///< size of an attribute (number of dimensions).
           DataType data_type = DataType::Float;   ///< type of buffer elements.
-          bool tightly_packed = false;            ///< is the attribute data tightly packed.
           bool normalized = false;                ///< should the data be normalized when loading.
      };
 
      /// @brief Parameters of a buffer.
      struct BufferParams
      {
-          void* data = nullptr;                        ///< data of the buffer.
+          const void* data = nullptr;                  ///< data of the buffer.
           std::size_t size = 0;                        ///< size of the buffer, in bytes.
           BufferType type = BufferType::StaticDraw;    ///< type of memory used by buffer.
      };
@@ -202,9 +228,14 @@ struct RenderParams
                                                        ///< may be called in other thread and in other frame,
                                                        ///< so it must not capture context by reference.
      Shader shader;                                    ///< shader which will be used in render.
-     FrameBuffer frame_buffer;                         ///< framebuffer for rendering.
+     FrameBuffer frame_buffer;                         ///< framebuffer for rendering (if ID is 0, will use default framebuffer).
      VertexBuffer vertex_buffer;                       ///< vertex buffer for rendering.
-     PrimitiveType primitive;                          ///< type of primitive to draw.
+     PrimitiveType primitive = PrimitiveType::Points;  ///< type of primitive to draw.
+     std::size_t vertex_count = 0;                     ///< number of vertices in each instance.
+     std::size_t instance_count = 1;                   ///< number of instances to draw.
+     bool clear_color = true;                          ///< should the color buffer be cleared.
+     bool clear_depth = false;                         ///< should the depth buffer be cleared.
+     bool clear_stencil = false;                       ///< should the stencil buffer be cleared.
 };
 
 } // namespace _16nar

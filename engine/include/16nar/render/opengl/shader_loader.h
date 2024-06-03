@@ -3,7 +3,7 @@
 #ifndef _16NAR_OPENGL_SHADER_LOADER_H
 #define _16NAR_OPENGL_SHADER_LOADER_H
 
-#include <16nar/render/opengl/gl_render_defs.h>
+#include <16nar/render/opengl/utils.h>
 
 namespace _16nar::opengl
 {

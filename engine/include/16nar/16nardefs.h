@@ -35,7 +35,6 @@ enum class ProfileType
 enum class ResourceType
 {
      Texture,            ///< 2D texture.
-     Buffer,             ///< buffer (for rendering).
      Shader,             ///< shader program.
      FrameBuffer,        ///< buffer for the frame.
      VertexBuffer,       ///< buffer or group of buffers for vertices.
@@ -71,10 +70,9 @@ struct TypedResource : public Resource
 
 using Shader       = TypedResource< ResourceType::Shader       >;
 using Texture      = TypedResource< ResourceType::Texture      >;
-using Buffer       = TypedResource< ResourceType::Buffer       >;
 using FrameBuffer  = TypedResource< ResourceType::FrameBuffer  >;
 using VertexBuffer = TypedResource< ResourceType::VertexBuffer >;
 
-} // nmespace _16nar
+} // namespace _16nar
 
 #endif // #ifndef _16NAR_DEFS_H
