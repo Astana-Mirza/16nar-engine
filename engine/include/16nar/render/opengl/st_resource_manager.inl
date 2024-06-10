@@ -20,7 +20,7 @@ ResID StResourceManager< T >::load( const std::any& params )
      const LoadParams& load_params = std::any_cast< const LoadParams& >( params );
      Handler handler;
      ResID id = next_;
-     if ( !T::load( load_params, handler ) )
+     if ( !T::load( managers_, load_params, handler ) )
      {
           throw ResourceException{ "cannot load resource ", id };
      }

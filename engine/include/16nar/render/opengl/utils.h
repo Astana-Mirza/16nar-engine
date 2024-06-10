@@ -12,37 +12,9 @@ namespace _16nar::opengl
 
 /// @brief Handler of a resource.
 /// @tparam T type of resource.
-template < ResourceType T > struct Handler {};
-
-
-/// @brief Handler of texture.
-template <>
-struct Handler< ResourceType::Texture >
+template < ResourceType T > struct Handler
 {
-     unsigned int descriptor = 0;  ///< texture descriptor.
-};
-
-
-/// @brief Handler of framebuffer.
-template <>
-struct Handler< ResourceType::FrameBuffer >
-{
-     /// @brief Handler of framebuffer attachment.
-     struct Attachment
-     {
-          unsigned int descriptor;                ///< descriptor of the attachments.
-          StorageType type;                       ///< type of attachment storage.
-     };
-     std::vector< Attachment > attachments;       ///< framebuffer attachments information.
-     unsigned int descriptor = 0;                 ///< framebuffer descriptor.
-};
-
-
-/// @brief Handler of shader program.
-template <>
-struct Handler< ResourceType::Shader >
-{
-     unsigned int descriptor = 0;  ///< shader descriptor.
+     unsigned int descriptor = 0;  ///< resource descriptor.
 };
 
 

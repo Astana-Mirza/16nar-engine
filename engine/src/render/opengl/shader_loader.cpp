@@ -85,7 +85,7 @@ void unload_shaders( const std::vector< unsigned int >& shaders, unsigned int pr
 } // anonymous namespace
 
 
-bool ShaderLoader::load( const LoadParams& params, Handler& handler )
+bool ShaderLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
 {
      GLint is_linked = 0;
      std::vector< unsigned int > descriptors;

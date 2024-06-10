@@ -18,7 +18,7 @@ struct MockLoader
           return unload_result;
      }
 
-     static bool load( const LoadParams& params, Handler& handler )
+     static bool load( const _16nar::ResourceManagerMap&, const LoadParams& params, Handler& handler )
      {
           return params.value;
      }
@@ -28,7 +28,7 @@ bool MockLoader::unload_result = true;
 
 TEST_CASE( "Load and unload", "[st_resource_manager]" )
 {
-     _16nar::opengl::StResourceManager< MockLoader > manager;
+     _16nar::opengl::StResourceManager< MockLoader > manager{ {} };
      MockLoader::LoadParams params;
      params.value = true;
 

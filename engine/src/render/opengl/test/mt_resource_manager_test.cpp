@@ -24,7 +24,7 @@ struct MockLoader
           return unload_result;
      }
 
-     static bool load( const LoadParams& params, Handler& handler )
+     static bool load( const _16nar::ResourceManagerMap&, const LoadParams& params, Handler& handler )
      {
           loaded_count++;
           return params.value;
@@ -36,7 +36,7 @@ std::size_t MockLoader::loaded_count = 0;
 
 TEST_CASE( "Parallel load and unload", "[mt_resource_manager]" )
 {
-     _16nar::opengl::MtResourceManager< MockLoader > manager;
+     _16nar::opengl::MtResourceManager< MockLoader > manager{ {} };
      MockLoader::LoadParams params;
      params.value = true;
 

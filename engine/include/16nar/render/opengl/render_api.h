@@ -29,8 +29,8 @@ public:
      /// @copydoc IRenderApi::unload(const Resource&)
      virtual void unload( const Resource& resource ) override;
 
-     /// @copydoc IRenderApi::render(const RenderParams&)
-     virtual void render( const RenderParams& params ) override;
+     /// @copydoc IRenderApi::get_device()
+     virtual IRenderDevice& get_device() const override;
 
      /// @copydoc IRenderApi::process()
      virtual void process() override;

@@ -22,7 +22,7 @@ public:
      /// @param[in] params parameters of texture loading.
      /// @param[out] handler handler of the texture.
      /// @return true on success, false otherwise.
-     static bool load( const LoadParams& params, Handler& handler );
+     static bool load( const ResourceManagerMap&, const LoadParams& params, Handler& handler );
 
      /// @brief Unload texture from OpenGL.
      /// @param[in] handler handler of the texture.

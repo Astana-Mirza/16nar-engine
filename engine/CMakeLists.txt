@@ -164,10 +164,12 @@ if (${NARENGINE_RENDER_OPENGL} OR ${NARENGINE_RENDER_OPENGL_ES})
         ${NARENGINE_SRC_DIR}/render/opengl/texture_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/shader_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/vertex_buffer_loader.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/render_buffer_loader.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/cubemap_loader.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/render_api.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/st_render_device.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/mt_render_device.cpp
-        ${NARENGINE_SRC_DIR}/render/opengl/shader.cpp
+        ${NARENGINE_SRC_DIR}/render/opengl/shader_program.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/utils.cpp
         ${NARENGINE_SRC_DIR}/render/opengl/glad.c
     )

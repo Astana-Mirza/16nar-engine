@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include <functional>
 #include <unordered_map>
 #include <memory>
@@ -67,15 +68,6 @@ enum class DataType
 {
      Byte,               ///< buffer is array of bytes (unsigned chars).
      Float               ///< buffer is array of floats.
-};
-
-
-/// @brief Type of graphics data storage.
-enum class StorageType
-{
-     RenderBuffer,       ///< renderbuffer, cannot be read from.
-     Texture2D,          ///< simple 2D texture.
-     Texture3D           ///< cubemap.
 };
 
 
@@ -143,10 +135,39 @@ struct LoadParams< ResourceType::Texture >
      TextureFilter    mag_filter = TextureFilter::Linear;   ///< filter used when magnifying the image.
      TextureWrap      wrap_x = TextureWrap::ClampToEdge;    ///< wrap method for horizontal coordinate.
      TextureWrap      wrap_y = TextureWrap::ClampToEdge;    ///< wrap method for vertical coordinate.
-     DataType         data_type = DataType::Byte;           ///< type of pixels data.
+     DataType         data_type = DataType::Byte;           ///< type of texels data.
      Vec4f            border_color;                         ///< color of the border, for ClampToBorder wrapping only.
      Vec2i            size;                                 ///< size of texture in texels.
-     const void*            data = nullptr;                 ///< data of a texture.
+     std::size_t      samples = 0;                          ///< number of samples for texture (texture cannot have data, 0 if not used).
+     const void*      data = nullptr;                       ///< data of a texture.
+};
+
+
+/// @brief Parameters of cubemap loading.
+template <>
+struct LoadParams< ResourceType::Cubemap >
+{
+     BufferDataFormat format = BufferDataFormat::Rgb;       ///< format of texel data.
+     TextureFilter    min_filter = TextureFilter::Linear;   ///< filter used when minifying the image.
+     TextureFilter    mag_filter = TextureFilter::Linear;   ///< filter used when magnifying the image.
+     TextureWrap      wrap_x = TextureWrap::ClampToEdge;    ///< wrap method for horizontal coordinate.
+     TextureWrap      wrap_y = TextureWrap::ClampToEdge;    ///< wrap method for vertical coordinate.
+     TextureWrap      wrap_z = TextureWrap::ClampToEdge;    ///< wrap method for volume coordinate.
+     DataType         data_type = DataType::Byte;           ///< type of texels data.
+     Vec4f            border_color;                         ///< color of the border, for ClampToBorder wrapping only.
+     Vec2i            size;                                 ///< size of texture in texels.
+     std::array< const void*, 6 > data{};                   ///< data of a texture.
+};
+
+
+/// @brief Parameters of render buffer loading.
+template <>
+struct LoadParams< ResourceType::RenderBuffer >
+{
+     BufferDataFormat format = BufferDataFormat::Rgb;       ///< format of pixel data.
+     DataType         data_type = DataType::Byte;           ///< type of pixels data.
+     Vec2i            size;                                 ///< size of render buffer in pixels.
+     std::size_t      samples = 0;                          ///< number of samples for render buffer (0 if not used).
 };
 
 
@@ -157,22 +178,13 @@ struct LoadParams< ResourceType::FrameBuffer >
      /// @brief Parameters of loading a framebuffer attachment.
      struct AttachmentParams
      {
-          StorageType      storage = StorageType::Texture2D;          ///< type of framebuffer attachment storage.
-          AttachmentType   attachment = AttachmentType::Color;        ///< type of framebuffer attachment.
-          BufferDataFormat format = BufferDataFormat::Rgb;            ///< format of texel data.
-          TextureFilter    min_filter = TextureFilter::Linear;        ///< filter used when minifying the image.
-          TextureFilter    mag_filter = TextureFilter::Linear;        ///< filter used when magnifying the image.
-          TextureWrap      wrap_x = TextureWrap::ClampToEdge;         ///< wrap method for horizontal coordinate.
-          TextureWrap      wrap_y = TextureWrap::ClampToEdge;         ///< wrap method for vertical coordinate.
-          TextureWrap      wrap_z = TextureWrap::ClampToEdge;         ///< wrap method for z coordinate (for cubemaps only).
-          DataType         data_type = DataType::Byte;                ///< type of pixels data.
-          Vec4f            border_color;                              ///< color of the border, for ClampToBorder wrapping only.
-          Vec2i            size;                                      ///< size of attachment in texels.
-          std::size_t      samples = 0;                               ///< count of samples, 0 if not used.
-          std::size_t      order = 0;                                 ///< order of attachment (for texture color attachments only).
+          Resource resource;                      ///< resource to be attached (must be texture, render buffer or cubemap).
+          AttachmentType type;                    ///< type of attachment.
+          std::size_t order;                      ///< order of attachment, for color attachments only.
+          bool multisample = false;               ///< does the resource use multisampling.
      };
 
-     std::vector< AttachmentParams > attachments;                     ///< parameters of attachments loading.
+     std::vector< AttachmentParams > attachments; ///< parameters of attachments loading.
 };
 
 
@@ -223,19 +235,11 @@ struct LoadParams< ResourceType::VertexBuffer >
 /// @brief Parameters of a render call.
 struct RenderParams
 {
-     std::vector< Texture > textures;                  ///< textures to be used (binded) during the draw call.
-     std::function< void( const IShader& ) > setup;    ///< function for setting uniforms,
-                                                       ///< may be called in other thread and in other frame,
-                                                       ///< so it must not capture context by reference.
-     Shader shader;                                    ///< shader which will be used in render.
-     FrameBuffer frame_buffer;                         ///< framebuffer for rendering (if ID is 0, will use default framebuffer).
+     std::vector< Texture > textures;                  ///< active textures for rendering.
      VertexBuffer vertex_buffer;                       ///< vertex buffer for rendering.
      PrimitiveType primitive = PrimitiveType::Points;  ///< type of primitive to draw.
      std::size_t vertex_count = 0;                     ///< number of vertices in each instance.
      std::size_t instance_count = 1;                   ///< number of instances to draw.
-     bool clear_color = true;                          ///< should the color buffer be cleared.
-     bool clear_depth = false;                         ///< should the depth buffer be cleared.
-     bool clear_stencil = false;                       ///< should the stencil buffer be cleared.
 };
 
 } // namespace _16nar

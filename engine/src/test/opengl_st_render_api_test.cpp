@@ -53,6 +53,7 @@ int main()
 
      Game::init();
 
+     // scope to close window and destroy api before game deinitialization
      {
           Window window( Vec2i{ 800, 600 }, "opengl_st_render_api_test" );
           window.make_context_current();
@@ -64,8 +65,9 @@ int main()
           render_params.primitive = PrimitiveType::Triangles;
           render_params.vertex_buffer = vb_id;
           render_params.vertex_count = 3;
-          render_params.shader = sh_id;
-          api.render( render_params );
+
+          api.get_device().bind_shader( sh_id );
+          api.get_device().render( render_params );
 
           window.swap_buffers();
           std::this_thread::sleep_for( std::chrono::seconds( 3 ) );

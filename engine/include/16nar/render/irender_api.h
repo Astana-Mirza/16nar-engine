@@ -11,6 +11,10 @@
 namespace _16nar
 {
 
+class IRenderDevice;
+
+
+/// @brief Interface for low-level graphics API (OpenGL, Vulkan, etc.).
 class ENGINE_API IRenderApi
 {
 public:
@@ -28,10 +32,9 @@ public:
      /// @param[in] resource identifier of a resource with type.
      virtual void unload( const Resource& resource ) = 0;
 
-     /// @brief Schedules a draw call with given parameters.
-     /// @details Order of draw calls is preserved even if they are not immediate.
-     /// @param[in] params render parameters.
-     virtual void render( const RenderParams& params ) = 0;
+     /// @brief Get render device of current graphics API.
+     /// @return render device of current graphics API.
+     virtual IRenderDevice& get_device() const = 0;
 
      /// @brief Process rendering.
      virtual void process() = 0;

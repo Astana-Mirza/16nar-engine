@@ -8,7 +8,7 @@
 namespace _16nar::opengl
 {
 
-bool VertexBufferLoader::load( const LoadParams& params, Handler& handler )
+bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
 {
      unsigned int buffers[ 2 ] = { 0, 0 };
      glGenVertexArrays( 1, &handler.vao_descriptor );

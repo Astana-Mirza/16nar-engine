@@ -38,6 +38,8 @@ enum class ResourceType
      Shader,             ///< shader program.
      FrameBuffer,        ///< buffer for the frame.
      VertexBuffer,       ///< buffer or group of buffers for vertices.
+     RenderBuffer,       ///< write-only render buffer.
+     Cubemap,            ///< 3D texture.
      Unknown             ///< unknown resource type for default initialization.
 };
 

@@ -30,6 +30,10 @@ template < typename T >
 class MtResourceManager : public IResourceManager
 {
 public:
+     /// @brief Constructor.
+     /// @param[in] managers resource managers for access to related resources.
+     MtResourceManager( const ResourceManagerMap& managers ) : managers_{ managers } {}
+
      /// @brief Destructor, requests unload of all loaded resources.
      ~MtResourceManager();
 
@@ -72,6 +76,7 @@ private:
      std::unordered_map< ResID, Handler > resources_;                      ///< resources loaded in previous frames.
      std::array< std::queue< Request >, _16nar_saved_frames > load_queue_; ///< requests to load resources.
      std::array< std::queue< ResID >, _16nar_saved_frames > unload_queue_; ///< requests to unload resources.
+     const ResourceManagerMap& managers_;                                  ///< resource managers for access to related resources.
      ResID next_ = 1;                                                      ///< next ID to be assigned.
      std::atomic_size_t frame_index_ = 0;                                  ///< index of the frame being rendered.
 };

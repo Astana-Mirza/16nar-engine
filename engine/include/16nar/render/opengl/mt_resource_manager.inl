@@ -75,7 +75,7 @@ void MtResourceManager< T >::process_load_queue()
      {
           auto& request = queue.front();
           Handler handler;
-          if ( !T::load( request.second, handler ) )
+          if ( !T::load( managers_, request.second, handler ) )
           {
                throw ResourceException{ "cannot load resource ", request.first };
           }

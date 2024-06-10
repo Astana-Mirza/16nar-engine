@@ -1,6 +1,6 @@
 #include <16nar/render/opengl/st_render_device.h>
 
-#include <16nar/render/opengl/shader.h>
+#include <16nar/render/opengl/shader_program.h>
 #include <16nar/render/opengl/glad.h>
 
 namespace _16nar::opengl
@@ -13,27 +13,6 @@ StRenderDevice::StRenderDevice( const ResourceManagerMap& managers ):
 
 void StRenderDevice::render( const RenderParams& params )
 {
-     do_render( params );
-}
-
-
-void StRenderDevice::do_render( const RenderParams& params )
-{
-     Handler< ResourceType::FrameBuffer > frame_buffer_handler;
-     const auto vertex_buffer_handler = std::any_cast< Handler< ResourceType::VertexBuffer > >(
-          managers_.at( ResourceType::VertexBuffer )->get_handler( params.vertex_buffer.id ) );
-     const auto shader_handler = std::any_cast< Handler< ResourceType::Shader > >(
-          managers_.at( ResourceType::Shader )->get_handler( params.shader.id ) );
-
-     if ( params.frame_buffer.id != 0 )
-     {
-          frame_buffer_handler = std::any_cast< Handler< ResourceType::FrameBuffer > >(
-               managers_.at( ResourceType::FrameBuffer )->get_handler( params.frame_buffer.id ) );
-     }
-     glBindFramebuffer( GL_FRAMEBUFFER, frame_buffer_handler.descriptor ); // may be 0
-     glBindVertexArray( vertex_buffer_handler.vao_descriptor );
-     glUseProgram( shader_handler.descriptor );
-
      const auto& texture_manager = managers_.at( ResourceType::Texture );
      for ( std::size_t i = 0; i < params.textures.size(); i++ )
      {
@@ -43,17 +22,10 @@ void StRenderDevice::do_render( const RenderParams& params )
           glBindTexture( GL_TEXTURE_2D, texture_descriptor.descriptor );
      }
 
-     if ( params.setup )
-     {
-          opengl::Shader shader{ shader_handler.descriptor };
-          params.setup( shader );
-     }
+     const auto vertex_buffer_handler = std::any_cast< Handler< ResourceType::VertexBuffer > >(
+          managers_.at( ResourceType::VertexBuffer )->get_handler( params.vertex_buffer.id ) );
 
-     GLbitfield clear_mask = 0;
-     clear_mask |= ( params.clear_color ? GL_COLOR_BUFFER_BIT : 0 );
-     clear_mask |= ( params.clear_depth ? GL_DEPTH_BUFFER_BIT : 0 );
-     clear_mask |= ( params.clear_stencil ? GL_STENCIL_BUFFER_BIT : 0 );
-     glClear( clear_mask );
+     glBindVertexArray( vertex_buffer_handler.vao_descriptor );
 
      if ( vertex_buffer_handler.ebo_descriptor != 0 )
      {
@@ -65,15 +37,71 @@ void StRenderDevice::do_render( const RenderParams& params )
           glDrawArraysInstanced( primitive_type_to_int( params.primitive ),
                0, params.vertex_count, params.instance_count );
      }
+}
 
-     for ( std::size_t i = 0; i < params.textures.size(); i++ )
+
+void StRenderDevice::set_viewport( const IntRect& rect )
+{
+     glViewport( rect.get_pos().x(), rect.get_pos().y(), rect.get_width(), rect.get_height() );
+}
+
+
+void StRenderDevice::set_depth_test_state( bool enable )
+{
+     if ( enable )
      {
-          glActiveTexture( GL_TEXTURE0 + i );
-          glBindTexture( GL_TEXTURE_2D, 0 );
+          glEnable( GL_DEPTH_TEST );
      }
-     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-     glBindVertexArray( 0 );
-     glUseProgram( 0 );
+     else
+     {
+          glDisable( GL_DEPTH_TEST );
+     }
+}
+
+
+void StRenderDevice::bind_shader( const Shader& shader, const std::function< void( const IShaderProgram& ) >& setup )
+{
+     if ( shader.id == 0 )
+     {
+          glUseProgram( 0 );
+          return;
+     }
+
+     const auto shader_handler = std::any_cast< Handler< ResourceType::Shader > >(
+          managers_.at( ResourceType::Shader )->get_handler( shader.id ) );
+
+     glUseProgram( shader_handler.descriptor );
+     if ( setup )
+     {
+          ShaderProgram shader{ shader_handler.descriptor };
+          setup( shader );
+     }
+}
+
+
+void StRenderDevice::bind_framebuffer( const FrameBuffer& framebuffer )
+{
+     if ( framebuffer.id == 0 )
+     {
+          glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+          return;
+     }
+     const auto frame_buffer_handler = std::any_cast< Handler< ResourceType::FrameBuffer > >(
+          managers_.at( ResourceType::FrameBuffer )->get_handler( framebuffer.id ) );
+     glBindFramebuffer( GL_FRAMEBUFFER, frame_buffer_handler.descriptor );
+}
+
+
+void StRenderDevice::clear( bool color, bool depth, bool stencil )
+{
+     GLbitfield clear_mask = 0;
+     clear_mask |= ( color ? GL_COLOR_BUFFER_BIT : 0 );
+     clear_mask |= ( depth ? GL_DEPTH_BUFFER_BIT : 0 );
+     clear_mask |= ( stencil ? GL_STENCIL_BUFFER_BIT : 0 );
+     if ( clear_mask )
+     {
+          glClear( clear_mask );
+     }
 }
 
 } // namespace _16nar::opengl

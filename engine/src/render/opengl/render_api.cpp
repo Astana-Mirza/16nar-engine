@@ -6,8 +6,10 @@
 #include <16nar/render/opengl/mt_render_device.h>
 #include <16nar/render/opengl/frame_buffer_loader.h>
 #include <16nar/render/opengl/vertex_buffer_loader.h>
+#include <16nar/render/opengl/render_buffer_loader.h>
 #include <16nar/render/opengl/texture_loader.h>
 #include <16nar/render/opengl/shader_loader.h>
+#include <16nar/render/opengl/cubemap_loader.h>
 #include <16nar/render/opengl/glad.h>
 
 #include <16nar/system/exceptions.h>
@@ -29,20 +31,36 @@ RenderApi::RenderApi( ProfileType profile )
      {
           case ProfileType::SingleThreaded:
           {
-               managers_.emplace( ResourceType::FrameBuffer, std::make_unique< StResourceManager< FrameBufferLoader > >() );
-               managers_.emplace( ResourceType::VertexBuffer, std::make_unique< StResourceManager< VertexBufferLoader > >() );
-               managers_.emplace( ResourceType::Texture, std::make_unique< StResourceManager< TextureLoader > >() );
-               managers_.emplace( ResourceType::Shader, std::make_unique< StResourceManager< ShaderLoader > >() );
+               managers_.emplace( ResourceType::FrameBuffer,
+                    std::make_unique< StResourceManager< FrameBufferLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::VertexBuffer,
+                    std::make_unique< StResourceManager< VertexBufferLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::Texture,
+                    std::make_unique< StResourceManager< TextureLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::Shader,
+                    std::make_unique< StResourceManager< ShaderLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::RenderBuffer,
+                    std::make_unique< StResourceManager< RenderBufferLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::Cubemap,
+                    std::make_unique< StResourceManager< CubemapLoader > >( managers_ ) );
 
                device_ = std::make_unique< StRenderDevice >( managers_ );
           }
           break;
           case ProfileType::MultiThreaded:
           {
-               managers_.emplace( ResourceType::FrameBuffer, std::make_unique< MtResourceManager< FrameBufferLoader > >() );
-               managers_.emplace( ResourceType::VertexBuffer, std::make_unique< MtResourceManager< VertexBufferLoader > >() );
-               managers_.emplace( ResourceType::Texture, std::make_unique< MtResourceManager< TextureLoader > >() );
-               managers_.emplace( ResourceType::Shader, std::make_unique< MtResourceManager< ShaderLoader > >() );
+               managers_.emplace( ResourceType::FrameBuffer,
+                    std::make_unique< MtResourceManager< FrameBufferLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::VertexBuffer,
+                    std::make_unique< MtResourceManager< VertexBufferLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::Texture,
+                    std::make_unique< MtResourceManager< TextureLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::Shader,
+                    std::make_unique< MtResourceManager< ShaderLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::RenderBuffer,
+                    std::make_unique< MtResourceManager< RenderBufferLoader > >( managers_ ) );
+               managers_.emplace( ResourceType::Cubemap,
+                    std::make_unique< MtResourceManager< CubemapLoader > >( managers_ ) );
 
                device_ = std::make_unique< MtRenderDevice >( managers_ );
           }
@@ -77,9 +95,9 @@ void RenderApi::unload( const Resource& resource )
 }
 
 
-void RenderApi::render( const RenderParams& params )
+IRenderDevice& RenderApi::get_device() const
 {
-     device_->render( params );
+     return *device_;
 }
 
 
@@ -87,8 +105,14 @@ void RenderApi::process()
 {
      for ( auto& pair : managers_ )
      {
-          pair.second->process_load_queue();
+          if ( pair.first != ResourceType::FrameBuffer )
+          {
+               pair.second->process_load_queue();
+          }
      }
+     // process frame buffer after attachments are loaded in other managers.
+     managers_[ ResourceType::FrameBuffer ]->process_load_queue();
+
      device_->process_render_queue();
      for ( auto& pair : managers_ )
      {

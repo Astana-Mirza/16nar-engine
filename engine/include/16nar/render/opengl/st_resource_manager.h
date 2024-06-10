@@ -17,6 +17,10 @@ template < typename T >
 class StResourceManager : public IResourceManager
 {
 public:
+     /// @brief Constructor.
+     /// @param[in] managers resource managers for access to related resources.
+     StResourceManager( const ResourceManagerMap& managers ) : managers_{ managers } {}
+
      /// @brief Destructor, requests unload of all loaded resources.
      ~StResourceManager();
 
@@ -42,6 +46,7 @@ private:
      using LoadParams = typename T::LoadParams;
 
      std::unordered_map< ResID, Handler > resources_;  ///< resources loaded in previous frames.
+     const ResourceManagerMap& managers_;              ///< resource managers for access to related resources.
      ResID next_ = 1;                                  ///< next ID to be assigned.
 };
 

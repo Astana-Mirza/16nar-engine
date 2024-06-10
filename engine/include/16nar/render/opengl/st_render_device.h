@@ -9,7 +9,7 @@
 
 namespace _16nar::opengl
 {
-
+ 
 /// @brief Class for tracking resources for OpenGL, singlethread profile.
 class StRenderDevice : public IRenderDevice
 {
@@ -21,10 +21,21 @@ public:
      /// @copydoc IRenderDevice::render(const RenderParams&)
      virtual void render( const RenderParams& params ) override;
 
-protected:
-     /// @brief Perform render call.
-     /// @param[in] params render parameters.
-     virtual void do_render( const RenderParams& params );
+     /// @copydoc IRenderDevice::set_viewport(const IntRect&)
+     virtual void set_viewport( const IntRect& rect ) override;
+
+     /// @copydoc IRenderDevice::set_depth_test_state(bool)
+     virtual void set_depth_test_state( bool enable ) override;
+
+     /// @copydoc IRenderDevice::bind_shader(const Shader&, const std::function<void(const IShaderProgram&)>&)
+     virtual void bind_shader( const Shader& shader,
+          const std::function< void( const IShaderProgram& ) >& setup = {} ) override;
+
+     /// @copydoc IRenderDevice::bind_framebuffer(const FrameBuffer&)
+     virtual void bind_framebuffer( const FrameBuffer& framebuffer ) override;
+
+     /// @copydoc IRenderDevice::clear(bool, bool, bool)
+     virtual void clear( bool color, bool depth, bool stencil ) override;
 
 private:
      const ResourceManagerMap& managers_;    ///< all resource managers.
