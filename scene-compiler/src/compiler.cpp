@@ -152,7 +152,7 @@ void Compiler::compile_package( const std::string& output_file )
 void Compiler::compile_scene( const std::string& output_file )
 {
      _16nar::SceneHeader hdr{};
-     hdr.signature = _16nar::SCENE_FILE_SIGNATURE;
+     hdr.signature = _16nar::_16nar_scene_signature;
      hdr.format_version = 1;
      hdr.main_code_file = main_object_[ "main_code_file" ].get< uint32_t >();
      hdr.code_file_count = static_cast< uint32_t >( main_object_[ "code_files" ]

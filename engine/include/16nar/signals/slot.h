@@ -3,7 +3,7 @@
 #ifndef _16NAR_SLOT_H
 #define _16NAR_SLOT_H
 
-#include <16nar/abstract/basic_slot.h>
+#include <16nar/signals/basic_slot.h>
 
 namespace _16nar
 {

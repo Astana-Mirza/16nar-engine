@@ -4,16 +4,10 @@
 #define _16NAR_DEFS_H
 
 #include <16nar/16narconfig.h>
+#include <cstdint>
 
-#ifdef USE_SFML
-#    include <SFML/GpuPreference.hpp>
-#    include <SFML/Graphics.hpp>
-#    include <SFML/Audio.hpp>
-#endif
-
-
-#ifdef WIN_EXPORT
-#    ifdef BUILDING_DLL
+#if defined( NARENGINE_WIN_EXPORT )
+#    ifdef NARENGINE_DLL
 #         define ENGINE_API __declspec( dllexport )
 #    else
 #         define ENGINE_API __declspec( dllimport )
@@ -22,49 +16,64 @@
 #    define ENGINE_API
 #endif
 
-
 namespace _16nar
 {
 
-class View;
+/// @brief Type of resource identifier.
+using ResID = uint32_t;
 
-#ifdef USE_SFML
 
-namespace Style = sf::Style;
+/// @brief Type of application profile, representing its execution method.
+enum class ProfileType
+{
+     SingleThreaded,     ///< executing application in single thread. 
+     MultiThreaded       ///< executing appliction in multiple threads, each having its own purpose.
+};
 
-using Transform = sf::Transformable;
-using TransformMatrix = sf::Transform;
-using RenderData = sf::RenderStates;
 
-using sf::Vector2f;
-using sf::IntRect;
-using sf::FloatRect;
-using sf::RenderTarget;
-using sf::RenderWindow;
-using sf::Color;
-using sf::Sprite;
-using sf::Texture;
-using sf::Text;
-using sf::Font;
-using sf::Shader;
-using sf::BlendMode;
-using sf::Vertex;
-using sf::VertexArray;
-using sf::Keyboard;
-using sf::Mouse;
-using sf::Joystick;
-using sf::Event;
-using sf::SoundBuffer;
-using sf::Sound;
-using sf::PrimitiveType;
+/// @brief Type of resource used for render.
+enum class ResourceType
+{
+     Texture,            ///< 2D texture.
+     Shader,             ///< shader program.
+     FrameBuffer,        ///< buffer for the frame.
+     VertexBuffer,       ///< buffer or group of buffers for vertices.
+     RenderBuffer,       ///< write-only render buffer.
+     Cubemap,            ///< 3D texture.
+     Unknown             ///< unknown resource type for default initialization.
+};
 
-// globals
-using sf::BlendAdd;
-using sf::BlendAlpha;
-using sf::BlendMultiply;
-using sf::BlendNone;
 
-#endif // #ifdef USE_SFML
+/// @brief Resource used in engine.
+struct Resource
+{
+     ResourceType type = ResourceType::Unknown; ///< type of the resource.
+     ResID        id   = 0;                     ///< id of the resource.
+
+     bool operator==( const Resource& rhs ) const { return type == rhs.type && id == rhs.id; }
+     bool operator!=( const Resource& rhs ) const { return !( *this == rhs ); }
+};
+
+
+/// @brief Resource with type embedded in typename.
+/// @tparam R type of resource.
+template < ResourceType R >
+struct TypedResource : public Resource
+{
+     TypedResource()                                      { type = R; }
+     TypedResource( const TypedResource& other )          { type = R; id = other.id; }
+     explicit TypedResource( ResID resId )                { type = R; id = resId; }
+     TypedResource& operator=( const TypedResource& rhs ) { type = R; id = rhs.id; return *this; }
+     TypedResource& operator=( ResID resId )              { type = R; id = resId; return *this; }
+     bool operator==( const TypedResource& rhs ) const    { return id == rhs.id; }
+     bool operator!=( const TypedResource& rhs ) const    { return !( *this == rhs ); }
+};
+
+
+using Shader       = TypedResource< ResourceType::Shader       >;
+using Texture      = TypedResource< ResourceType::Texture      >;
+using FrameBuffer  = TypedResource< ResourceType::FrameBuffer  >;
+using VertexBuffer = TypedResource< ResourceType::VertexBuffer >;
 
 } // namespace _16nar
 

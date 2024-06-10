@@ -12,7 +12,7 @@ static_assert( sizeof( float ) == 4 );
 #pragma pack ( push, 1 )
 
 /// @brief signature for checking file format validity.
-constexpr uint32_t SCENE_FILE_SIGNATURE = 0x72616e16;
+constexpr uint32_t _16nar_scene_signature = 0x72616e16;
 
 
 /// @brief Type of a resource packed in a file.
@@ -220,7 +220,6 @@ struct StateInfo
      uint8_t updating;             ///< is this state is initially updating.
      uint8_t rendering;            ///< is this state is initially rendering.
 };
-
 
 } // namespace _16nar
 

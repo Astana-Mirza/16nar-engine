@@ -7,12 +7,14 @@
 #include <vector>
 #include <string>
 
-#include <16nar/render/quadrant.h>
-#include <16nar/constructor/world_node.h>
-#include <16nar/abstract/scene_reader.h>
+#include <16nar/16nardefs.h>
+/*
+#include <16nar/system/window.h>
 #include <16nar/system/event_manager.h>
+#include <16nar/abstract/scene_reader.h>
 #include <16nar/abstract/profile.h>
-
+#include <16nar/constructor/world_node.h>
+*/
 namespace _16nar
 {
 
@@ -22,14 +24,25 @@ class Node;
 class ENGINE_API Game
 {
 public:
-     /// @brief Method for getting single game object.
+  /*   /// @brief Method for getting single game object.
      static Game& get_game();
 
      /// @brief Method for getting current scene's world node.
      static WorldNode& get_world();
 
      Game( const Game& )               = delete;
-     void operator=( const Game& )     = delete;
+     void operator=( const Game& )     = delete;*/
+
+     /// @brief Initialize engine, must be called before any function in engine.
+     /// @detail Does nothing if engine is already initialized. It is called in Game constructor.
+     static void init();
+
+     /// @brief Deinitialize engine, no engine functions must be called after this one.
+     /// @detail Does nothing if engine is already initialized. It is called in Game destructor.
+     static void deinit();
+/*
+     /// @brief Destructor.
+     ~Game();
 
      /// @brief Runs the game loop within loaded scene.
      void run();
@@ -86,11 +99,12 @@ private:
      };
 
      WorldNode world_;                                          ///< node which manages scene states.
-     std::shared_ptr< RenderWindow > window_;                   ///< pointer to main window of the game.
+     std::shared_ptr< Window > window_;                         ///< pointer to main window of the game.
      std::unique_ptr< Profile > profile_;                       ///< current running profile.
      std::unique_ptr< SceneReader > scene_reader_;              ///< pointer to reader of scenes.
      std::unique_ptr< EventManager > event_manager_;            ///< pointer to input event manager.
      TaskType current_task_;                                    ///< current game task.
+*/
 };
 
 } // namespace _16nar

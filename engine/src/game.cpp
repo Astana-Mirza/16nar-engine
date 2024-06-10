@@ -1,23 +1,45 @@
 #include <16nar/game.h>
 
+#include <16nar/logger/logger.h>
+
+/*
 #include <16nar/system/file_scene_reader.h>
 #define USE_SINGLE_THREAD_PROFILE
 #ifdef USE_SINGLE_THREAD_PROFILE
-#    include <16nar/system/profiles/single_thread_profile.h>
-#endif
+#    include <16nar/profiles/single_thread_profile.h>
+#endif*/
+
+#include <GLFW/glfw3.h>
+#include <stdexcept>
+
+namespace // anonymous
+{
+
+void glfw_error_handler( int error_code, const char *description )
+{
+     throw std::runtime_error{ std::string{ "GLFW error " }
+                             + std::to_string( error_code )
+                             + ": " + description };
+}
+
+} // anonymous namespace
+
 
 namespace _16nar
 {
 
-
-Game::Game():
+/*
+Game::Game() :
      window_{ std::make_shared< RenderWindow >() },
 #ifdef USE_SINGLE_THREAD_PROFILE
      profile_{ std::make_unique< SingleThreadProfile >( world_, window_ ) },
 #endif
      scene_reader_{ std::make_unique< FileSceneReader >() },
      event_manager_{ std::make_unique< EventManager >() },
-     current_task_{ TaskType::Running } {}
+     current_task_{ TaskType::Running }
+{
+     init();
+}
 
 
 Game& Game::get_game()
@@ -30,6 +52,30 @@ Game& Game::get_game()
 WorldNode& Game::get_world()
 {
      return get_game().world_;
+}
+
+*/
+void Game::init()
+{
+     glfwSetErrorCallback( glfw_error_handler );
+     if ( !glfwInit() )
+     {
+          throw std::runtime_error{ "GLFW error: failed to initialize" };
+     }
+     LOG_16NAR_INFO( "16nar engine was initialized" );
+}
+
+
+void Game::deinit()
+{
+     glfwTerminate();
+     LOG_16NAR_INFO( "16nar engine was deinitialized" );
+}
+
+/*
+Game::~Game()
+{
+     deinit();
 }
 
 
@@ -131,5 +177,5 @@ Shader& Game::get_shader( ResourceID id )
 {
      return scene_reader_->get_shader( id );
 }
-
+*/
 } // namespace _16nar

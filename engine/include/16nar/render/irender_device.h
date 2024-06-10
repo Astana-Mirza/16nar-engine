@@ -1,0 +1,63 @@
+/// @file
+/// @brief File with IRenderDevice interface definition.
+#ifndef _16NAR_IRENDER_DEVICE_H
+#define _16NAR_IRENDER_DEVICE_H
+
+#include <16nar/16nardefs.h>
+#include <16nar/render/render_defs.h>
+
+#include <16nar/math/rectangle.h>
+
+namespace _16nar
+{
+
+class IShaderProgram;
+
+/// @brief Inteface for rendering graphic primitives on the screen.
+class ENGINE_API IRenderDevice
+{
+public:
+     /// @brief Virtual default destructor.
+     virtual ~IRenderDevice() = default;
+
+     /// @brief Schedules a draw call with given parameters.
+     /// @param[in] params render parameters.
+     virtual void render( const RenderParams& params ) = 0;
+
+     /// @brief Set viewport for rendering.
+     /// @param[in] rect rectangle of a viewport.
+     virtual void set_viewport( const IntRect& rect ) = 0;
+
+     /// @brief Set state of depth testing.
+     /// @param[in] enable should the depth testing be enabled.
+     virtual void set_depth_test_state( bool enable ) = 0;
+
+     /// @brief Bind shader program and set its parameters.
+     /// @details setup function may be called in other thread and in other frame,
+     /// so it must not capture context by reference.
+     /// @param[in] shader target shader resource identifier.
+     /// @param[in] setup function for setting uniforms.
+     virtual void bind_shader( const Shader& shader,
+          const std::function< void( const IShaderProgram& ) >& setup = {} ) = 0;
+
+     /// @brief Bind framebuffer for rendering.
+     /// @details Framebuffer ID 0 can be specified to bind default framebuffer.
+     /// @param[in] framebuffer target framebuffer resource identifier.
+     virtual void bind_framebuffer( const FrameBuffer& framebuffer ) = 0;
+
+     /// @brief Clear currently bound framebuffer.
+     /// @param[in] color should the color buffer be cleared.
+     /// @param[in] depth should the depth buffer be cleared.
+     /// @param[in] stencil should the stencil buffer be cleared.
+     virtual void clear( bool color, bool depth, bool stencil ) = 0;
+
+     /// @brief Process all requests in render queue.
+     virtual void process_render_queue() {}
+
+     /// @brief Swap queues and prepare for new frame.
+     virtual void end_frame() {}
+};
+
+} // namespace _16nar
+
+#endif // #ifndef _16NAR_IRENDER_DEVICE_H

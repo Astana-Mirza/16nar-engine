@@ -5,14 +5,14 @@
 
 #include <unordered_map>
 
-#include <16nar/abstract/render_system.h>
+#include <16nar/render/render_system.h>
 #include <16nar/render/quadrant.h>
 
 namespace _16nar
 {
 
 /// @brief Render system which uses quadrant tree space partition.
-/// @detail Space partition is needed to reduce number of checked nodes.
+/// @details Space partition is needed to reduce number of checked nodes.
 /// The checks are made to find visible nodes which need to be drawn.
 /// With space partition the whole scene space is divided into parts (quadrants),
 /// and only nodes from visible parts of scene are checked.
