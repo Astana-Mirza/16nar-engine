@@ -17,10 +17,13 @@
 namespace _16nar
 {
 
-class IShader; // forward declaration
+class IShaderProgram; // forward declaration
 
 /// @brief Map of resource types to respective resource manager.
 using ResourceManagerMap = std::unordered_map< ResourceType, std::unique_ptr< IResourceManager > >;
+
+/// @brief Function for setting shader program's uniform values.
+using ShaderSetupFunction = std::function< void( const IShaderProgram& ) >;
 
 /// @brief Frames saved for profiles with multiple threads.
 constexpr std::size_t _16nar_saved_frames = 2;
@@ -240,6 +243,15 @@ struct RenderParams
      PrimitiveType primitive = PrimitiveType::Points;  ///< type of primitive to draw.
      std::size_t vertex_count = 0;                     ///< number of vertices in each instance.
      std::size_t instance_count = 1;                   ///< number of instances to draw.
+};
+
+
+/// @brief Information needed to render one object.
+struct DrawInfo
+{
+     RenderParams render_params;        ///< parameters of a render call.
+     ShaderSetupFunction shader_setup;  ///< shader program setup function.
+     Shader shader;                     ///< shader program used to render object.
 };
 
 } // namespace _16nar

@@ -1,32 +1,34 @@
 /// @file
 /// @brief File with Quadrant class definition.
-#ifndef _16NAR_QUADRANT_H
-#define _16NAR_QUADRANT_H
+#ifndef _16NAR_CONSTRUCTOR_QUADRANT_H
+#define _16NAR_CONSTRUCTOR_QUADRANT_H
 
 #include <map>
 #include <array>
 #include <unordered_set>
 
-#include <16nar/16nardefs.h>
-#include <16nar/abstract/drawable.h>
+#include <16nar/render/render_defs.h>
+#include <16nar/math/rectangle.h>
 
-namespace _16nar
+namespace _16nar::constructor
 {
+
+class Drawable2D;
 
 /// @brief Class for space partitioning with quadrant tree.
 class ENGINE_API Quadrant
 {
 public:
      /// @brief Constant which represents this quadrant's children count.
-     constexpr static size_t quad_count = 4;
+     constexpr static std::size_t quad_count = 4;
 
-     using DrawableSet = std::unordered_set< Drawable * >;
+     using DrawableSet = std::unordered_set< Drawable2D * >;
      using LayerMap = std::map< int, DrawableSet >;
      using QuadArray = std::array< Quadrant *, quad_count >;
 
      /// @brief Constructor sets area of this quadrant.
      /// @param[in] area area of the quadrant.
-     explicit Quadrant( const FloatRect& area = {} );
+     explicit Quadrant( const FloatRect& area );
 
      /// @brief Destructor deletes all children quadrants recursively.
      ~Quadrant();
@@ -47,11 +49,11 @@ public:
 
      /// @brief Add a drawable object to this quadrant.
      /// @param[in] child pointer to drawable object to be added.
-     void add_draw_child( Drawable *child );
+     void add_draw_child( Drawable2D *child );
 
      /// @brief Delete a drawable object from this quadrant, memory will not be freed.
      /// @param[in] child pointer to drawable object to be deleted.
-     void delete_draw_child( Drawable *child );
+     void delete_draw_child( Drawable2D *child );
 
      /// @brief Recursively find objects in this quadrant, which intersect with given area.
      /// @param[in] area area for which we look for intersections.
@@ -65,6 +67,6 @@ private:
      Quadrant *parent_;            ///< parent of this quadrant.
 };
 
-} // namespace _16nar
+} // namespace _16nar::constructor
 
-#endif // #ifndef _16NAR_QUADRANT_H
+#endif // #ifndef _16NAR_CONSTRUCTOR_QUADRANT_H

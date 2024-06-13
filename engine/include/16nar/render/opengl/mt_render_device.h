@@ -30,9 +30,11 @@ public:
      /// @copydoc IRenderDevice::set_depth_test_state(bool)
      virtual void set_depth_test_state( bool enable ) override;
 
-     /// @copydoc IRenderDevice::bind_shader(const Shader&, const std::function<void(const IShaderProgram&)>&)
-     virtual void bind_shader( const Shader& shader,
-          const std::function< void( const IShaderProgram& ) >& setup = {} ) override;
+     /// @copydoc IRenderDevice::bind_shader(const Shader&)
+     virtual void bind_shader( const Shader& shader ) override;
+
+     /// @copydoc IRenderDevice::set_shader_params(const ShaderSetupFunction&)
+     virtual void set_shader_params( const ShaderSetupFunction& setup ) override;
 
      /// @copydoc IRenderDevice::bind_framebuffer(const FrameBuffer&)
      virtual void bind_framebuffer( const FrameBuffer& framebuffer ) override;

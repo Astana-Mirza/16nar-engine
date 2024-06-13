@@ -7,7 +7,7 @@ namespace _16nar::opengl
 {
 
 StRenderDevice::StRenderDevice( const ResourceManagerMap& managers ):
-     managers_{ managers }
+     managers_{ managers }, current_shader_{}
 {}
 
 
@@ -59,23 +59,27 @@ void StRenderDevice::set_depth_test_state( bool enable )
 }
 
 
-void StRenderDevice::bind_shader( const Shader& shader, const std::function< void( const IShaderProgram& ) >& setup )
+void StRenderDevice::bind_shader( const Shader& shader )
 {
      if ( shader.id == 0 )
      {
           glUseProgram( 0 );
+          current_shader_ = {};
           return;
      }
 
      const auto shader_handler = std::any_cast< Handler< ResourceType::Shader > >(
           managers_.at( ResourceType::Shader )->get_handler( shader.id ) );
 
+     current_shader_ = shader_handler;
      glUseProgram( shader_handler.descriptor );
-     if ( setup )
-     {
-          ShaderProgram shader{ shader_handler.descriptor };
-          setup( shader );
-     }
+}
+
+
+void StRenderDevice::set_shader_params( const std::function< void( const IShaderProgram& ) >& setup )
+{
+     ShaderProgram shader{ current_shader_.descriptor };
+     setup( shader );
 }
 
 

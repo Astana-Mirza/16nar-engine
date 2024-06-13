@@ -1,10 +1,12 @@
-#include <16nar/render/quadrant.h>
+#include <16nar/constructor/render/quadrant.h>
 
-namespace _16nar
+#include <16nar/constructor/render/drawable_2d.h>
+
+namespace _16nar::constructor
 {
 
 Quadrant::Quadrant( const FloatRect& area ):
-     area_{ area }, children_{ nullptr, nullptr, nullptr, nullptr }, parent_{ nullptr }
+     drawables_{}, area_{ area }, children_{}, parent_{ nullptr }
 {}
 
 Quadrant::~Quadrant()
@@ -41,13 +43,13 @@ void Quadrant::add_child( Quadrant *child, int index )
 }
 
 
-void Quadrant::add_draw_child( Drawable *child )
+void Quadrant::add_draw_child( Drawable2D *child )
 {
      drawables_.insert( child );
 }
 
 
-void Quadrant::delete_draw_child( Drawable *child )
+void Quadrant::delete_draw_child( Drawable2D *child )
 {
      drawables_.erase( child );
 }
@@ -71,4 +73,4 @@ void Quadrant::find_objects( const FloatRect& area, LayerMap& layers ) const
      }
 }
 
-} // namespace _16nar
+} // namespace _16nar::constructor

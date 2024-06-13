@@ -1,16 +1,19 @@
-#include <16nar/render/qtree_render_system.h>
-#include <16nar/abstract/render_device.h>
-#include <16nar/render/view.h>
+#include <16nar/constructor/render/qtree_render_system.h>
 
-namespace _16nar
+#include <16nar/constructor/render/drawable_2d.h>
+#include <16nar/logger/logger.h>
+
+namespace _16nar::constructor
 {
 
-QTreeRenderSystem::QTreeRenderSystem( Quadrant&& root ): root_{ root } {}
+QTreeRenderSystem::QTreeRenderSystem( std::unique_ptr< IRenderApi >&& api, Quadrant&& root ):
+     quad_map_{}, root_{ root }, api_{ std::move( api ) }, current_shader_{}
+{}
 
 
-void QTreeRenderSystem::start_render( const View& view, RenderDevice& device )
+void QTreeRenderSystem::select_objects()
 {
-     Quadrant::LayerMap layers;
+     /*Quadrant::LayerMap layers;
      root_.find_objects( view.get_global_bounds(), layers );
      if ( !layers.empty() )
      {
@@ -31,24 +34,24 @@ void QTreeRenderSystem::start_render( const View& view, RenderDevice& device )
                     device.add_data( data );
                }
           }
-     }
+     }*/
 }
 
 
-void QTreeRenderSystem::finish_render( RenderDevice& device )
+void QTreeRenderSystem::draw_objects()
 {
-     device.flush();
+
 }
 
 
-void QTreeRenderSystem::add_draw_child( Drawable *child )
+void QTreeRenderSystem::add_draw_child( Drawable2D *child )
 {
      quad_map_[ child ] = &root_;
      root_.add_draw_child( child );
 }
 
 
-void QTreeRenderSystem::delete_draw_child( Drawable *child )
+void QTreeRenderSystem::delete_draw_child( Drawable2D *child )
 {
      auto iter = quad_map_.find( child );
      if ( iter != quad_map_.cend() )
@@ -59,12 +62,13 @@ void QTreeRenderSystem::delete_draw_child( Drawable *child )
 }
 
 
-void QTreeRenderSystem::handle_change( Drawable *child )
+void QTreeRenderSystem::handle_change( Drawable2D *child )
 {
      bool found = false;
      auto iter = quad_map_.find( child );
      if ( iter == quad_map_.cend() )
      {
+          LOG_16NAR_ERROR( "No such node in current render system" );
           return;
      }
      Quadrant *prev = iter->second;
@@ -101,11 +105,11 @@ Quadrant& QTreeRenderSystem::get_root()
 }
 
 
-bool QTreeRenderSystem::check_quadrant( Drawable *obj, const Quadrant *quad )
+bool QTreeRenderSystem::check_quadrant( Drawable2D *obj, const Quadrant *quad )
 {
      auto rect = obj->get_global_bounds();
-     if ( quad->get_area().contains( rect.left, rect.top ) &&
-          quad->get_area().contains( rect.left + rect.width - 1, rect.top + rect.height - 1 ) )
+     if ( quad->get_area().contains( rect.get_pos() ) &&
+          quad->get_area().contains( rect.get_pos() + Vec2f{ rect.get_width(), rect.get_height() } ) )
      {
           return true;
      }
@@ -113,4 +117,4 @@ bool QTreeRenderSystem::check_quadrant( Drawable *obj, const Quadrant *quad )
 }
 
 
-} // namespace _16nar
+} // namespace _16nar::constructor

@@ -9,7 +9,7 @@ namespace _16nar
 {
 
 /// @brief 2D camera, defining a view which looks into the scene.
-class ENGINE_API Camera2D : public Camera
+class ENGINE_API Camera2D
 {
 public:
      /// @brief Constructor.
