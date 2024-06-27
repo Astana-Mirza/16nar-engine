@@ -90,14 +90,6 @@ private:
      /// @brief Constructor.
      Game();
 
-     /// @brief Type of current game task.
-     enum class TaskType
-     {
-          Running,       ///< Execution of a scene.
-          Loading,       ///< Loading a scene.
-          Exiting        ///< Exiting from game.
-     };
-
      WorldNode world_;                                          ///< node which manages scene states.
      std::shared_ptr< Window > window_;                         ///< pointer to main window of the game.
      std::unique_ptr< Profile > profile_;                       ///< current running profile.

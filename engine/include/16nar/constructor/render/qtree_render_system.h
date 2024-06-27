@@ -10,6 +10,14 @@
 
 #include <16nar/render/irender_api.h>
 
+namespace _16nar
+{
+
+class Window;
+
+} // namespace _16nar
+
+
 namespace _16nar::constructor
 {
 
@@ -28,8 +36,14 @@ class ENGINE_API QTreeRenderSystem : public IRenderSystem2D
 public:
      /// @brief Constructor.
      /// @param[in] api API for rendering selected objects.
-     /// @param[in] root root quadrant.
-     QTreeRenderSystem( std::unique_ptr< IRenderApi >&& api, Quadrant&& root );
+     /// @param[in] window game window.
+     QTreeRenderSystem( IRenderApi& api, Window& window );
+
+     /// @copydoc IRenderSystem::reset()
+     virtual void reset() override;
+
+     /// @copydoc IRenderSystem::clear_screen()
+     virtual void clear_screen() override;
 
      /// @copydoc IRenderSystem::select_objects()
      virtual void select_objects() override;
@@ -46,8 +60,21 @@ public:
      /// @copydoc IRenderSystem2D::handle_change(Drawable2D*)
      void handle_change( Drawable2D *child ) override;
 
-     /// @brief Get root quadrant of the tree.
-     Quadrant& get_root();
+     /// @copydoc IRenderSystem2D::set_camera(Camera2D*)
+     virtual void set_camera( Camera2D *camera ) override;
+
+     /// @copydoc IRenderSystem2D::get_camera()
+     virtual const Camera2D* get_camera() const override;
+
+     /// @copydoc IRenderSystem::get_render_api()
+     virtual IRenderApi& get_render_api() override;
+
+     /// @copydoc IRenderSystem::get_window()
+     virtual Window& get_window() override;
+
+     /// @brief Set render quadrant for next draw call.
+     /// @param[in] root root quadrant for drawing.
+     void set_root_quadrant( Quadrant *root );
 
 protected:
      /// @brief Check if the object fits in specified quadrant.
@@ -56,10 +83,21 @@ protected:
      static bool check_quadrant( Drawable2D *obj, const Quadrant *quad );
 
 private:
+     /// @brief Call render API to draw the object.
+     /// @param[in] obj object to be drawn.
+     void draw_object( Drawable2D *obj );
+
+     /// @brief Set shader parameters of render system.
+     void set_shader_params() const;
+
+private:
      std::unordered_map< Drawable2D*, Quadrant* > quad_map_;     ///< map of drawable objects and their quadrants.
-     Quadrant root_;                                             ///< root quadrant, covering the whole scene.
-     std::unique_ptr< IRenderApi > api_;                         ///< API for rendering selected objects.
+     Quadrant::LayerMap layers_;                                 ///< map of layers and selected drawables on them.
+     Quadrant *root_;                                            ///< root quadrant, covering the whole scene.
+     IRenderApi& api_;                                           ///< API for rendering selected objects.
      Shader current_shader_;                                     ///< currently bound shader.
+     Camera2D *camera_;                                          ///< camera of the render system.
+     Window& window_;                                            ///< main application window.
 };
 
 } // namespace _16nar::constructor

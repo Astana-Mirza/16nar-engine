@@ -1,6 +1,7 @@
 #include <16nar/render/opengl/shader_program.h>
 
 #include <16nar/render/opengl/glad.h>
+#include <16nar/math/transform_matrix.h>
 
 namespace _16nar::opengl
 {
@@ -61,6 +62,12 @@ void ShaderProgram::set_uniform( std::string_view name, const Vec4i& value ) con
 void ShaderProgram::set_uniform( std::string_view name, const Vec4f& value ) const
 {
      glUniform4f( glGetUniformLocation( descriptor_, name.data() ), value.x(), value.y(), value.z(), value.w() );
+}
+
+
+void ShaderProgram::set_uniform( std::string_view name, const TransformMatrix& value ) const
+{
+     glUniformMatrix4fv( glGetUniformLocation( descriptor_, name.data() ), 1, GL_FALSE, value.data() );
 }
 
 } // namespace _16nar::opengl

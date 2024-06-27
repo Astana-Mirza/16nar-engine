@@ -1,0 +1,78 @@
+namespace _16nar.data;
+
+/// @brief 2-dimensional vector of floats.
+struct Vec2f
+{
+     data:     [float32: 2];
+}
+
+
+/// @brief 2-dimensional vector of integers.
+struct Vec2i
+{
+     data:     [int32: 2];
+}
+
+
+/// @brief 3-dimensional vector of floats.
+struct Vec3f
+{
+     data:     [float32: 3];
+}
+
+
+/// @brief 3-dimensional vector of integers.
+struct Vec3i
+{
+     data:     [int32: 3];
+}
+
+
+/// @brief 4-dimensional vector of floats.
+struct Vec4f
+{
+     data:     [float32: 4];
+}
+
+
+/// @brief 4-dimensional vector of integers.
+struct Vec4i
+{
+     data:     [int32: 4];
+}
+
+
+/// @brief Simple rectangle of integer type.
+struct IntRect
+{
+     pos:      [int32: 2];
+     width:    int32;
+     height:   int32;
+}
+
+
+/// @brief Simple rectangle of float type.
+struct FloatRect
+{
+     pos:      [float32: 2];
+     width:    float32;
+     height:   float32;
+}
+
+
+/// @brief Transformation matrix.
+struct TransformMatrix
+{
+     data:     [float32: 16];
+}
+
+
+/// @brief Resource identifier.
+table ResourceId
+{
+     package:  string    (required);
+     id:       uint32;
+}
+
+
+file_extension "nar";

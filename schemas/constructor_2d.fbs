@@ -1,0 +1,46 @@
+include "common.fbs";
+
+namespace _16nar.data.constructor;
+
+/// @brief Common node information.
+struct NodeData
+{
+     position: Vec2f;
+     scale:    Vec2f;
+     rotation: float32;
+}
+
+
+/// @brief Simple 2D node.
+table Node2D
+{
+     data:          NodeData;
+     user_data:     [ubyte]   (flexbuffer);
+}
+
+
+/// @brief Node holding a sprite.
+table SpriteNode
+{
+     data:          NodeData;
+     sprite_id:     ResourceId;
+     user_data:     [ubyte]   (flexbuffer);
+}
+
+
+/// @brief Union to store any 2D node.
+union AnyNode2D
+{
+     Node2D,
+     SpriteNode
+}
+
+
+/// @brief Scene executed by engine.
+table Scene2D
+{
+     nodes:    [AnyNode2D];
+}
+
+root_type Scene2D;
+file_identifier "16C2";  // 16nar engine, constructor 2D architecture

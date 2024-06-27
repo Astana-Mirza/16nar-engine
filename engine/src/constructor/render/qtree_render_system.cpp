@@ -1,53 +1,87 @@
 #include <16nar/constructor/render/qtree_render_system.h>
 
 #include <16nar/constructor/render/drawable_2d.h>
+
+#include <16nar/render/irender_device.h>
+#include <16nar/render/ishader_program.h>
+#include <16nar/render/camera_2d.h>
+#include <16nar/system/window.h>
 #include <16nar/logger/logger.h>
+
+#include <stdexcept>
 
 namespace _16nar::constructor
 {
 
-QTreeRenderSystem::QTreeRenderSystem( std::unique_ptr< IRenderApi >&& api, Quadrant&& root ):
-     quad_map_{}, root_{ root }, api_{ std::move( api ) }, current_shader_{}
+QTreeRenderSystem::QTreeRenderSystem( IRenderApi& api, Window& window ):
+     quad_map_{}, layers_{}, root_{ nullptr }, api_{ api },
+     current_shader_{}, camera_{ nullptr }, window_{ window }
 {}
+
+
+void QTreeRenderSystem::reset()
+{
+     quad_map_.clear();
+     layers_.clear();
+     current_shader_ = 0;
+     root_ = nullptr;
+     camera_ = nullptr;
+}
+
+
+void QTreeRenderSystem::clear_screen()
+{
+     api_.get_device().clear( true, true, false );
+}
 
 
 void QTreeRenderSystem::select_objects()
 {
-     /*Quadrant::LayerMap layers;
-     root_.find_objects( view.get_global_bounds(), layers );
-     if ( !layers.empty() )
+     if ( !root_ )
      {
-          RenderDevice::DeviceData data{};
-          data.type = RenderDevice::DeviceDataType::View;
-          data.view = view;
-          device.add_data( data );
+          LOG_16NAR_ERROR( "Root quadrant is not set for render system" );
+          return;
      }
-     for ( const auto& [ lay, objs ] : layers )
+     if ( !camera_ )
+     {
+          LOG_16NAR_ERROR( "Camera is not set for render system" );
+          return;
+     }
+     root_->find_objects( camera_->get_global_bounds(), layers_ );
+     if ( layers_.empty() )
+     {
+          return;
+     }
+     for ( const auto& [ lay, objs ] : layers_ )
      {
           for ( const auto drawable : objs )
           {
-               if ( drawable->is_visible() )
-               {
-                    RenderDevice::DeviceData data{};
-                    data.type = RenderDevice::DeviceDataType::View;
-                    data.render_data = drawable->get_render_data();
-                    device.add_data( data );
-               }
+               draw_object( drawable );
           }
-     }*/
+     }
+     layers_.clear();
 }
 
 
 void QTreeRenderSystem::draw_objects()
 {
-
+     api_.process();
+     api_.end_frame();
+     window_.swap_buffers();
+     current_shader_ = 0;
 }
 
 
 void QTreeRenderSystem::add_draw_child( Drawable2D *child )
 {
-     quad_map_[ child ] = &root_;
-     root_.add_draw_child( child );
+     if ( !root_ )
+     {
+          LOG_16NAR_ERROR( "Root quadrant is not set for render system" );
+          return;
+     }
+     quad_map_[ child ] = root_;
+     root_->add_draw_child( child );
+     handle_change( child );
 }
 
 
@@ -99,9 +133,34 @@ void QTreeRenderSystem::handle_change( Drawable2D *child )
 }
 
 
-Quadrant& QTreeRenderSystem::get_root()
+void QTreeRenderSystem::set_camera( Camera2D *camera )
 {
-     return root_;
+     camera_ = camera;
+}
+
+
+const Camera2D* QTreeRenderSystem::get_camera() const
+{
+     return camera_;
+}
+
+
+IRenderApi& QTreeRenderSystem::get_render_api()
+{
+     return api_;
+}
+
+
+Window& QTreeRenderSystem::get_window()
+{
+     return window_;
+}
+
+
+void QTreeRenderSystem::set_root_quadrant( Quadrant *root )
+{
+     root_ = root;
+     quad_map_.clear();
 }
 
 
@@ -116,5 +175,42 @@ bool QTreeRenderSystem::check_quadrant( Drawable2D *obj, const Quadrant *quad )
      return false;
 }
 
+
+void QTreeRenderSystem::draw_object( Drawable2D *obj )
+{
+     auto info = obj->get_draw_info();
+     auto& device = api_.get_device();
+     if ( info.shader != current_shader_ )
+     {
+          current_shader_ = info.shader;
+          device.bind_shader( info.shader );
+          set_shader_params();
+     }
+     if ( info.shader_setup )
+     {
+          device.set_shader_params( info.shader_setup );
+     }
+     device.render( info.render_params );
+}
+
+
+void QTreeRenderSystem::set_shader_params() const
+{
+     if ( !camera_ )
+     {
+          LOG_16NAR_ERROR( "Camera is not set for render system" );
+          return;
+     }
+     Vec2f size = camera_->get_size();
+     TransformMatrix proj = TransformMatrix{}.scale( Vec2f{ 1.0f / size.x(), 1.0f / size.y() } );
+     TransformMatrix view = camera_->get_transform_matr();
+     api_.get_device().set_shader_params(
+          [ view, proj ]( const IShaderProgram& shader )
+          {
+               shader.set_uniform( "view_matr", view );
+               shader.set_uniform( "proj_matr", proj );
+          }
+     );
+}
 
 } // namespace _16nar::constructor

@@ -1,115 +1,155 @@
 #include <16nar/render/camera_2d.h>
 
+#include <16nar/math/math_functions.h>
+#include <cmath>
+
 namespace _16nar
 {
 
-Camera2D::Camera2D( const FloatRect& view_rect ): view_rect_{ view_rect } {}
+Camera2D::Camera2D( const Vec2f& center, float width, float height ):
+     matr_{}, global_bounds_{ Vec2f{ center.x() - width / 2, center.y() - height / 2 }, width, height},
+     center_{ center }, half_width_{ width / 2 }, half_height_{ height / 2 }, scale_{ 1.0f },
+     rotation_{ 0.0f }, transformed_{ false }
+{}
 
 
 FloatRect Camera2D::get_global_bounds() const
 {
-     return matr_ * view_rect_;
-}
-
-void View::set_center( const Vector2f pos )
-{
-     view_.setCenter( pos );
-}
-
-
-void View::set_center( float x, float y )
-{
-     view_.setCenter( x, y );
+     if ( transformed_ )
+     {
+          params_calculate();
+     }
+     return global_bounds_;
 }
 
 
-void View::set_size( float width, float height )
+void Camera2D::set_center( const Vec2f& pos )
 {
-     view_.setSize( width, height );
+     center_ = pos;
+     transformed_ = true;
 }
 
 
-void View::set_size( const Vector2f& size )
+void Camera2D::set_size( float width, float height )
 {
-     view_.setSize( size );
+     half_width_ = width / 2;
+     half_height_ = height / 2;
+     transformed_ = true;
 }
 
 
-void View::set_rotation( float angle )
+void Camera2D::set_rotation( float angle )
 {
-     view_.setRotation( angle );
+     rotation_ = angle >= 0.0f ? std::fmod( angle, 360.0f ) : ( 360.0f - std::fmod( -angle, 360.0f ) );
+     transformed_ = true;
 }
 
 
-void View::set_viewport( const FloatRect& viewport )
+void Camera2D::set_zoom( float zoom )
 {
-     view_.setViewport( viewport );
+     if ( zoom > 0.0f )
+     {
+          scale_ = 1.0f / zoom;
+          transformed_ = true;
+     }
 }
 
 
-void View::reset( const FloatRect& rectangle )
+void Camera2D::reset( const Vec2f& center, float width, float height )
 {
-     view_.reset( rectangle );
+     matr_ = {};
+     half_width_ = width / 2;
+     half_height_ = height / 2;
+     center_ = center;
+     rotation_ = 0.0f;
+     scale_ = 1.0f;
+     transformed_ = false;
 }
 
 
-const Vector2f& View::get_center() const
+const Vec2f& Camera2D::get_center() const
 {
-     return view_.getCenter();
+     return center_;
 }
 
 
-const Vector2f& View::get_size() const
+Vec2f Camera2D::get_size() const
 {
-     return view_.getSize();
+     return Vec2f{ half_width_ * 2.0f, half_height_ * 2.0f };
 }
 
 
-float View::get_rotation() const
+float Camera2D::get_rotation() const
 {
-     return view_.getRotation();
+     return rotation_;
 }
 
 
-const FloatRect& View::get_viewport() const
+float Camera2D::get_zoom() const
 {
-     return view_.getViewport();
+     return 1.0f / scale_;
 }
 
 
-void View::move( float offset_x, float offset_y )
+void Camera2D::move( const Vec2f& offset )
 {
-     view_.move( offset_x, offset_y );
+     set_center( center_ + offset );
 }
 
 
-void View::move( const Vector2f& offset )
+void Camera2D::rotate( float angle )
 {
-     view_.move( offset );
+     set_rotation( rotation_ + angle );
 }
 
 
-void View::rotate( float angle )
+void Camera2D::zoom( float factor )
 {
-     view_.rotate( angle );
+     if ( factor > 0.0f )
+     {
+          scale_ /= factor;
+     }
+     transformed_ = true;
 }
 
 
-void View::zoom( float factor )
+const TransformMatrix& Camera2D::get_transform_matr() const
 {
-     view_.zoom( factor );
+     if ( transformed_ )
+     {
+          params_calculate();
+     }
+     return matr_;
 }
 
 
-const TransformMatrix& View::get_transform_matr() const
+TransformMatrix Camera2D::get_inverse_transform_matr() const
 {
-     return view_.getTransform();
+     return get_transform_matr().affine_inv();
 }
 
 
-const TransformMatrix& View::get_inverse_transform_matr() const
+void Camera2D::params_calculate() const
 {
-     return view_.getInverseTransform();
+     matr_ = {};
+     matr_.move( -center_ )
+          .rotate( deg2rad( rotation_ ) )
+          .scale( Vec2f{ scale_, scale_ } );
+
+     TransformMatrix tmp;
+     tmp.rotate( deg2rad( rotation_ ) )
+          .scale( Vec2f{ scale_, scale_ } );
+     auto tmp2 = TransformMatrix{};
+     tmp2.move( center_ );
+     tmp2 *= tmp;
+
+     global_bounds_ = tmp2 * FloatRect{
+          Vec2f{ -half_width_, -half_height_ },
+          half_width_ * 2,
+          half_height_ * 2
+     };
+
+     transformed_ = false;
 }
 
 } // namespace _16nar

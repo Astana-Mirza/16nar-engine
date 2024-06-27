@@ -78,6 +78,10 @@ void StRenderDevice::bind_shader( const Shader& shader )
 
 void StRenderDevice::set_shader_params( const std::function< void( const IShaderProgram& ) >& setup )
 {
+     if ( current_shader_.descriptor == 0 )
+     {
+          return;
+     }
      ShaderProgram shader{ current_shader_.descriptor };
      setup( shader );
 }

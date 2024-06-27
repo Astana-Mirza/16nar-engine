@@ -61,7 +61,10 @@ void Quadrant::find_objects( const FloatRect& area, LayerMap& layers ) const
      {
           for ( const auto ptr : drawables_ )
           {
-               layers[ ptr->get_layer() ].insert( ptr );
+               if ( ptr->is_visible() )
+               {
+                    layers[ ptr->get_layer() ].insert( ptr );
+               }
           }
           for ( const auto ptr : children_ )
           {

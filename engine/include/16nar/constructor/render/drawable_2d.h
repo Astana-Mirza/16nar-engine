@@ -29,11 +29,11 @@ public:
 
      /// @brief Get the scene layer of the object.
      /// @return scene layer of the object.
-     virtual int get_layer() const               = 0;
+     int get_layer() const;
 
      /// @brief Set scene layer of this object.
      /// @param[in] layer scene layer.
-     virtual void set_layer( int layer )         = 0;
+     void set_layer( int layer );
 
      /// @brief Get local bounds of the object (in its own coordinates).
      /// @return local bounds of the object.
@@ -43,8 +43,9 @@ public:
      /// @return global bounds of the object.
      virtual FloatRect get_global_bounds() const = 0;
 
-protected:
+private:
      IRenderSystem2D* render_system_;   ///< render system which draws this object.
+     int layer_;
 };
 
 } // namespace _16nar::constructor

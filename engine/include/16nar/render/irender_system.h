@@ -9,7 +9,8 @@
 namespace _16nar
 {
 
-class Drawable;
+class IRenderApi;
+class Window;
 
 /// @brief Interface for world state rendering system.
 /// @details Rendering system defines an algorithm for drawing.
@@ -24,23 +25,25 @@ public:
      /// @brief Virtual default destructor.
      virtual ~IRenderSystem()                                      = default;
 
+     /// @brief Clear all data and reset to initial state.
+     virtual void reset()                                                = 0;
+
+     /// @brief Clear screen.
+     virtual void clear_screen()                                         = 0;
+
      /// @brief Select and save all objects which will be drawn on the screen.
      virtual void select_objects()                                       = 0;
 
      /// @brief Draw all objects on the screen.
      virtual void draw_objects()                                         = 0;
 
-     /// @brief Add a drawable object to this system.
-     /// @param[in] child pointer to drawable object to be added.
-     virtual void add_draw_child( Drawable *child )                      = 0;
+     /// @brief Get render API of the render system.
+     /// @return render API of the render system.
+     virtual IRenderApi& get_render_api()                                = 0;
 
-     /// @brief Delete a drawable object from this system, memory will not be freed.
-     /// @param[in] child pointer to drawable object to be deleted.
-     virtual void delete_draw_child( Drawable *child )                   = 0;
-
-     /// @brief Handle change of object and adjust for future redrawing.
-     /// @param[in] child changed object.
-     virtual void handle_change( Drawable *child )                       = 0;
+     /// @brief Get window of the render sustem.
+     /// @return window of the render sustem.
+     virtual Window& get_window()                                        = 0;
 };
 
 } // namespace _16nar
