@@ -10,7 +10,9 @@ set(NARENGINE_SCHEMAS
     "${NARENGINE_SCHEMAS_DIR}/resource.fbs"
 )
 
-add_custom_target(generate-includes ALL DEPENDS "${NARENGINE_GEN_INCLUDE_DIR}")
+set_source_files_properties("${NARENGINE_GEN_INCLUDE_DIR}" PROPERTIES GENERATED TRUE)
+
+add_custom_target(generate-includes ALL DEPENDS flatbuffers "${NARENGINE_GEN_INCLUDE_DIR}")
 
 add_custom_command(OUTPUT "${NARENGINE_GEN_INCLUDE_DIR}"
     DEPENDS "${NARENGINE_FLATC_PATH}" ${NARENGINE_SCHEMAS}

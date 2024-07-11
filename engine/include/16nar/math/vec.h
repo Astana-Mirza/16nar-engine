@@ -111,14 +111,14 @@ public:
      /// @param[in] i index of element to get.
      inline T& operator[]( std::size_t i )
      {
-          return vec_[ static_cast< glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
+          return vec_[ static_cast< typename glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
      }
 
      /// @brief Subscription operator (const).
      /// @param[in] i index of element to get.
      inline const T& operator[]( std::size_t i ) const
      {
-          return vec_[ static_cast< glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
+          return vec_[ static_cast< typename glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
      }
 
      /// @brief Get element x.
