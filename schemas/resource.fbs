@@ -1,0 +1,8 @@
+include "package_common.fbs";
+
+namespace _16nar.data.package;
+
+root_type Resource;
+
+file_identifier "16RA";  // 16nar engine resource asset
+file_extension "narasset";

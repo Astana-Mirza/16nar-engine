@@ -71,8 +71,5 @@ struct TransformMatrix
 table ResourceId
 {
      package:  string    (required);
-     id:       uint32;
+     name:     string    (required);
 }
-
-
-file_extension "nar";

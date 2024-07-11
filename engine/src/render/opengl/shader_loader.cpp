@@ -33,7 +33,7 @@ void log_link_error( unsigned int descriptor )
 bool load_shader_from_source( const LoadParams< ResourceType::Shader >::ShaderParams& params,
      unsigned int& descriptor )
 {
-     const char *source = reinterpret_cast< const char * >( params.data );
+     const char *source = params.data.get();
      descriptor = glCreateShader( shader_type_to_int( params.type ) );
      glShaderSource( descriptor, 1, &source, nullptr );
      glCompileShader( descriptor );
@@ -54,7 +54,7 @@ bool load_shader_from_source( const LoadParams< ResourceType::Shader >::ShaderPa
 bool load_shader( const LoadParams< ResourceType::Shader >::ShaderParams& params, unsigned int& descriptor )
 {
      descriptor = glCreateShader( shader_type_to_int( params.type ) );
-     glShaderBinary( 1, &descriptor, GL_SHADER_BINARY_FORMAT_SPIR_V, params.data, params.size );
+     glShaderBinary( 1, &descriptor, GL_SHADER_BINARY_FORMAT_SPIR_V, params.data.get(), params.size);
      glSpecializeShader( descriptor, params.entrypoint.c_str(), 0, nullptr, nullptr );
 
      GLint is_compiled = 0;

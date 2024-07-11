@@ -98,13 +98,19 @@ int main()
      LoadParams< ResourceType::Shader > shader;
      DrawInfo draw_info;
 
-     vertex_buffer.buffer.data = &vertices[ 0 ];
+     vertex_buffer.buffer.data = DataSharedPtr{ new char[ sizeof( vertices ) ], std::default_delete< char[] >() };
+     std::memcpy( vertex_buffer.buffer.data.get(), vertices, sizeof( vertices ) );
      vertex_buffer.buffer.size = sizeof( vertices );
      vertex_buffer.buffer.type = BufferType::StaticDraw;
      vertex_buffer.attributes.push_back( { 3, DataType::Float, false } );
 
-     shader.shaders.push_back( { "", sizeof( vertex_source ), vertex_source, ShaderType::Vertex, true } );
-     shader.shaders.push_back( { "", sizeof( fragment_source ), fragment_source, ShaderType::Fragment, true } );
+     DataSharedPtr vertex_shader_ptr{ new char[ std::strlen( vertex_source ) + 1 ]{}, std::default_delete< char[] >()};
+     std::memcpy( vertex_shader_ptr.get(), vertex_source, std::strlen( vertex_source ) );
+     shader.shaders.push_back( { "", std::strlen( vertex_source ) + 1, vertex_shader_ptr, ShaderType::Vertex, true } );
+
+     DataSharedPtr fragment_shader_ptr{ new char[ std::strlen( fragment_source ) + 1 ]{}, std::default_delete< char[] >()};
+     std::memcpy( fragment_shader_ptr.get(), fragment_source, std::strlen( fragment_source ) );
+     shader.shaders.push_back( { "", std::strlen( fragment_source ) + 1, fragment_shader_ptr, ShaderType::Fragment, true } );
 
      Game::init();
 

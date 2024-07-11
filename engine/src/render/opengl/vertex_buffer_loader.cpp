@@ -17,13 +17,13 @@ bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParams& para
 
      glBindVertexArray( handler.vao_descriptor );
      glBindBuffer( GL_ARRAY_BUFFER, handler.vbo_descriptor );
-     glBufferData( GL_ARRAY_BUFFER, params.buffer.size, params.buffer.data,
+     glBufferData( GL_ARRAY_BUFFER, params.buffer.size, params.buffer.data.get(),
           buffer_type_to_int( params.buffer.type ) );
      if ( params.index_buffer.data != nullptr )
      {
           handler.ebo_descriptor = buffers[ 1 ];
           glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, handler.ebo_descriptor );
-          glBufferData( GL_ELEMENT_ARRAY_BUFFER, params.index_buffer.size, params.index_buffer.data,
+          glBufferData( GL_ELEMENT_ARRAY_BUFFER, params.index_buffer.size, params.index_buffer.data.get(),
                buffer_type_to_int( params.index_buffer.type ) );
      }
 

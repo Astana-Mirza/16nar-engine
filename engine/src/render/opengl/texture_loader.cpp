@@ -25,7 +25,7 @@ bool TextureLoader::load( const ResourceManagerMap&, const LoadParams& params, H
           texture_type = GL_TEXTURE_2D;
           glBindTexture( texture_type, handler.descriptor );
           glTexImage2D( texture_type, 0, data_format_to_int( params.format ), params.size.x(), params.size.y(),
-               0, data_format_to_int( params.format ), data_type_to_int( params.data_type ), params.data );
+               0, data_format_to_int( params.format ), data_type_to_int( params.data_type ), params.data.get() );
      }
      glTexParameteri( texture_type, GL_TEXTURE_MIN_FILTER, tex_filter_to_int( params.min_filter ) );
      glTexParameteri( texture_type, GL_TEXTURE_MAG_FILTER, tex_filter_to_int( params.mag_filter ) );
