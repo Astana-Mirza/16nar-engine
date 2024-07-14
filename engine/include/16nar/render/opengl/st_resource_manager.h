@@ -40,14 +40,14 @@ public:
 
 private:
      /// @brief Handler of the resource.
-     using Handler = typename T::Handler;
+     using HandlerType = typename T::HandlerType;
 
      /// @brief Loading parameters of the resource.
-     using LoadParams = typename T::LoadParams;
+     using LoadParamsType = typename T::LoadParamsType;
 
-     std::unordered_map< ResID, Handler > resources_;  ///< resources loaded in previous frames.
-     const ResourceManagerMap& managers_;              ///< resource managers for access to related resources.
-     ResID next_ = 1;                                  ///< next ID to be assigned.
+     std::unordered_map< ResID, HandlerType > resources_;   ///< resources loaded in previous frames.
+     const ResourceManagerMap& managers_;                   ///< resource managers for access to related resources.
+     ResID next_ = 1;                                       ///< next ID to be assigned.
 };
 
 } // namespace _16nar::opengl

@@ -8,7 +8,7 @@
 namespace _16nar::opengl
 {
 
-bool TextureLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool TextureLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      unsigned int texture_type = 0;
      glGenTextures( 1, &handler.descriptor );
@@ -38,7 +38,7 @@ bool TextureLoader::load( const ResourceManagerMap&, const LoadParams& params, H
 }
 
 
-bool TextureLoader::unload( const Handler& handler )
+bool TextureLoader::unload( const HandlerType& handler )
 {
      glDeleteTextures( 1, &handler.descriptor );
      LOG_16NAR_DEBUG( "Texture " << handler.descriptor << " was unloaded" );

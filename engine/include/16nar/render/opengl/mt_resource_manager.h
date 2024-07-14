@@ -65,15 +65,15 @@ public:
 
 private:
      /// @brief Handler of the resource.
-     using Handler = typename T::Handler;
+     using HandlerType = typename T::HandlerType;
 
      /// @brief Loading parameters of the resource.
-     using LoadParams = typename T::LoadParams;
+     using LoadParamsType = typename T::LoadParamsType;
 
      /// @brief Element of load queue.
-     using Request = std::pair< ResID, LoadParams >;
+     using Request = std::pair< ResID, LoadParamsType >;
 
-     std::unordered_map< ResID, Handler > resources_;                      ///< resources loaded in previous frames.
+     std::unordered_map< ResID, HandlerType > resources_;                  ///< resources loaded in previous frames.
      std::array< std::queue< Request >, _16nar_saved_frames > load_queue_; ///< requests to load resources.
      std::array< std::queue< ResID >, _16nar_saved_frames > unload_queue_; ///< requests to unload resources.
      const ResourceManagerMap& managers_;                                  ///< resource managers for access to related resources.

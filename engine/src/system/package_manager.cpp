@@ -25,7 +25,7 @@ constexpr char assetExt[] = ".narasset";
 Resource load_texture( const pkg::TextureLoadParams* params,
      const std::vector< DataSharedPtr >& data, IRenderApi& api )
 {
-     struct LoadParams< ResourceType::Texture > api_params;
+     LoadParams< ResourceType::Texture > api_params;
 
      //api_params.
 
@@ -153,7 +153,8 @@ bool PackageManager::load_package( std::string_view filename, bool unpacked )
      std::vector< uint8_t > header_buffer( header_size );
      ifs.read( reinterpret_cast< char * >( header_buffer.data() ), header_size );
 
-     if ( !pkg::VerifyPackageBuffer( fb::Verifier( header_buffer.data(), header_size ) ) )
+     fb::Verifier verifier{ header_buffer.data(), header_size };
+     if ( !pkg::VerifyPackageBuffer( verifier ) )
      {
           LOG_16NAR_ERROR( "Package " << filename << " has broken header" );
           return false;
@@ -279,7 +280,8 @@ bool PackageManager::load_unpacked( std::string_view dirname )
 
           auto resource = pkg::GetResource( header_buffer.data() );
 
-          if ( !pkg::VerifyResourceBuffer( fb::Verifier( header_buffer.data(), header_size ) ) )
+          fb::Verifier verifier{ header_buffer.data(), header_size };
+          if ( !pkg::VerifyResourceBuffer( verifier ) )
           {
                LOG_16NAR_ERROR( "Asset " << dir_entry.path() << " from package " << dirname << " is broken" );
                ok = false;

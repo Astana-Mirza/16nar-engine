@@ -15,21 +15,21 @@ class RenderBufferLoader
 {
 public:
      /// @brief Parameters of render buffer loading.
-     using LoadParams = LoadParams< ResourceType::RenderBuffer >;
+     using LoadParamsType = LoadParams< ResourceType::RenderBuffer >;
 
      /// @brief Handler of loaded render buffer and its attachments.
-     using Handler = Handler< ResourceType::RenderBuffer >;
+     using HandlerType = Handler< ResourceType::RenderBuffer >;
 
      /// @brief Load render buffer to OpenGL and fill its handler.
      /// @param[in] params parameters of render buffer loading.
      /// @param[out] handler handler of the render buffer.
-     /// @return true on success, false otherwise.
-     static bool load( const ResourceManagerMap&, const LoadParams& params, Handler& handler );
+     /// @return true on success, false otherwise.handler
+     static bool load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler );
 
      /// @brief Unload render buffer from OpenGL.
      /// @param[in] handler handler of the render buffer.
      /// @return true on success, false otherwise.
-     static bool unload( const Handler& handler );
+     static bool unload( const HandlerType& handler );
 
 };
 

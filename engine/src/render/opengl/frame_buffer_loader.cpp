@@ -13,7 +13,7 @@ namespace
 
 bool load_attachment( const ResourceManagerMap& managers,
      const LoadParams< ResourceType::FrameBuffer >::AttachmentParams& params,
-     FrameBufferLoader::Handler& handler,
+     FrameBufferLoader::HandlerType& handler,
      std::vector< unsigned int >& color_attachments )
 {
      bool success = true;
@@ -63,7 +63,7 @@ bool load_attachment( const ResourceManagerMap& managers,
 } // anonymous namespace
 
 
-bool FrameBufferLoader::load( const ResourceManagerMap& managers, const LoadParams& params, Handler& handler )
+bool FrameBufferLoader::load( const ResourceManagerMap& managers, const LoadParamsType& params, HandlerType& handler )
 {
      std::vector< unsigned int > color_attachments;
      glGenFramebuffers( 1, &handler.descriptor );
@@ -91,7 +91,7 @@ bool FrameBufferLoader::load( const ResourceManagerMap& managers, const LoadPara
 }
 
 
-bool FrameBufferLoader::unload( const Handler& handler )
+bool FrameBufferLoader::unload( const HandlerType& handler )
 {
      glDeleteFramebuffers( 1, &handler.descriptor );
      LOG_16NAR_DEBUG( "Framebuffer " << handler.descriptor << " was unloaded" );

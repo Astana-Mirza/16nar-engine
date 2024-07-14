@@ -8,7 +8,7 @@
 namespace _16nar::opengl
 {
 
-bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      unsigned int buffers[ 2 ] = { 0, 0 };
      glGenVertexArrays( 1, &handler.vao_descriptor );
@@ -49,7 +49,7 @@ bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParams& para
 }
 
 
-bool VertexBufferLoader::unload( const Handler& handler )
+bool VertexBufferLoader::unload( const HandlerType& handler )
 {
      unsigned int buffers[ 2 ] = { handler.vbo_descriptor, handler.ebo_descriptor };
      glDeleteBuffers( handler.ebo_descriptor != 0 ? 2 : 1, &buffers[ 0 ] );

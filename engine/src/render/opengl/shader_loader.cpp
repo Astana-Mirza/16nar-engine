@@ -85,7 +85,7 @@ void unload_shaders( const std::vector< unsigned int >& shaders, unsigned int pr
 } // anonymous namespace
 
 
-bool ShaderLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool ShaderLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      GLint is_linked = 0;
      std::vector< unsigned int > descriptors;
@@ -128,7 +128,7 @@ bool ShaderLoader::load( const ResourceManagerMap&, const LoadParams& params, Ha
 }
 
 
-bool ShaderLoader::unload( const Handler& handler )
+bool ShaderLoader::unload( const HandlerType& handler )
 {
      glDeleteProgram( handler.descriptor );
      LOG_16NAR_DEBUG( "Shader " << handler.descriptor << " was unloaded" );

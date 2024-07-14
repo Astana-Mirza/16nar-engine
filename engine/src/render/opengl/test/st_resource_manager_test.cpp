@@ -7,18 +7,18 @@ namespace
 struct MockLoader
 {
      static bool unload_result;
-     struct Handler {};
-     struct LoadParams
+     struct HandlerType {};
+     struct LoadParamsType
      {
           bool value;
      };
 
-     static bool unload( const Handler& handler )
+     static bool unload( const HandlerType& handler )
      {
           return unload_result;
      }
 
-     static bool load( const _16nar::ResourceManagerMap&, const LoadParams& params, Handler& handler )
+     static bool load( const _16nar::ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
      {
           return params.value;
      }
@@ -29,7 +29,7 @@ bool MockLoader::unload_result = true;
 TEST_CASE( "Load and unload", "[st_resource_manager]" )
 {
      _16nar::opengl::StResourceManager< MockLoader > manager{ {} };
-     MockLoader::LoadParams params;
+     MockLoader::LoadParamsType params;
      params.value = true;
 
      _16nar::ResID id1 = manager.load( params );

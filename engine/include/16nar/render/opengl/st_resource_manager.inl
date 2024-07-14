@@ -17,8 +17,8 @@ StResourceManager< T >::~StResourceManager()
 template < typename T >
 ResID StResourceManager< T >::load( const std::any& params )
 {
-     const LoadParams& load_params = std::any_cast< const LoadParams& >( params );
-     Handler handler;
+     const LoadParamsType& load_params = std::any_cast< const LoadParamsType& >( params );
+     HandlerType handler;
      ResID id = next_;
      if ( !T::load( managers_, load_params, handler ) )
      {

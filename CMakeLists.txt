@@ -50,6 +50,9 @@ narengine_set_option(NARENGINE_BUILD_TESTS ON BOOL "Build tests for 16nar engine
 
 narengine_set_option(NARENGINE_BUILD_CONSTRUCTOR ON BOOL "Build constructor architecture")
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # GLM dependency
 narengine_git_dependency(GLM https://github.com/g-truc/glm "bf71a83" "glm-src")
 

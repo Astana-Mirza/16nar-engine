@@ -7,7 +7,7 @@
 namespace _16nar::opengl
 {
 
-bool CubemapLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool CubemapLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      glGenTextures( 1, &handler.descriptor );
      glBindTexture( GL_TEXTURE_CUBE_MAP, handler.descriptor );
@@ -28,9 +28,9 @@ bool CubemapLoader::load( const ResourceManagerMap&, const LoadParams& params, H
      LOG_16NAR_DEBUG( "Cubemap " << handler.descriptor << " was loaded" );
      return true;
 }
+ 
 
-
-bool CubemapLoader::unload( const Handler& handler )
+bool CubemapLoader::unload( const HandlerType& handler )
 {
      glDeleteTextures( 1, &handler.descriptor );
      LOG_16NAR_DEBUG( "Cubemap " << handler.descriptor << " was unloaded" );

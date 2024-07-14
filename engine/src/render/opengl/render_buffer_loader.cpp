@@ -7,7 +7,7 @@
 namespace _16nar::opengl
 {
 
-bool RenderBufferLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool RenderBufferLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      glGenRenderbuffers( 1, &handler.descriptor );
      glBindRenderbuffer( GL_RENDERBUFFER, handler.descriptor );
@@ -28,7 +28,7 @@ bool RenderBufferLoader::load( const ResourceManagerMap&, const LoadParams& para
 }
 
 
-bool RenderBufferLoader::unload( const Handler& handler )
+bool RenderBufferLoader::unload( const HandlerType& handler )
 {
      glDeleteRenderbuffers( 1, &handler.descriptor );
      LOG_16NAR_DEBUG( "Render buffer " << handler.descriptor << " was unloaded" );
