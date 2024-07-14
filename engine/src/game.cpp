@@ -81,38 +81,13 @@ Game::~Game()
 
 void Game::run()
 {
-     if ( current_task_ == TaskType::Loading )
-     {
-          world_.load( *scene_reader_ );
-     }
-     current_task_ = TaskType::Running;
-     profile_->set_finish( false );
-     while ( current_task_ != TaskType::Exiting )
-     {
-          if ( current_task_ == TaskType::Loading )
-          {
-               world_.load( *scene_reader_ );
-               current_task_ = TaskType::Running;
-               profile_->set_finish( false );
-          }
-          profile_->run();
-          if ( current_task_ == TaskType::Exiting )
-          {
-               window_->close();
-               world_.clear();
-               profile_.reset();
-               scene_reader_.reset();
-               event_manager_.reset();
-               window_.reset();
-          }
-     }
+
 }
 
 
 void Game::exit()
 {
-     current_task_ = TaskType::Exiting;
-     profile_->set_finish( true );
+
 }
 
 

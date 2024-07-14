@@ -43,6 +43,9 @@ public:
      /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec4f&)
      virtual void set_uniform( std::string_view name, const Vec4f& value ) const override;
 
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, const TransformMatrix&)
+     virtual void set_uniform( std::string_view name, const TransformMatrix& value ) const override;
+
 private:
      unsigned int descriptor_;          ///< descriptor of shader program.
 };

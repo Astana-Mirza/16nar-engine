@@ -32,13 +32,15 @@ public:
      /// @param[in] enable should the depth testing be enabled.
      virtual void set_depth_test_state( bool enable ) = 0;
 
-     /// @brief Bind shader program and set its parameters.
+     /// @brief Bind shader program.
+     /// @param[in] shader target shader resource identifier.
+     virtual void bind_shader( const Shader& shader ) = 0;
+
+     /// @brief Set currently bound shader program parameters (uniforms).
      /// @details setup function may be called in other thread and in other frame,
      /// so it must not capture context by reference.
-     /// @param[in] shader target shader resource identifier.
      /// @param[in] setup function for setting uniforms.
-     virtual void bind_shader( const Shader& shader,
-          const std::function< void( const IShaderProgram& ) >& setup = {} ) = 0;
+     virtual void set_shader_params( const ShaderSetupFunction& setup ) = 0;
 
      /// @brief Bind framebuffer for rendering.
      /// @details Framebuffer ID 0 can be specified to bind default framebuffer.

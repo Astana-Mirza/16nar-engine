@@ -32,9 +32,15 @@ void MtRenderDevice::set_depth_test_state( bool enable )
 }
 
 
-void MtRenderDevice::bind_shader( const Shader& shader, const std::function< void( const IShaderProgram& ) >& setup )
+void MtRenderDevice::bind_shader( const Shader& shader )
 {
-     _16NAR_ENQUEUE_COMMAND( bind_shader, shader, setup );
+     _16NAR_ENQUEUE_COMMAND( bind_shader, shader );
+}
+
+
+void MtRenderDevice::set_shader_params( const std::function< void( const IShaderProgram& ) >& setup )
+{
+     _16NAR_ENQUEUE_COMMAND( set_shader_params, setup );
 }
 
 

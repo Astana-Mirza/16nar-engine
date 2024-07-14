@@ -13,21 +13,21 @@ class ShaderLoader
 {
 public:
      /// @brief Parameters of shader loading.
-     using LoadParams = LoadParams< ResourceType::Shader >;
+     using LoadParamsType = LoadParams< ResourceType::Shader >;
 
      /// @brief Handler of shader program.
-     using Handler = Handler< ResourceType::Shader >;
+     using HandlerType = Handler< ResourceType::Shader >;
 
      /// @brief Load shader to OpenGL and fill its handler.
      /// @param[in] params parameters of shader loading.
      /// @param[out] handler handler of the shader.
      /// @return true on success, false otherwise.
-     static bool load( const ResourceManagerMap&, const LoadParams& params, Handler& handler );
+     static bool load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler );
 
      /// @brief Unload shader from OpenGL.
      /// @param[in] handler handler of the shader.
      /// @return true on success, false otherwise.
-     static bool unload( const Handler& handler );
+     static bool unload( const HandlerType& handler );
 };
 
 } // namespace _16nar::opengl

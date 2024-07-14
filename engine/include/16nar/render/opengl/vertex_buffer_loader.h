@@ -13,21 +13,21 @@ class VertexBufferLoader
 {
 public:
      /// @brief Parameters of vertex buffer loading.
-     using LoadParams = LoadParams< ResourceType::VertexBuffer >;
+     using LoadParamsType = LoadParams< ResourceType::VertexBuffer >;
 
      /// @brief Handler of vertex buffer.
-     using Handler = Handler< ResourceType::VertexBuffer >;
+     using HandlerType = Handler< ResourceType::VertexBuffer >;
 
      /// @brief Load vertex buffer to OpenGL and fill its handler.
      /// @param[in] params parameters of vertex buffer loading.
      /// @param[out] handler handler of the vertex buffer.
      /// @return true on success, false otherwise.
-     static bool load( const ResourceManagerMap&, const LoadParams& params, Handler& handler );
+     static bool load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler );
 
      /// @brief Unload vertex buffer from OpenGL.
      /// @param[in] handler handler of the vertex buffer.
      /// @return true on success, false otherwise.
-     static bool unload( const Handler& handler );
+     static bool unload( const HandlerType& handler );
 };
 
 } // namespace _16nar::opengl

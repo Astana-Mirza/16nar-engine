@@ -17,10 +17,16 @@
 namespace _16nar
 {
 
-class IShader; // forward declaration
+class IShaderProgram; // forward declaration
 
 /// @brief Map of resource types to respective resource manager.
 using ResourceManagerMap = std::unordered_map< ResourceType, std::unique_ptr< IResourceManager > >;
+
+/// @brief Function for setting shader program's uniform values.
+using ShaderSetupFunction = std::function< void( const IShaderProgram& ) >;
+
+/// @brief Shared pointer to raw data.
+using DataSharedPtr = std::shared_ptr< char >;
 
 /// @brief Frames saved for profiles with multiple threads.
 constexpr std::size_t _16nar_saved_frames = 2;
@@ -139,7 +145,7 @@ struct LoadParams< ResourceType::Texture >
      Vec4f            border_color;                         ///< color of the border, for ClampToBorder wrapping only.
      Vec2i            size;                                 ///< size of texture in texels.
      std::size_t      samples = 0;                          ///< number of samples for texture (texture cannot have data, 0 if not used).
-     const void*      data = nullptr;                       ///< data of a texture.
+     DataSharedPtr    data{};                               ///< data of a texture.
 };
 
 
@@ -156,7 +162,7 @@ struct LoadParams< ResourceType::Cubemap >
      DataType         data_type = DataType::Byte;           ///< type of texels data.
      Vec4f            border_color;                         ///< color of the border, for ClampToBorder wrapping only.
      Vec2i            size;                                 ///< size of texture in texels.
-     std::array< const void*, 6 > data{};                   ///< data of a texture.
+     std::array< DataSharedPtr, 6 > data{};                 ///< data of a texture.
 };
 
 
@@ -197,7 +203,7 @@ struct LoadParams< ResourceType::Shader >
      {
           std::string entrypoint;                 ///< name of entry function.
           std::size_t size = 0;                   ///< size of shader data.
-          const void *data = nullptr;             ///< data of shader.
+          DataSharedPtr data{};                   ///< data of shader.
           ShaderType type = ShaderType::Vertex;   ///< type of shader.
           bool from_source = false;               ///< compile shader from source code instead of loading binary.
      };
@@ -221,7 +227,7 @@ struct LoadParams< ResourceType::VertexBuffer >
      /// @brief Parameters of a buffer.
      struct BufferParams
      {
-          const void* data = nullptr;                  ///< data of the buffer.
+          DataSharedPtr data{};                        ///< data of the buffer.
           std::size_t size = 0;                        ///< size of the buffer, in bytes.
           BufferType type = BufferType::StaticDraw;    ///< type of memory used by buffer.
      };
@@ -240,6 +246,15 @@ struct RenderParams
      PrimitiveType primitive = PrimitiveType::Points;  ///< type of primitive to draw.
      std::size_t vertex_count = 0;                     ///< number of vertices in each instance.
      std::size_t instance_count = 1;                   ///< number of instances to draw.
+};
+
+
+/// @brief Information needed to render one object.
+struct DrawInfo
+{
+     RenderParams render_params;        ///< parameters of a render call.
+     ShaderSetupFunction shader_setup;  ///< shader program setup function.
+     Shader shader;                     ///< shader program used to render object.
 };
 
 } // namespace _16nar

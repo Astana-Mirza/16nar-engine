@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <utility>
 
-#define _16NAR_ENABLE_IF( expr ) template < typename = typename std::enable_if_t< ( expr ) > >
+#define _16NAR_ENABLE_IF( expr ) template < bool _B = true, typename = typename std::enable_if_t< ( expr ) && _B > >
 
 namespace _16nar
 {
@@ -46,7 +46,7 @@ public:
      /// @param[in] v0 first element.
      /// @param[in] v1 second element.
      _16NAR_ENABLE_IF( N == 2 )
-     explicit Vec( T v0, T v1 ):
+     Vec( T v0, T v1 ):
           vec_{ v0, v1 }
      {}
 
@@ -55,7 +55,7 @@ public:
      /// @param[in] v1 second element.
      /// @param[in] v2 third element.
      _16NAR_ENABLE_IF( N == 3 )
-     explicit Vec( T v0, T v1, T v2 ):
+     Vec( T v0, T v1, T v2 ):
           vec_{ v0, v1, v2 }
      {}
 
@@ -65,7 +65,7 @@ public:
      /// @param[in] v2 third element.
      /// @param[in] v3 fourth element.
      _16NAR_ENABLE_IF( N == 4 )
-     explicit Vec( T v0, T v1, T v2, T v3 ):
+     Vec( T v0, T v1, T v2, T v3 ):
           vec_{ v0, v1, v2, v3 }
      {}
 
@@ -111,14 +111,14 @@ public:
      /// @param[in] i index of element to get.
      inline T& operator[]( std::size_t i )
      {
-          return vec_[ static_cast< glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
+          return vec_[ static_cast< typename glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
      }
 
      /// @brief Subscription operator (const).
      /// @param[in] i index of element to get.
      inline const T& operator[]( std::size_t i ) const
      {
-          return vec_[ static_cast< glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
+          return vec_[ static_cast< typename glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
      }
 
      /// @brief Get element x.

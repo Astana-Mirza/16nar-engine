@@ -13,21 +13,21 @@ class TextureLoader
 {
 public:
      /// @brief Parameters of texture loading.
-     using LoadParams = LoadParams< ResourceType::Texture >;
+     using LoadParamsType = LoadParams< ResourceType::Texture >;
 
      /// @brief Handler of texture.
-    using Handler = Handler< ResourceType::Texture >;
+    using HandlerType = Handler< ResourceType::Texture >;
 
      /// @brief Load texture to OpenGL and fill its handler.
      /// @param[in] params parameters of texture loading.
      /// @param[out] handler handler of the texture.
      /// @return true on success, false otherwise.
-     static bool load( const ResourceManagerMap&, const LoadParams& params, Handler& handler );
+     static bool load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler );
 
      /// @brief Unload texture from OpenGL.
      /// @param[in] handler handler of the texture.
      /// @return true on success, false otherwise.
-     static bool unload( const Handler& handler );
+     static bool unload( const HandlerType& handler );
 };
 
 } // namespace _16nar::opengl

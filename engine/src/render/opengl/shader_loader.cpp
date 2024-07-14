@@ -33,7 +33,7 @@ void log_link_error( unsigned int descriptor )
 bool load_shader_from_source( const LoadParams< ResourceType::Shader >::ShaderParams& params,
      unsigned int& descriptor )
 {
-     const char *source = reinterpret_cast< const char * >( params.data );
+     const char *source = params.data.get();
      descriptor = glCreateShader( shader_type_to_int( params.type ) );
      glShaderSource( descriptor, 1, &source, nullptr );
      glCompileShader( descriptor );
@@ -54,7 +54,7 @@ bool load_shader_from_source( const LoadParams< ResourceType::Shader >::ShaderPa
 bool load_shader( const LoadParams< ResourceType::Shader >::ShaderParams& params, unsigned int& descriptor )
 {
      descriptor = glCreateShader( shader_type_to_int( params.type ) );
-     glShaderBinary( 1, &descriptor, GL_SHADER_BINARY_FORMAT_SPIR_V, params.data, params.size );
+     glShaderBinary( 1, &descriptor, GL_SHADER_BINARY_FORMAT_SPIR_V, params.data.get(), params.size);
      glSpecializeShader( descriptor, params.entrypoint.c_str(), 0, nullptr, nullptr );
 
      GLint is_compiled = 0;
@@ -85,7 +85,7 @@ void unload_shaders( const std::vector< unsigned int >& shaders, unsigned int pr
 } // anonymous namespace
 
 
-bool ShaderLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool ShaderLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      GLint is_linked = 0;
      std::vector< unsigned int > descriptors;
@@ -128,7 +128,7 @@ bool ShaderLoader::load( const ResourceManagerMap&, const LoadParams& params, Ha
 }
 
 
-bool ShaderLoader::unload( const Handler& handler )
+bool ShaderLoader::unload( const HandlerType& handler )
 {
      glDeleteProgram( handler.descriptor );
      LOG_16NAR_DEBUG( "Shader " << handler.descriptor << " was unloaded" );

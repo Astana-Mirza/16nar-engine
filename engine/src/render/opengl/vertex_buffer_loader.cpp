@@ -8,7 +8,7 @@
 namespace _16nar::opengl
 {
 
-bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      unsigned int buffers[ 2 ] = { 0, 0 };
      glGenVertexArrays( 1, &handler.vao_descriptor );
@@ -17,13 +17,13 @@ bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParams& para
 
      glBindVertexArray( handler.vao_descriptor );
      glBindBuffer( GL_ARRAY_BUFFER, handler.vbo_descriptor );
-     glBufferData( GL_ARRAY_BUFFER, params.buffer.size, params.buffer.data,
+     glBufferData( GL_ARRAY_BUFFER, params.buffer.size, params.buffer.data.get(),
           buffer_type_to_int( params.buffer.type ) );
      if ( params.index_buffer.data != nullptr )
      {
           handler.ebo_descriptor = buffers[ 1 ];
           glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, handler.ebo_descriptor );
-          glBufferData( GL_ELEMENT_ARRAY_BUFFER, params.index_buffer.size, params.index_buffer.data,
+          glBufferData( GL_ELEMENT_ARRAY_BUFFER, params.index_buffer.size, params.index_buffer.data.get(),
                buffer_type_to_int( params.index_buffer.type ) );
      }
 
@@ -49,7 +49,7 @@ bool VertexBufferLoader::load( const ResourceManagerMap&, const LoadParams& para
 }
 
 
-bool VertexBufferLoader::unload( const Handler& handler )
+bool VertexBufferLoader::unload( const HandlerType& handler )
 {
      unsigned int buffers[ 2 ] = { handler.vbo_descriptor, handler.ebo_descriptor };
      glDeleteBuffers( handler.ebo_descriptor != 0 ? 2 : 1, &buffers[ 0 ] );

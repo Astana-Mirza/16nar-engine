@@ -7,7 +7,7 @@
 namespace _16nar::opengl
 {
 
-bool CubemapLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool CubemapLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      glGenTextures( 1, &handler.descriptor );
      glBindTexture( GL_TEXTURE_CUBE_MAP, handler.descriptor );
@@ -16,7 +16,7 @@ bool CubemapLoader::load( const ResourceManagerMap&, const LoadParams& params, H
           glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                data_format_to_int( params.format ), params.size.x(), params.size.y(),
                0, data_format_to_int( params.format ),
-               data_type_to_int( params.data_type ), params.data[ i ] );
+               data_type_to_int( params.data_type ), params.data[ i ].get() );
      }
      glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, tex_filter_to_int( params.min_filter ) );
      glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, tex_filter_to_int( params.mag_filter ) );
@@ -28,9 +28,9 @@ bool CubemapLoader::load( const ResourceManagerMap&, const LoadParams& params, H
      LOG_16NAR_DEBUG( "Cubemap " << handler.descriptor << " was loaded" );
      return true;
 }
+ 
 
-
-bool CubemapLoader::unload( const Handler& handler )
+bool CubemapLoader::unload( const HandlerType& handler )
 {
      glDeleteTextures( 1, &handler.descriptor );
      LOG_16NAR_DEBUG( "Cubemap " << handler.descriptor << " was unloaded" );

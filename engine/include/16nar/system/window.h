@@ -11,7 +11,58 @@ struct GLFWwindow;
 
 namespace _16nar
 {
- 
+
+/// @brief API for which context will be created.
+enum class ContextApi
+{
+#if defined( NARENGINE_RENDER_OPENGL )
+     OpenGL,             ///< OpenGL.
+#endif
+#if defined( NARENGINE_RENDER_OPENGL_ES )
+     OpenGLES,           ///< OpenGL ES.
+#endif
+     NoApi               ///< no any API (for Vulkan or DirectX).
+};
+
+
+/// @brief Settings for opening a window.
+/// @details Some (or all) settings may not be applied when opening a window.
+/// It's up to operating system to decide the resulting open settings, these are
+/// just hints, except of forward_compatible and compat_profile for OpenGL.
+///
+/// If OpenGL context version 3.3 or higher is stated, core profile will be
+/// requested.
+struct OpenSettings
+{
+     ContextApi api               = ContextApi::OpenGL; ///< API to create context.
+#if defined( NARENGINE_RENDER_OPENGL ) || defined( NARENGINE_RENDER_OPENGL_ES )
+     int  red_bits                = 8;       ///< bits for red channel (OpenGL or OpenGL ES).
+     int  green_bits              = 8;       ///< bits for green channel (OpenGL or OpenGL ES).
+     int  blue_bits               = 8;       ///< bits for blue channel (OpenGL or OpenGL ES).
+     int  stencil_bits            = 8;       ///< bits for stencil testing (OpenGL or OpenGL ES).
+     int  depth_bits              = 24;      ///< bits for depth testing (OpenGL or OpenGL ES).
+     int  inner_msaa_samples      = 0;       ///< count of sampling buffers for MSAA (OpenGL or OpenGL ES).
+     int  context_version_major   = 3;       ///< major version of OpenGL context (OpenGL or OpenGL ES).
+     int  context_version_minor   = 3;       ///< minor version of OpenGL context (OpenGL or OpenGL ES).
+     bool inner_srgb_capable      = false;   ///< sRGB support for the window (OpenGL or OpenGL ES).
+#endif // NARENGINE_RENDER_OPENGL || NARENGINE_RENDER_OPENGL_ES
+#if defined( NARENGINE_RENDER_OPENGL )
+     bool forward_compatible      = true;    ///< should the context be without deprecated functions (OpenGL >= 3.0 only).
+     bool compat_profile          = false;   ///< should the context use compatibility profile
+                                             /// (OpenGL >= 3.2 only, for lower versions, OS will choose).
+#endif // NARENGINE_RENDER_OPENGL
+     bool transparent_framebuffer = false;   ///< ability to make transparent framebuffer.
+     bool resizable               = true;    ///< ability to resize the window.
+     bool decorated               = true;    ///< make window with borders and buttons.
+                                             ///  Undecorated windows cannot be resized bu user.
+     bool focused                 = true;    ///< should the window be under focus after opening.
+     bool auto_iconify            = true;    ///< should the window be iconified after losing focus.
+     bool maximized               = false;   ///< should the window be expanded to monitor size.
+     bool center_cursor           = false;   ///< should the cursor be centered after opening (fulscreen only).
+     bool scale_to_monitor        = false;   ///< should the monitor's content scale be taken in account.
+};
+
+
 class Monitor;
 
 /// @brief Window of the application.
@@ -24,55 +75,6 @@ class Monitor;
 class ENGINE_API Window
 {
 public:
-     /// @brief API for which context will be created.
-     enum class ContextApi
-     {
-#if defined( NARENGINE_RENDER_OPENGL )
-          OpenGL,             ///< OpenGL.
-#endif
-#if defined( NARENGINE_RENDER_OPENGL_ES )
-          OpenGLES,           ///< OpenGL ES.
-#endif
-          NoApi               ///< no any API (for Vulkan or DirectX).
-     };
-
-     /// @brief Settings for opening a window.
-     /// @details Some (or all) settings may not be applied when opening a window.
-     /// It's up to operating system to decide the resulting open settings, these are
-     /// just hints, except of forward_compatible and compat_profile for OpenGL.
-     ///
-     /// If OpenGL context version 3.3 or higher is stated, core profile will be
-     /// requested.
-     struct OpenSettings
-     {
-          ContextApi api               = ContextApi::OpenGL; ///< API to create context.
-#if defined( NARENGINE_RENDER_OPENGL ) || defined( NARENGINE_RENDER_OPENGL_ES )
-          int  red_bits                = 8;       ///< bits for red channel (OpenGL or OpenGL ES).
-          int  green_bits              = 8;       ///< bits for green channel (OpenGL or OpenGL ES).
-          int  blue_bits               = 8;       ///< bits for blue channel (OpenGL or OpenGL ES).
-          int  stencil_bits            = 8;       ///< bits for stencil testing (OpenGL or OpenGL ES).
-          int  depth_bits              = 24;      ///< bits for depth testing (OpenGL or OpenGL ES).
-          int  inner_msaa_samples      = 0;       ///< count of sampling buffers for MSAA (OpenGL or OpenGL ES).
-          int  context_version_major   = 3;       ///< major version of OpenGL context (OpenGL or OpenGL ES).
-          int  context_version_minor   = 3;       ///< minor version of OpenGL context (OpenGL or OpenGL ES).
-          bool inner_srgb_capable      = false;   ///< sRGB support for the window (OpenGL or OpenGL ES).
-#endif // NARENGINE_RENDER_OPENGL || NARENGINE_RENDER_OPENGL_ES
-#if defined( NARENGINE_RENDER_OPENGL )
-          bool forward_compatible      = true;    ///< should the context be without deprecated functions (OpenGL >= 3.0 only).
-          bool compat_profile          = false;   ///< should the context use compatibility profile
-                                                  /// (OpenGL >= 3.2 only, for lower versions, OS will choose).
-#endif // NARENGINE_RENDER_OPENGL
-          bool transparent_framebuffer = false;   ///< ability to make transparent framebuffer.
-          bool resizable               = true;    ///< ability to resize the window.
-          bool decorated               = true;    ///< make window with borders and buttons.
-                                                  ///  Undecorated windows cannot be resized bu user.
-          bool focused                 = true;    ///< should the window be under focus after opening.
-          bool auto_iconify            = true;    ///< should the window be iconified after losing focus.
-          bool maximized               = false;   ///< should the window be expanded to monitor size.
-          bool center_cursor           = false;   ///< should the cursor be centered after opening (fulscreen only).
-          bool scale_to_monitor        = false;   ///< should the monitor's content scale be taken in account.
-     };
-
      Window( const Window& ) = delete;
 
      /// @brief Move constructor.

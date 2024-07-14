@@ -12,6 +12,8 @@
 namespace _16nar
 {
 
+class TransformMatrix;
+
 /// @brief Interface for shader programs.
 /// @details This interface should be used to load various parameters to
 /// shader programs. Compilation and linking of shader program is out of scope of
@@ -50,6 +52,9 @@ public:
 
      /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
      virtual void set_uniform( std::string_view name, const Vec4f& value ) const = 0;
+
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
+     virtual void set_uniform( std::string_view name, const TransformMatrix& value ) const = 0;
 };
 
 } // namespace _16nar

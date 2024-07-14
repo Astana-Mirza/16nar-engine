@@ -8,7 +8,7 @@
 namespace _16nar::opengl
 {
 
-bool TextureLoader::load( const ResourceManagerMap&, const LoadParams& params, Handler& handler )
+bool TextureLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
 {
      unsigned int texture_type = 0;
      glGenTextures( 1, &handler.descriptor );
@@ -25,7 +25,7 @@ bool TextureLoader::load( const ResourceManagerMap&, const LoadParams& params, H
           texture_type = GL_TEXTURE_2D;
           glBindTexture( texture_type, handler.descriptor );
           glTexImage2D( texture_type, 0, data_format_to_int( params.format ), params.size.x(), params.size.y(),
-               0, data_format_to_int( params.format ), data_type_to_int( params.data_type ), params.data );
+               0, data_format_to_int( params.format ), data_type_to_int( params.data_type ), params.data.get() );
      }
      glTexParameteri( texture_type, GL_TEXTURE_MIN_FILTER, tex_filter_to_int( params.min_filter ) );
      glTexParameteri( texture_type, GL_TEXTURE_MAG_FILTER, tex_filter_to_int( params.mag_filter ) );
@@ -38,7 +38,7 @@ bool TextureLoader::load( const ResourceManagerMap&, const LoadParams& params, H
 }
 
 
-bool TextureLoader::unload( const Handler& handler )
+bool TextureLoader::unload( const HandlerType& handler )
 {
      glDeleteTextures( 1, &handler.descriptor );
      LOG_16NAR_DEBUG( "Texture " << handler.descriptor << " was unloaded" );
