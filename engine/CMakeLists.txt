@@ -52,7 +52,7 @@ set(NARENGINE_MATH_SOURCES
     "${NARENGINE_SRC_DIR}/math/math_functions.cpp"
     "${NARENGINE_SRC_DIR}/math/transform_matrix.cpp"
 )
-set(NARENGINE_MATH_LINK_LIBS "${NAME}_logger")
+set(NARENGINE_MATH_LINK_LIBS "${NAME}_logger" "glm::glm")
 add_library("${NAME}_math" ${NARENGINE_MATH_SOURCES})
 target_include_directories("${NAME}_math" PUBLIC ${NARENGINE_MATH_INCLUDE_DIRS})
 target_compile_definitions("${NAME}_math" PUBLIC ${NARENGINE_MATH_COMPILER_DEFS})
@@ -146,7 +146,6 @@ endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR}")
 # Testing
 if ("${NARENGINE_BUILD_TESTS}")
     enable_testing()
-
     add_executable("${NAME}_math_test"
         "${NARENGINE_SRC_DIR}/math/test/transform_matrix_test.cpp"
         "${NARENGINE_SRC_DIR}/math/test/vec_test.cpp"
@@ -187,7 +186,9 @@ if ("${NARENGINE_BUILD_TESTS}")
             target_link_directories("${NAME}_opengl_st_api_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
             target_link_libraries("${NAME}_opengl_st_api_test" PRIVATE
                 "${NAME}_constructor" "${NAME}_render_gl" "${NAME}_base" "${NAME}_math" "${NAME}_logger" "glfw")
-            add_test(NAME "${NAME}_opengl_st_api_test" COMMAND "${NAME}_opengl_st_api_test")
+
+            # do not call add_test() because it is manual test utility
+
         endif()
      endif() # if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}")
 endif() # if ("${NARENGINE_BUILD_TESTS}")
@@ -195,18 +196,19 @@ endif() # if ("${NARENGINE_BUILD_TESTS}")
 
 # Installation
 install(DIRECTORY "${NARENGINE_INCLUDE_DIR}/${NAME}" DESTINATION "include")
-install(FILES "${PROJECT_BINARY_DIR}/${NAME}/${NAME}config.h" DESTINATION "include/${NAME}")
+install(DIRECTORY "${GLM_INCLUDE_DIR}/glm" DESTINATION "include")
+install(FILES "${PROJECT_BINARY_DIR}/engine/${NAME}/${NAME}config.h" DESTINATION "include/${NAME}")
 if ("${WIN32}")
-    list(TRANSFORM "NARENGINE_INSTALL_TARGETS" PREPEND "${PROJECT_BINARY_DIR}"
+    list(TRANSFORM "NARENGINE_INSTALL_TARGETS" PREPEND "${PROJECT_BINARY_DIR}/engine/"
         OUTPUT_VARIABLE "NARENGINE_INSTALL_TARGETS_FULL")
     if ("${BUILD_SHARED_LIBS}")
-        list(TRANSFORM "NARENGINE_INSTALL_TARGETS_FULL" APPEND ".lib"
-            OUTPUT_VARIABLE "NARENGINE_INSTALL_TARGETS_LIB")
-        install(FILES ${NARENGINE_INSTALL_TARGETS_LIB} DESTINATION "lib")
+        list(TRANSFORM "NARENGINE_INSTALL_TARGETS_FULL" APPEND ".dll"
+            OUTPUT_VARIABLE "NARENGINE_INSTALL_TARGETS_BIN")
+        install(FILES ${NARENGINE_INSTALL_TARGETS_BIN} DESTINATION "bin")
     endif()
-    list(TRANSFORM "NARENGINE_INSTALL_TARGETS_FULL" APPEND ".bin"
-        OUTPUT_VARIABLE "NARENGINE_INSTALL_TARGETS_BIN")
-    install(FILES ${NARENGINE_INSTALL_TARGETS_LIB} DESTINATION "bin")
+    list(TRANSFORM "NARENGINE_INSTALL_TARGETS_FULL" APPEND ".lib"
+        OUTPUT_VARIABLE "NARENGINE_INSTALL_TARGETS_LIB")
+    install(FILES ${NARENGINE_INSTALL_TARGETS_LIB} DESTINATION "lib")
 else()
     install(TARGETS ${NARENGINE_INSTALL_TARGETS} DESTINATION "lib")
 endif()
