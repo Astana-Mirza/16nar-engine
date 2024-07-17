@@ -46,7 +46,8 @@ narengine_set_option(NARENGINE_RENDER_OPENGL ON BOOL "Use OpenGL for rendering (
 narengine_set_option(NARENGINE_RENDER_VULKAN OFF BOOL "Use Vulkan for rendering (uses GLM + GLFW)") # not implemented
 narengine_set_option(NARENGINE_RENDER_OPENGL_ES OFF BOOL "Use OpenGL ES for rendering (uses GLM + GLFW + glad)") # not implemented
 narengine_set_option(NARENGINE_LOG_LEVEL "9" STRING "Maximum log level of engine logging library")
-narengine_set_option(NARENGINE_BUILD_TESTS ON BOOL "Build tests for 16nar engine")
+narengine_set_option(NARENGINE_BUILD_TOOLS ON BOOL "Build tools for development with engine")
+narengine_set_option(NARENGINE_BUILD_TESTS OFF BOOL "Build tests for engine")
 
 narengine_set_option(NARENGINE_BUILD_CONSTRUCTOR ON BOOL "Build constructor architecture")
 
@@ -68,17 +69,26 @@ narengine_git_dependency(GLFW https://github.com/glfw/glfw "3.3.8" "glfw-src/inc
 set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 narengine_git_dependency(FLATBUFFERS https://github.com/google/flatbuffers "v24.3.25" "flatbuffers-src/include")
 
-# STB dependency
-if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}" OR "${NARENGINE_RENDER_VULKAN}")
-    narengine_git_dependency(STB https://github.com/nothings/stb "5736b15" "stb-src")
+if ("${NARENGINE_BUILD_TOOLS}")
+    # nlohmann::json dependency
+    narengine_git_dependency(nlohmann_json "https://github.com/nlohmann/json.git"
+        "v3.11.2" "nlohmann_json-src/single_include")
+
+    # STB dependency
+    if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}" OR "${NARENGINE_RENDER_VULKAN}")
+        narengine_git_dependency(STB https://github.com/nothings/stb "5736b15" "stb-src")
+    endif()
 endif()
 
 # Catch2 dependency
 if ("${NARENGINE_BUILD_TESTS}")
     narengine_git_dependency(CATCH2 https://github.com/catchorg/Catch2.git "v3.0.1" "catch2-src/src")
+    enable_testing()
 endif()
 
 set(NAME 16nar)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/schemas")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/engine")
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/scene-compiler)
+if ("${NARENGINE_BUILD_TOOLS}")
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/tools")
+endif()
