@@ -1,6 +1,7 @@
 #include <16nar/math/transform_matrix.h>
 
-#include <glm/gtx/transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
 #include <array>
@@ -138,25 +139,25 @@ TransformMatrix& TransformMatrix::scale( const Vec2f& factors )
 
 TransformMatrix& TransformMatrix::scale( const Vec2f& factors, const Vec2f& pivot )
 {
-     mat_ = glm::translate( glm::vec3{ pivot.vec_, 0.0f } ) *
-            glm::scale( glm::vec3{ factors.vec_, 1.0f } ) *
-            glm::translate( glm::vec3{ -pivot.vec_, 0.0f } ) * mat_;
+     mat_ = glm::translate( glm::mat4( 1.0f ), glm::vec3{ pivot.vec_, 0.0f } ) *
+            glm::scale( glm::mat4( 1.0f ), glm::vec3{ factors.vec_, 1.0f } ) *
+            glm::translate( glm::mat4( 1.0f ), glm::vec3{ -pivot.vec_, 0.0f } ) * mat_;
      return *this;
 }
 
 
 TransformMatrix& TransformMatrix::rotate( float angle )
 {
-     mat_ = glm::rotate( angle, glm::vec3{ 0.0f, 0.0f, 1.0f } ) * mat_;
+     mat_ = glm::rotate( glm::mat4( 1.0f ), angle, glm::vec3{ 0.0f, 0.0f, 1.0f } ) * mat_;
      return *this;
 }
 
 
 TransformMatrix& TransformMatrix::rotate( float angle, const Vec2f& pivot )
 {
-     mat_ = glm::translate( glm::vec3{ pivot.vec_, 0.0f } ) *
-            glm::rotate( angle, glm::vec3{ 0.0f, 0.0f, 1.0f } ) *
-            glm::translate( glm::vec3{ -pivot.vec_, 0.0f } ) * mat_;
+     mat_ = glm::translate( glm::mat4( 1.0f ), glm::vec3{ pivot.vec_, 0.0f } ) *
+            glm::rotate( glm::mat4( 1.0f ), angle, glm::vec3{ 0.0f, 0.0f, 1.0f } ) *
+            glm::translate( glm::mat4( 1.0f ), glm::vec3{ -pivot.vec_, 0.0f } ) * mat_;
      return *this;
 }
 
@@ -179,25 +180,25 @@ TransformMatrix& TransformMatrix::scale( const Vec3f& factors )
 
 TransformMatrix& TransformMatrix::scale( const Vec3f& factors, const Vec3f& pivot )
 {
-     mat_ = glm::translate( pivot.vec_ ) *
-            glm::scale( factors.vec_ ) *
-            glm::translate( -pivot.vec_ ) * mat_;
+     mat_ = glm::translate( glm::mat4( 1.0f ), pivot.vec_ ) *
+            glm::scale( glm::mat4( 1.0f ), factors.vec_ ) *
+            glm::translate( glm::mat4( 1.0f ), -pivot.vec_ ) * mat_;
      return *this;
 }
 
 
 TransformMatrix& TransformMatrix::rotate( float angle, const Vec3f& axis )
 {
-     mat_ = glm::rotate( angle, axis.vec_ ) * mat_;
+     mat_ = glm::rotate( glm::mat4( 1.0f ), angle, axis.vec_ ) * mat_;
      return *this;
 }
 
 
 TransformMatrix& TransformMatrix::rotate( float angle, const Vec3f& axis, const Vec3f& pivot )
 {
-     mat_ = glm::translate( pivot.vec_ ) *
-            glm::rotate( angle, axis.vec_ ) *
-            glm::translate( -pivot.vec_ ) * mat_;
+     mat_ = glm::translate( glm::mat4( 1.0f ), pivot.vec_ ) *
+            glm::rotate( glm::mat4( 1.0f ), angle, axis.vec_ ) *
+            glm::translate( glm::mat4( 1.0f ), -pivot.vec_ ) * mat_;
      return *this;
 }
 
