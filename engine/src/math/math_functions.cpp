@@ -1,6 +1,6 @@
 #include <16nar/math/math_functions.h>
 
-#include <glm/gtx/transform.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace _16nar
 {
