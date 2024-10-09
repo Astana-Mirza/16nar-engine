@@ -17,6 +17,9 @@ class IShaderProgram;
 class ENGINE_API IRenderDevice
 {
 public:
+     /// @brief Default constructor.
+     IRenderDevice() = default;
+
      /// @brief Virtual default destructor.
      virtual ~IRenderDevice() = default;
 
@@ -58,6 +61,10 @@ public:
 
      /// @brief Swap queues and prepare for new frame.
      virtual void end_frame() {}
+
+private:
+     IRenderDevice( const IRenderDevice& )            = delete;
+     IRenderDevice& operator=( const IRenderDevice& ) = delete;
 };
 
 } // namespace _16nar

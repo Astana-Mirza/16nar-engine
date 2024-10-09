@@ -73,3 +73,11 @@ table ResourceId
      package:  string    (required);
      name:     string    (required);
 }
+
+
+/// @brief Library symbol identifier.
+table SymbolId
+{
+     library:  string    (required);
+     name:     string    (required);
+}

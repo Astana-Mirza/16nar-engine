@@ -18,15 +18,14 @@ Signallable::~Signallable()
 {
      for ( auto& sig_types : acceptors_ )
      {
+          SlotId id{ sig_types.first, this };
           for ( auto& pair : sig_types.second )
           {
-               delete pair.second;
-               pair.first->slots_.erase( SlotId{ sig_types.first, this } );
+               pair.first->slots_.erase( id );
           }
      }
      for ( auto& pair : slots_ )
      {
-          delete pair.second;
           auto& id = pair.first;
           id.second->acceptors_[ id.first ].erase( this );
      }

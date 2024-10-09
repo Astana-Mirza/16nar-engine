@@ -4,6 +4,9 @@
 #define _16NAR_SLOT_H
 
 #include <16nar/signals/basic_slot.h>
+#include <16nar/logger/logger.h>
+
+#include <stdexcept>
 
 namespace _16nar
 {
@@ -15,14 +18,21 @@ class Slot : public BasicSlot
 public:
      /// @brief Constructor, taking handler.
      /// @param[in] handler Handler of a signal.
-     Slot( const Handler& handler ) : handler_{ handler } {}
+     Slot( Handler&& handler ) : handler_{ handler } {}
 
 
      /// @brief Accept an emitted signal.
      /// @param[in] sig Signal being accepted.
      void accept_signal( const Signal& sig ) override
      {
-          handler_( static_cast< const SignalType& >( sig ) );
+          try
+          {
+               handler_( dynamic_cast< const SignalType& >( sig ) );
+          }
+          catch ( const std::bad_cast& ex )
+          {
+               LOG_16NAR_ERROR( "Cannot handle signal in slot, bad cast: " << ex.what() );
+          }
      }
 
 private:

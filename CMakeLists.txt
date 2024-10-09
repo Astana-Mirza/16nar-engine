@@ -24,16 +24,18 @@ project(16nar LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(CTest)
+
 # Wayland needs these packages: libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules
 # X11 needs xorg-dev
 narengine_set_option(NARENGINE_RENDER_OPENGL ON BOOL "Build with OpenGL support (uses GLM + GLFW + glad)")
-narengine_set_option(NARENGINE_RENDER_VULKAN ON BOOL "Build with Vulkan support (uses GLM + GLFW)") # not implemented
-narengine_set_option(NARENGINE_RENDER_OPENGL_ES ON BOOL "Build with OpenGL ES support (uses GLM + GLFW + glad)") # not implemented
+#narengine_set_option(NARENGINE_RENDER_VULKAN ON BOOL "Build with Vulkan support (uses GLM + GLFW)") # not implemented
+#narengine_set_option(NARENGINE_RENDER_OPENGL_ES ON BOOL "Build with OpenGL ES support (uses GLM + GLFW + glad)") # not implemented
 narengine_set_option(NARENGINE_LOG_LEVEL "9" STRING "Maximum log level of engine logging library")
 narengine_set_option(NARENGINE_BUILD_TOOLS ON BOOL "Build tools for development with engine")
-narengine_set_option(NARENGINE_BUILD_TESTS OFF BOOL "Build tests for engine")
+narengine_set_option(NARENGINE_BUILD_TESTS "${BUILD_TESTING}" BOOL "Build tests for engine")
 
-narengine_set_option(NARENGINE_BUILD_CONSTRUCTOR ON BOOL "Build constructor architecture")
+narengine_set_option(NARENGINE_BUILD_CONSTRUCTOR2D ON BOOL "Build constructor2d architecture")
 
 # Dependencies
 # Visual Studio 17 2022 bug workaround
@@ -58,7 +60,7 @@ if ("${NARENGINE_BUILD_TOOLS}")
     if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}" OR "${NARENGINE_RENDER_VULKAN}")
         find_package(STB CONFIG REQUIRED)
     endif()
-endif()
+endif() # if ("${NARENGINE_BUILD_TOOLS}")
 if ("${NARENGINE_BUILD_TESTS}")
     find_package(Catch2 CONFIG REQUIRED)
     enable_testing()
@@ -73,8 +75,8 @@ else()
     set(NARENGINE_LIB_TYPE "STATIC")
 endif()
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/schemas")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/engine")
+add_subdirectory("${PROJECT_SOURCE_DIR}/schemas")
+add_subdirectory("${PROJECT_SOURCE_DIR}/engine")
 if ("${NARENGINE_BUILD_TOOLS}")
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/tools")
-endif()
+    add_subdirectory("${PROJECT_SOURCE_DIR}/tools")
+endif() # if ("${NARENGINE_BUILD_TOOLS}")

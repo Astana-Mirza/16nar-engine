@@ -1,26 +1,26 @@
 /// @file
 /// @brief File with IRenderApi interface definition.
-#ifndef _16NAR_OPENGL_IRENDER_API_H
-#define _16NAR_OPENGL_IRENDER_API_H
+#ifndef _16NAR_IRENDER_API_H
+#define _16NAR_IRENDER_API_H
 
 #include <16nar/16nardefs.h>
 #include <16nar/render/render_defs.h>
+#include <16nar/render/irender_device.h>
 
 #include <any>
 
 namespace _16nar
 {
 
-class IRenderDevice;
-
-
 /// @brief Interface for low-level graphics API (OpenGL, Vulkan, etc.).
 class ENGINE_API IRenderApi
 {
 public:
+     /// @brief Default constructor.
+     IRenderApi() = default;
+
      /// @brief Virtual default destructor.
      virtual ~IRenderApi() = default;
-     IRenderApi()          = default;
 
      /// @brief Load a resource with given parameters.
      /// @param[in] type type of the resource.
@@ -42,11 +42,15 @@ public:
      /// @brief End current frame and prepare for new frame.
      virtual void end_frame() = 0;
 
-protected:
+private:
      IRenderApi( const IRenderApi& )            = delete;
      IRenderApi& operator=( const IRenderApi& ) = delete;
+
+protected:
+     ResourceManagerMap managers_;                ///< all resource managers.
+     std::unique_ptr< IRenderDevice > device_;    ///< render device used to draw graphics.
 };
 
 } // namespace _16nar
 
-#endif // #ifndef _16NAR_OPENGL_IRENDER_API_H
+#endif // #ifndef _16NAR_IRENDER_API_H

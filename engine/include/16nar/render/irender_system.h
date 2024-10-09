@@ -18,9 +18,8 @@ class Window;
 class ENGINE_API IRenderSystem
 {
 public:
-     IRenderSystem()                                               = default;
-     IRenderSystem( const IRenderSystem& )                          = delete;
-     IRenderSystem( IRenderSystem&& )                               = delete;
+     /// @brief Default constructor.
+     IRenderSystem() = default;
 
      /// @brief Virtual default destructor.
      virtual ~IRenderSystem()                                      = default;
@@ -37,13 +36,9 @@ public:
      /// @brief Draw all objects on the screen.
      virtual void draw_objects()                                         = 0;
 
-     /// @brief Get render API of the render system.
-     /// @return render API of the render system.
-     virtual IRenderApi& get_render_api()                                = 0;
-
-     /// @brief Get window of the render sustem.
-     /// @return window of the render sustem.
-     virtual Window& get_window()                                        = 0;
+private:
+     IRenderSystem( const IRenderSystem& )                          = delete;
+     IRenderSystem& operator=( const IRenderSystem& )               = delete;
 };
 
 } // namespace _16nar

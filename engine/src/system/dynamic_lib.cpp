@@ -30,7 +30,7 @@ DynamicLib::DynamicLib( const std::string& name ):
          throw std::runtime_error{ "Cannot open library: error " + std::to_string( GetLastError() ) };
      }
 #endif
-     LOG_16NAR_INFO( "Successfully loaded dynamic library " << name );
+     LOG_16NAR_INFO( "Successfully loaded dynamic library '" << name_ << "'" );
 }
 
 
@@ -62,7 +62,7 @@ DynamicLib::~DynamicLib()
 #elif _WIN32
           FreeLibrary( static_cast< HMODULE >( handle_ ) );
 #endif
-          LOG_16NAR_DEBUG( "Successfully unloaded dynamic library" );
+          LOG_16NAR_INFO( "Successfully unloaded dynamic library '" << name_ << "'" );
      }
 }
 
@@ -85,7 +85,7 @@ void *DynamicLib::get_symbol( const std::string& name ) const
                                     name_ + ": error " + std::to_string( GetLastError() ) };
      }
 #endif
-     return sym;
+     return nullptr;
 }
 
 } // namespace _16nar

@@ -50,8 +50,8 @@ struct Resource
      ResourceType type = ResourceType::Unknown; ///< type of the resource.
      ResID        id   = 0;                     ///< id of the resource.
 
-     bool operator==( const Resource& rhs ) const { return type == rhs.type && id == rhs.id; }
-     bool operator!=( const Resource& rhs ) const { return !( *this == rhs ); }
+     inline bool operator==( const Resource& rhs ) const { return type == rhs.type && id == rhs.id; }
+     inline bool operator!=( const Resource& rhs ) const { return !( *this == rhs ); }
 };
 
 
@@ -60,13 +60,13 @@ struct Resource
 template < ResourceType R >
 struct TypedResource : public Resource
 {
-     TypedResource()                                      { type = R; }
-     TypedResource( const TypedResource& other )          { type = R; id = other.id; }
-     explicit TypedResource( ResID resId )                { type = R; id = resId; }
-     TypedResource& operator=( const TypedResource& rhs ) { type = R; id = rhs.id; return *this; }
-     TypedResource& operator=( ResID resId )              { type = R; id = resId; return *this; }
-     bool operator==( const TypedResource& rhs ) const    { return id == rhs.id; }
-     bool operator!=( const TypedResource& rhs ) const    { return !( *this == rhs ); }
+     inline TypedResource()                                      { type = R; }
+     inline TypedResource( const TypedResource& other )          { type = R; id = other.id; }
+     inline explicit TypedResource( ResID resId )                { type = R; id = resId; }
+     inline TypedResource& operator=( const TypedResource& rhs ) { type = R; id = rhs.id; return *this; }
+     inline TypedResource& operator=( ResID resId )              { type = R; id = resId; return *this; }
+     inline bool operator==( const TypedResource& rhs ) const    { return id == rhs.id; }
+     inline bool operator!=( const TypedResource& rhs ) const    { return !( *this == rhs ); }
 };
 
 
@@ -76,5 +76,23 @@ using FrameBuffer  = TypedResource< ResourceType::FrameBuffer  >;
 using VertexBuffer = TypedResource< ResourceType::VertexBuffer >;
 
 } // namespace _16nar
+
+
+namespace std
+{
+
+template< typename Key > struct hash;
+
+/// @brief Definition of hash for pair of std::type_index and pointer, needed for signals.
+template<>
+struct hash< ::_16nar::Resource >
+{
+     inline size_t operator()( const ::_16nar::Resource& id ) const
+     {
+          return id.id ^ static_cast< ::_16nar::ResID >( id.type );
+     }
+};
+
+}
 
 #endif // #ifndef _16NAR_DEFS_H

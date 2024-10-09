@@ -37,10 +37,6 @@ public:
 
      /// @copydoc IRenderApi::end_frame()
      virtual void end_frame() override;
-
-private:
-     ResourceManagerMap managers_;                ///< all resource managers.
-     std::unique_ptr< IRenderDevice > device_;    ///< render device used to draw graphics.
 };
 
 } // namespace _16nar::opengl
