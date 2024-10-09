@@ -5,6 +5,8 @@
 
 #include <16nar/16nardefs.h>
 
+#include <string_view>
+
 namespace _16nar
 {
 
@@ -14,14 +16,19 @@ namespace _16nar
 class ENGINE_API IProfile
 {
 public:
+     /// @brief Default constructor.
+     IProfile() = default;
+
      /// @brief Virtual default destructor.
      virtual ~IProfile() = default;
 
-     /// @brief Run updating and rendering loops.
+     /// @brief Run updating and rendering loops of selected scene.
+     /// @details Scene will be loaded if it is not yet loaded.
      virtual void run() = 0;
 
-     /// @brief Finish execution of current scene.
-     virtual void finish_scene() = 0;
+     /// @brief Finish execution of current scene and run next one.
+     /// @param[in] name name of the next scene to be executed.
+     virtual void switch_scene( std::string_view name ) = 0;
 
      /// @brief Finish execution of current application.
      virtual void exit() = 0;
@@ -29,6 +36,10 @@ public:
      /// @brief Set time per frame.
      /// @param[in] time_per_frame time per frame, in seconds.
      virtual void set_time_per_frame( float time_per_frame ) = 0;
+
+private:
+     IProfile( const IProfile& )                          = delete;
+     IProfile& operator=( const IProfile& )               = delete;
 };
 
 } // namespace _16nar

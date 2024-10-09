@@ -27,10 +27,6 @@ public:
 
      /// @brief Set current scene as active.
      virtual void activate_scene() = 0;
-
-     /// @brief Get render system required by parsed file.
-     /// @return render system required by parsed file.
-     virtual std::unique_ptr< IRenderSystem > get_render_system() = 0;
 };
 
 } // namespace _16nar

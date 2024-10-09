@@ -1,0 +1,43 @@
+include "constructor_nodes.fbs";
+
+namespace _16nar.data.constructor2d;
+
+/// @brief 2D render system which uses quadrants for binary space partition.
+table QTreeRenderSystem
+{
+     quad_start:    Vec2f;
+     quad_size:     Vec2f;
+     state_size:    Vec2i;
+}
+
+
+/// @brief Union to store any 2D render system.
+union RenderSystem2D
+{
+     QTreeRenderSystem
+}
+
+
+/// @brief Record about one state of the scene.
+table SceneState2D
+{
+     updating:      bool;
+     rendering:     bool;
+     render_system: RenderSystem2D (required);
+     nodes:         [AnyNode2D]    (required);
+}
+
+
+/// @brief Scene executed by engine.
+table Scene2D
+{
+     main_lib:      string;
+     loop_func:     string;
+     setup_func:    string;
+     deps:          Dependencies   (required);
+     states:        [SceneState2D] (required);
+}
+
+root_type Scene2D;
+file_identifier "16C2";  // 16nar engine, constructor 2D architecture
+file_extension "nar";

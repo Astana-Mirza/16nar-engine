@@ -6,6 +6,7 @@
 #include <16nar/signals/slot.h>
 
 #include <unordered_map>
+#include <memory>
 #include <typeindex>
 
 namespace _16nar
@@ -45,52 +46,36 @@ public:
      /// @param[in] sender pointer to an object which emits signals.
      /// @param[in] handle handler for the signal.
      template < typename SignalType, typename Handler >
-     void connect( Signallable *sender, const Handler& handle )
-     {
-          SlotId id{ std::type_index( typeid( SignalType ) ), sender };
-          auto slot = new Slot< SignalType, Handler >{ handle };
-          delete slots_[ id ]; // free old slot if it exists
-          slots_[ id ] = slot;
-          id.second->acceptors_[ id.first ][ this ] = slot;
-	}
-
+     void connect( Signallable *sender, Handler&& handle );
 
      /// @brief Deletes a handler for a signal of given type from specified sender.
      /// @tparam SignalType type of a signal being handled.
      /// @param[in] sender pointer to an object which emits signals.
      template < typename SignalType >
-     void disconnect( Signallable *sender )
-     {
-          SlotId id{ std::type_index( typeid( SignalType ) ), sender };
-          delete slots_[ id ];
-          slots_.erase( id );
-          id.second->acceptors_[ id.first ].erase( this );
-     }
-
+     void disconnect( Signallable *sender );
 
      /// @brief Emits a signal, making all acceptors to handle it
      /// @tparam signalType type of a signal being emitted.
      /// @param[in] sig signal object.
 	template < typename SignalType >
-	void emit( const SignalType& sig )
-     {
-          auto& handlers = acceptors_[ std::type_index( typeid( SignalType ) ) ];
-          for ( auto& pair : handlers )
-          {
-               pair.second->accept_signal( sig );
-          }
-     }
+	void emit( const SignalType& sig );
 
+     /// @brief Destructor, disconnects all slots.
      virtual ~Signallable();
 
 private:
      using AcceptorMap = std::unordered_map< Signallable *, BasicSlot * >;
-     std::unordered_map< std::type_index, AcceptorMap > acceptors_; ///< all slots accepting signals from this object.
-                                                                    ///< maps signal type and receiver to accepting slot,
-                                                                    ///< has ability to group by signal type.
-     std::unordered_map< SlotId, BasicSlot * > slots_;              ///< maps slot identifier to accepting slot.
+     using SignalMap = std::unordered_map< std::type_index, AcceptorMap >;
+     using SlotMap = std::unordered_map< SlotId, std::unique_ptr< BasicSlot > >;
+
+     SignalMap acceptors_;    ///< all slots accepting signals from this object.
+                              ///< Maps signal type and receiver to accepting slot,
+                              ///< has ability to group by signal type.
+     SlotMap slots_;          ///< maps slot identifier to accepting slot.
 };
 
 } // namespace _16nar
+
+#include <16nar/signals/signallable.inl>
 
 #endif // #ifndef _16NAR_SIGNALLABLE_H

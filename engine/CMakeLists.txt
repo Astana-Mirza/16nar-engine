@@ -1,5 +1,5 @@
-set(NARENGINE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(NARENGINE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(NARENGINE_SRC_DIR "${PROJECT_SOURCE_DIR}/engine/src")
+set(NARENGINE_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/engine/include")
 set(NARENGINE_GEN_INCLUDE_DIR "${PROJECT_BINARY_DIR}/schemas/gen-cpp")
 
 # Basic settings
@@ -27,7 +27,6 @@ set(NARENGINE_COMMON_LINK_DIRS "${CMAKE_CURRENT_BINARY_DIR}")
 set(NARENGINE_COMMON_INCLUDE_DIRS
     "${NARENGINE_INCLUDE_DIR}"
     "${CMAKE_CURRENT_BINARY_DIR}"
-    "${NARENGINE_GEN_INCLUDE_DIR}"
 )
 configure_file("${NARENGINE_INCLUDE_DIR}/${NAME}config.h.in" "${NAME}/${NAME}config.h")
 
@@ -64,11 +63,11 @@ set(NARENGINE_INSTALL_TARGETS ${NARENGINE_INSTALL_TARGETS} "${NAME}_math")
 # Main engine library
 set(NARENGINE_BASE_INCLUDE_DIRS
     PUBLIC ${NARENGINE_COMMON_INCLUDE_DIRS}
-    PRIVATE "${GLFW_INCLUDE_DIR}" "${FLATBUFFERS_INCLUDE_DIR}"
+    PRIVATE "${GLFW_INCLUDE_DIR}" "${FLATBUFFERS_INCLUDE_DIR}" "${NARENGINE_GEN_INCLUDE_DIR}"
 )
 set(NARENGINE_BASE_LINK_LIBS
-    PUBLIC "${NAME}_math" "${NAME}_logger" "glfw" ${GLFW_LIBRARIES} "Threads::Threads"
-    PRIVATE "flatbuffers::flatbuffers")
+    PUBLIC "${NAME}_math" "glfw" ${GLFW_LIBRARIES} "Threads::Threads"
+    PRIVATE "flatbuffers::libflatbuffers")
 set(NARENGINE_BASE_LINK_DIRS PUBLIC ${NARENGINE_COMMON_LINK_DIRS})
 set(NARENGINE_BASE_COMPILER_DEFS PUBLIC ${NARENGINE_COMMON_COMPILER_DEFS})
 set(NARENGINE_BASE_SOURCES
@@ -78,9 +77,10 @@ set(NARENGINE_BASE_SOURCES
     "${NARENGINE_SRC_DIR}/system/exceptions.cpp"
     "${NARENGINE_SRC_DIR}/system/package_manager.cpp"
     "${NARENGINE_SRC_DIR}/render/camera_2d.cpp"
+    "${NARENGINE_SRC_DIR}/render/drawable.cpp"
 )
 add_library("${NAME}_base" "${NARENGINE_LIB_TYPE}" ${NARENGINE_BASE_SOURCES})
-add_dependencies("${NAME}_base" "gen-cpp")
+add_dependencies("${NAME}_base" "gen-cpp" "GENERATE_gen-cpp")
 target_include_directories("${NAME}_base" ${NARENGINE_BASE_INCLUDE_DIRS})
 target_link_directories("${NAME}_base" ${NARENGINE_BASE_LINK_DIRS})
 target_compile_definitions("${NAME}_base" ${NARENGINE_BASE_COMPILER_DEFS})
@@ -124,31 +124,29 @@ endif() # if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}")
 
 
 # constructor architecture library
-if ("${NARENGINE_BUILD_CONSTRUCTOR}")
-    set(NARENGINE_CONSTRUCTOR_INCLUDE_DIRS
+if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+    set(NARENGINE_CONSTRUCTOR2D_INCLUDE_DIRS
         PUBLIC ${NARENGINE_COMMON_INCLUDE_DIRS}
-        PRIVATE "${FLATBUFFERS_INCLUDE_DIR}")
-    set(NARENGINE_CONSTRUCTOR_LINK_LIBS
+        PRIVATE "${FLATBUFFERS_INCLUDE_DIR}" "${NARENGINE_GEN_INCLUDE_DIR}")
+    set(NARENGINE_CONSTRUCTOR2D_LINK_LIBS
         PUBLIC "${NAME}_base"
-        PRIVATE "flatbuffers::flatbuffers")
-    set(NARENGINE_CONSTRUCTOR_LINK_DIRS PUBLIC ${NARENGINE_COMMON_LINK_DIRS})
-    set(NARENGINE_CONSTRUCTOR_COMPILER_DEFS PUBLIC ${NARENGINE_COMMON_COMPILER_DEFS})
-    set(NARENGINE_CONSTRUCTOR_SOURCES
-        "${NARENGINE_SRC_DIR}/constructor/render/drawable.cpp"
-        "${NARENGINE_SRC_DIR}/constructor/render/drawable_2d.cpp"
-        "${NARENGINE_SRC_DIR}/constructor/render/quadrant.cpp"
-        "${NARENGINE_SRC_DIR}/constructor/render/qtree_render_system.cpp"
-        "${NARENGINE_SRC_DIR}/constructor/profiles/single_thread_profile.cpp"
+        PRIVATE "flatbuffers::libflatbuffers")
+    set(NARENGINE_CONSTRUCTOR2D_LINK_DIRS PUBLIC ${NARENGINE_COMMON_LINK_DIRS})
+    set(NARENGINE_CONSTRUCTOR2D_COMPILER_DEFS PUBLIC ${NARENGINE_COMMON_COMPILER_DEFS})
+    set(NARENGINE_CONSTRUCTOR2D_SOURCES
+        "${NARENGINE_SRC_DIR}/constructor2d/render/drawable_2d.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/render/quadrant.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/render/qtree_render_system.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/profiles/single_thread_profile.cpp"
     )
 
-    add_library("${NAME}_constructor" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CONSTRUCTOR_SOURCES})
-    add_dependencies("${NAME}_constructor" "gen-cpp")
-    target_include_directories("${NAME}_constructor" ${NARENGINE_CONSTRUCTOR_INCLUDE_DIRS})
-    target_compile_definitions("${NAME}_constructor" ${NARENGINE_CONSTRUCTOR_COMPILER_DEFS})
-    target_link_directories("${NAME}_constructor" ${NARENGINE_CONSTRUCTOR_LINK_DIRS})
-    target_link_libraries("${NAME}_constructor" ${NARENGINE_CONSTRUCTOR_LINK_LIBS})
-    set(NARENGINE_INSTALL_TARGETS ${NARENGINE_INSTALL_TARGETS} "${NAME}_constructor")
-endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR}")
+    add_library("${NAME}_constructor2d" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CONSTRUCTOR2D_SOURCES})
+    target_include_directories("${NAME}_constructor2d" ${NARENGINE_CONSTRUCTOR2D_INCLUDE_DIRS})
+    target_compile_definitions("${NAME}_constructor2d" ${NARENGINE_CONSTRUCTOR2D_COMPILER_DEFS})
+    target_link_directories("${NAME}_constructor2d" ${NARENGINE_CONSTRUCTOR2D_LINK_DIRS})
+    target_link_libraries("${NAME}_constructor2d" ${NARENGINE_CONSTRUCTOR2D_LINK_LIBS})
+    set(NARENGINE_INSTALL_TARGETS ${NARENGINE_INSTALL_TARGETS} "${NAME}_constructor2d")
+endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 
 
 # Testing
@@ -184,18 +182,29 @@ if ("${NARENGINE_BUILD_TESTS}")
         target_link_libraries("${NAME}_render_opengl_test" PRIVATE "${NAME}_render_gl" "Catch2::Catch2WithMain")
         add_test(NAME "${NAME}_render_opengl_test" COMMAND "${NAME}_render_opengl_test")
 
-        if ("${NARENGINE_BUILD_CONSTRUCTOR}")
+        if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
             add_executable("${NAME}_opengl_st_api_test"
-                "${NARENGINE_SRC_DIR}/constructor/test/opengl_st_render_api_test.cpp"
+                "${NARENGINE_SRC_DIR}/constructor2d/test/opengl_st_render_api_test.cpp"
             )
             target_include_directories("${NAME}_opengl_st_api_test" PRIVATE ${NARENGINE_COMMON_INCLUDE_DIRS})
             target_link_directories("${NAME}_opengl_st_api_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
-            target_link_libraries("${NAME}_opengl_st_api_test" PRIVATE "${NAME}_constructor" "${NAME}_render_gl")
+            target_link_libraries("${NAME}_opengl_st_api_test" PRIVATE "${NAME}_constructor2d" "${NAME}_render_gl")
 
             # do not call add_test() because it is manual test utility
 
         endif()
      endif() # if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}")
+
+     if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+          add_executable("${NAME}_constructor2d_qtree_test"
+               "${NARENGINE_SRC_DIR}/constructor2d/render/test/qtree_test.cpp"
+          )
+          target_include_directories("${NAME}_constructor2d_qtree_test" PRIVATE
+               ${NARENGINE_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
+          target_link_directories("${NAME}_constructor2d_qtree_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
+          target_link_libraries("${NAME}_constructor2d_qtree_test" PRIVATE "${NAME}_constructor2d" "Catch2::Catch2WithMain")
+          add_test(NAME "${NAME}_constructor2d_qtree_test" COMMAND "${NAME}_constructor2d_qtree_test")
+     endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 endif() # if ("${NARENGINE_BUILD_TESTS}")
 
 

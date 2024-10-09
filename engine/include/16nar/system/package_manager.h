@@ -5,8 +5,9 @@
 
 #include <string_view>
 #include <string>
+#include <map>
 #include <unordered_map>
-#include <vector>
+#include <unordered_set>
 
 #include <16nar/16nardefs.h>
 
@@ -19,12 +20,7 @@ class IRenderApi;
 class PackageManager
 {
 public:
-     /// @brief Map of resource package names and named resource handlers.
-     using PackageMap = std::unordered_map< std::string, std::unordered_map< std::string, Resource > >;
-
-     /// @brief Constructor.
-     /// @param[in] render_api API for graphic resource management.
-     PackageManager( IRenderApi& render_api );
+     PackageManager() = default;
 
      /// @brief Load resource package and create all its resources.
      /// @details Package can be packed into single file with .nrs extension.
@@ -32,33 +28,38 @@ public:
      /// @param[in] filename path to resource package file or directory.
      /// @param[in] unpacked true if package compiled into .nrs file, false otherwise.
      /// @return true if package is loaded successfully, false otherwise.
-     bool load_package( std::string_view filename, bool unpacked = false );
+     bool load_package( std::string_view name, bool unpacked = false );
 
      /// @brief Unload resource package and all its resources.
      /// @param[in] filename path to resource package file.
-     void unload_package( std::string_view filename );
+     void unload_package( std::string_view name );
 
      /// @brief Check if given package is loaded.
-     /// @param[in] filename name of package file.
+     /// @param[in] name name of package file.
      /// @return true if package is loaded, false otherwise.
-     bool is_loaded( std::string_view package ) const;
+     bool is_package_loaded( std::string_view name ) const;
 
      /// @brief Check if given resource is loaded.
-     /// @param[in] package name of package file.
-     /// @param[in] resource name of resource.
-     /// @return true if package is loaded, false otherwise.
-     bool is_resource_loaded( std::string_view package, std::string_view resource ) const;
+     /// @param[in] name name of resource.
+     /// @return true if resource is loaded, false otherwise.
+     bool is_resource_loaded( std::string_view name ) const;
 
      /// @brief Set directory containing resource packages.
      /// @param[in] dirname path to directory.
      void set_package_dir( std::string_view dirname );
 
-     /// @brief Get loaded resource or empty if it is not found.
-     /// @param[in] package name of package file.
-     /// @param[in] resource name of resource.
-     Resource get_resource( std::string_view package, std::string_view resource ) const;
+     /// @brief Get loaded resource.
+     /// @param[in] name name of resource.
+     /// @return valid resource if it exists, empty resource otherwise.
+     Resource get_resource( std::string_view name ) const;
 
 private:
+     /// @brief Map of resource names and resource handlers (names of form "package_name/resource_name").
+     using ResourceMap = std::map< std::string, Resource >;
+
+     /// @brief Map of resource handlers and iterators to their names.
+     using NameMap = std::unordered_map< Resource, ResourceMap::const_iterator >;
+
      /// @brief Load unpacked resource package from directory.
      /// @details This function scans directory and load resources
      /// from files in it. It is intended for usage in debug builds.
@@ -67,9 +68,10 @@ private:
      bool load_unpacked( std::string_view dirname );
 
 private:
-     PackageMap packages_;    ///< all currently loaded resources.
-     std::string pkg_dir_;    ///< path to directory containig resource packages.
-     IRenderApi& render_api_; ///< API for graphic resource management.
+     ResourceMap resources_;                      ///< all currently loaded resources.
+     NameMap names_;                              ///< names of all currently loaded resources.
+     std::unordered_set< std::string > packages_; ///< all currently loaded packages.
+     std::string pkg_dir_;                        ///< path to directory containig resource packages.
 };
 
 } // namespace _16nar

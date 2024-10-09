@@ -1,0 +1,70 @@
+include "common.fbs";
+
+namespace _16nar.data.constructor2d;
+
+/// @brief Common node information.
+table NodeData
+{
+     parent:   uint32;
+     position: Vec2f     (required);
+     scale:    Vec2f     (required);
+     origin:   Vec2f     (required);
+     rotation: float32;
+     name:     string;
+     lib:      string;
+     creator:  string;
+     data:     [ubyte]   (flexbuffer);
+}
+
+
+/// @brief Drawable node information.
+table DrawableData
+{
+     shader:   ResourceId     (required);
+     layer:    int32;
+     visible:  bool = true;
+}
+
+
+/// @brief Link to external scene piece.
+table PieceLinkNode
+{
+     node:          NodeData       (required);
+     draw_data:     DrawableData;
+     link:          string;
+}
+
+
+/// @brief Simple 2D node.
+table Node2D
+{
+     node:     NodeData  (required);
+}
+
+
+/// @brief Node holding a sprite.
+table SpriteNode
+{
+     node:          NodeData       (required);
+     draw_data:     DrawableData   (required);
+     texture_id:    ResourceId     (required);
+     rect:          FloatRect      (required);
+}
+
+
+/// @brief Union to store any 2D node.
+union AnyNode2D
+{
+     Node2D,
+     SpriteNode,
+     PieceLinkNode
+}
+
+
+/// @brief Lists of scene or scene piece dependencies.
+table Dependencies
+{
+     resources:     [string];
+     libs:          [string];
+     pieces:        [string];
+}

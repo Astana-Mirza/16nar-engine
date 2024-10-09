@@ -187,38 +187,49 @@ public:
      void set_opacity( float opacity );
 
      /// @brief Check if window is open.
+     /// @return true if window is open, false otherwise.
      bool is_open() const;
 
      /// @brief Check if window is focused.
+     /// @return true if window is focused, false otherwise.
      bool is_focused() const;
 
      /// @brief Check if window is iconified (to status bar).
      /// @details Always returns false on Wayland.
+     /// @return true if window is iconified, false otherwise, always false on Wayland.
      bool is_iconified() const;
 
      /// @brief Check if window is maximized.
+     /// @return true if window is maximized, false otherwise.
      bool is_maximized() const;
 
      /// @brief Check if window is resizable.
+     /// @return true if window is resizable, false otherwise.
      bool is_resizable() const;
 
      /// @brief Check if window is decorated.
+     /// @return true if window is decorated, false otherwise.
      bool is_decorated() const;
 
      /// @brief Check if window is auto iconified on focus loss.
+     /// @return true if window is auto iconified, false otherwise.
      bool is_auto_iconify() const;
 
      /// @brief Check if window has transparent framebuffer.
+     /// @return true if window has transparent framebuffer, false otherwise.
      bool is_transparent_framebuffer() const;
 
      /// @brief Check if the window is in fullscreen mode.
+     /// @return true if window is in fullscreen mode, false otherwise.
      bool is_fullscreen() const;
 
      /// @brief Get window position, in screen coordinates.
      /// @details Always throws std::runtime_error on Wayland.
+     /// @return window position.
      Vec2i get_pos() const;
 
      /// @brief Get window's content area size, in screen coordinates.
+     /// @return window size.
      Vec2i get_size() const;
 
      /// @brief Get window's edges size, including window's decorations, in screen coordinates.
@@ -228,14 +239,17 @@ public:
      /// @param[out] bottom size of bottom edge of the window.
      void get_size_decorated( int& left, int& top, int& right, int& bottom ) const;
 
-     /// @brief Get window's content area size, in pixels.
+     /// @brief Get window's framebuffer size, in pixels.
+     /// @return window's framebuffer size.
      Vec2i get_framebuffer_size() const;
 
      /// @brief Get window's content scale.
+     /// @return window's content scale.
      Vec2f get_content_scale() const;
 
      /// @brief Get window's monitor.
      /// @details For fullscreen windows only. Throws runtime_error for non-fullscreen windows.
+     /// @return window's monitor.
      Monitor get_monitor() const;
 
 private:

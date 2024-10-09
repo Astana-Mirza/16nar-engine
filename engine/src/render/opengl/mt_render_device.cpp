@@ -38,7 +38,7 @@ void MtRenderDevice::bind_shader( const Shader& shader )
 }
 
 
-void MtRenderDevice::set_shader_params( const std::function< void( const IShaderProgram& ) >& setup )
+void MtRenderDevice::set_shader_params( const ShaderSetupFunction& setup )
 {
      _16NAR_ENQUEUE_COMMAND( set_shader_params, setup );
 }

@@ -26,7 +26,7 @@ using ResourceManagerMap = std::unordered_map< ResourceType, std::unique_ptr< IR
 using ShaderSetupFunction = std::function< void( const IShaderProgram& ) >;
 
 /// @brief Shared pointer to raw data.
-using DataSharedPtr = std::shared_ptr< char >;
+using DataSharedPtr = std::shared_ptr< std::byte >;
 
 /// @brief Frames saved for profiles with multiple threads.
 constexpr std::size_t _16nar_saved_frames = 2;

@@ -28,13 +28,15 @@ public:
 
      /// @brief Move assignment.
      /// @param[in] lib rvalue reference to DynamicLib.
+     /// @return Reference to *this.
      DynamicLib& operator= ( DynamicLib&& lib ) noexcept;
 
-     /// @brief Destructor, which closes the handle.
+     /// @brief Destructor, closes the handle.
      ~DynamicLib();
 
      /// @brief Get the symbol with given name.
      /// @param[in] name name of the symbol.
+     /// @return loaded symbol, nullptr in case of error.
      void *get_symbol( const std::string& name ) const;
 
 private:

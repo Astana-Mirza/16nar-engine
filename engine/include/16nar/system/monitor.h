@@ -59,30 +59,39 @@ public:
 
      /// @brief Copy assignment operator.
      /// @param[in] other monitor to be copied.
+     /// @return current object which was assigned to.
      Monitor& operator=( const Monitor& other );
 
      /// @brief Get virtual position of the monitor's viewport.
+     /// @return virtual position of the monitor's viewport.
      Vec2i get_pos() const;
 
-     /// @brief Get monitor size, in millimeters.
+     /// @brief Get monitor's size, in millimeters.
+     /// @return monitor's size, in millimeters.
      Vec2i get_physical_size() const;
 
      /// @brief Get content scale ratio for X and Y.
+     /// @return content scale ratio.
      Vec2f get_content_scale() const;
 
      /// @brief Get virtual area without OS taskbars.
+     /// @return virtual area without OS taskbars.
      IntRect get_workarea() const;
 
      /// @brief Get monitor name.
+     /// @return monitor name.
      std::string get_name() const;
 
      /// @brief Get current video mode of the monitor.
+     /// @return current video mode of the monitor.
      VideoMode get_current_video_mode() const;
 
      /// @brief Get supported video modes.
+     /// @return supported video modes.
      std::vector< VideoMode > get_video_modes() const;
 
      /// @brief Get gamma ramp applied to the monitor.
+     /// @return gamma ramp applied to the monitor.
      GammaRamp get_gamma_ramp() const;
 
      /// @brief Set additional software gamma for the monitor.
@@ -96,6 +105,7 @@ public:
      void set_gamma_ramp( const GammaRamp& ramp );
 
      /// @brief Get all connected monitors.
+     /// @return all connected monitors.
      static std::vector< Monitor > get_monitors();
 
      /// @brief Set callback for monitor connection.
