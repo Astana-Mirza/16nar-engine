@@ -6,6 +6,7 @@
 #include <16nar/system/iprofile.h>
 
 #include <memory>
+#include <string>
 
 namespace _16nar
 {

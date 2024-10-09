@@ -44,6 +44,7 @@ jobs:
     - name: Conan install dependencies
       run:  conan install .
             --settings=build_type=${{ env.BUILD_TYPE }}
+            --settings=compiler.cppstd=17
             --build=missing
 
     - name: Configure CMake
