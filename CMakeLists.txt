@@ -80,3 +80,5 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/engine")
 if ("${NARENGINE_BUILD_TOOLS}")
     add_subdirectory("${PROJECT_SOURCE_DIR}/tools")
 endif() # if ("${NARENGINE_BUILD_TOOLS}")
+
+install(EXPORT "${NAME}" DESTINATION "lib/cmake" NAMESPACE "${NAME}::")

@@ -4,6 +4,11 @@
 
 #include <16nar/16nardefs.h>
 
+#define GLM_FORCE_INLINE
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+#define GLM_FORCE_INTRINSICS
+#define GLM_FORCE_SIZE_T_LENGTH
+
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>

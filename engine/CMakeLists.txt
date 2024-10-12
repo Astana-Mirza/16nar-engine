@@ -15,18 +15,15 @@ endif() # if ("${BUILD_SHARED_LIBS}")
 set(NARENGINE_COMMON_COMPILER_DEFS ${NARENGINE_COMMON_COMPILER_DEFS}
     "NARENGINE_LOG_LEVEL=${NARENGINE_LOG_LEVEL}"
     "GLFW_INCLUDE_NONE"
-    "GLM_FORCE_INLINE"
-    "GLM_FORCE_DEFAULT_ALIGNED_GENTYPES"
-    "GLM_FORCE_INTRINSICS"
-    "GLM_FORCE_SIZE_T_LENGTH"
 )
 if ("${NARENGINE_RENDER_VULKAN}")
     set(NARENGINE_COMMON_COMPILER_DEFS ${NARENGINE_COMMON_COMPILER_DEFS} "GLFW_INCLUDE_VULKAN")
 endif()
-set(NARENGINE_COMMON_LINK_DIRS "${CMAKE_CURRENT_BINARY_DIR}")
+set(NARENGINE_COMMON_LINK_DIRS "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<INSTALL_INTERFACE:lib>")
 set(NARENGINE_COMMON_INCLUDE_DIRS
-    "${NARENGINE_INCLUDE_DIR}"
-    "${CMAKE_CURRENT_BINARY_DIR}"
+    "$<BUILD_INTERFACE:${NARENGINE_INCLUDE_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<INSTALL_INTERFACE:include>"
 )
 configure_file("${NARENGINE_INCLUDE_DIR}/${NAME}config.h.in" "${NAME}/${NAME}config.h")
 
@@ -47,7 +44,7 @@ set(NARENGINE_INSTALL_TARGETS ${NARENGINE_INSTALL_TARGETS} "${NAME}_logger")
 
 # Math library
 set(NARENGINE_MATH_COMPILER_DEFS PUBLIC ${NARENGINE_COMMON_COMPILER_DEFS})
-set(NARENGINE_MATH_INCLUDE_DIRS PUBLIC ${NARENGINE_COMMON_INCLUDE_DIRS} "${GLM_INCLUDE_DIR}")
+set(NARENGINE_MATH_INCLUDE_DIRS PUBLIC ${NARENGINE_COMMON_INCLUDE_DIRS})
 set(NARENGINE_MATH_LINK_LIBS PUBLIC "${NAME}_logger" "glm::glm")
 set(NARENGINE_MATH_SOURCES
     "${NARENGINE_SRC_DIR}/math/math_functions.cpp"
@@ -66,8 +63,8 @@ set(NARENGINE_BASE_INCLUDE_DIRS
     PRIVATE "${GLFW_INCLUDE_DIR}" "${FLATBUFFERS_INCLUDE_DIR}" "${NARENGINE_GEN_INCLUDE_DIR}"
 )
 set(NARENGINE_BASE_LINK_LIBS
-    PUBLIC "${NAME}_math" "glfw" ${GLFW_LIBRARIES} "Threads::Threads"
-    PRIVATE "flatbuffers::libflatbuffers")
+    PUBLIC "${NAME}_math"
+    PRIVATE "glfw" "flatbuffers::libflatbuffers" "Threads::Threads")
 set(NARENGINE_BASE_LINK_DIRS PUBLIC ${NARENGINE_COMMON_LINK_DIRS})
 set(NARENGINE_BASE_COMPILER_DEFS PUBLIC ${NARENGINE_COMMON_COMPILER_DEFS})
 set(NARENGINE_BASE_SOURCES
@@ -96,7 +93,7 @@ if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}")
     )
     set(NARENGINE_GL_LINK_DIRS PUBLIC ${NARENGINE_COMMON_LINK_DIRS})
     set(NARENGINE_GL_COMPILER_DEFS PUBLIC ${NARENGINE_COMMON_COMPILER_DEFS})
-    set(NARENGINE_GL_LINK_LIBS PUBLIC "${NAME}_base" ${OPENGL_LIBRARIES})
+    set(NARENGINE_GL_LINK_LIBS PUBLIC "${NAME}_base" PRIVATE "glfw" ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES})
 
     set_source_files_properties("${NARENGINE_SRC_DIR}/render/opengl/glad.c" PROPERTIES LANGUAGE CXX)
     set(NARENGINE_GL_SOURCES
@@ -130,7 +127,7 @@ if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
         PRIVATE "${FLATBUFFERS_INCLUDE_DIR}" "${NARENGINE_GEN_INCLUDE_DIR}")
     set(NARENGINE_CONSTRUCTOR2D_LINK_LIBS
         PUBLIC "${NAME}_base"
-        PRIVATE "flatbuffers::libflatbuffers")
+        PRIVATE "flatbuffers::libflatbuffers" "Threads::Threads")
     set(NARENGINE_CONSTRUCTOR2D_LINK_DIRS PUBLIC ${NARENGINE_COMMON_LINK_DIRS})
     set(NARENGINE_CONSTRUCTOR2D_COMPILER_DEFS PUBLIC ${NARENGINE_COMMON_COMPILER_DEFS})
     set(NARENGINE_CONSTRUCTOR2D_SOURCES
@@ -181,18 +178,6 @@ if ("${NARENGINE_BUILD_TESTS}")
         target_link_directories("${NAME}_render_opengl_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
         target_link_libraries("${NAME}_render_opengl_test" PRIVATE "${NAME}_render_gl" "Catch2::Catch2WithMain")
         add_test(NAME "${NAME}_render_opengl_test" COMMAND "${NAME}_render_opengl_test")
-
-        if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
-            add_executable("${NAME}_opengl_st_api_test"
-                "${NARENGINE_SRC_DIR}/constructor2d/test/opengl_st_render_api_test.cpp"
-            )
-            target_include_directories("${NAME}_opengl_st_api_test" PRIVATE ${NARENGINE_COMMON_INCLUDE_DIRS})
-            target_link_directories("${NAME}_opengl_st_api_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
-            target_link_libraries("${NAME}_opengl_st_api_test" PRIVATE "${NAME}_constructor2d" "${NAME}_render_gl")
-
-            # do not call add_test() because it is manual test utility
-
-        endif()
      endif() # if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}")
 
      if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
@@ -209,6 +194,6 @@ endif() # if ("${NARENGINE_BUILD_TESTS}")
 
 
 # Installation
-install(TARGETS ${NARENGINE_INSTALL_TARGETS})
+install(TARGETS ${NARENGINE_INSTALL_TARGETS} EXPORT "16nar")
 install(DIRECTORY "${NARENGINE_INCLUDE_DIR}/${NAME}" DESTINATION "include")
 install(FILES "${PROJECT_BINARY_DIR}/engine/${NAME}/${NAME}config.h" DESTINATION "include/${NAME}")

@@ -61,7 +61,7 @@ private:
 };
 
 
-int main()
+int main( int argc, char *argv[] )
 {
      const char *vertex_source = R"(
           #version 330 core
@@ -114,7 +114,7 @@ int main()
 
      Game::init();
 
-     // scope to close window and destroy api before game deinitialization
+     if ( argc < 1 || std::string{ argv[ 1 ] } != "--no-window" )
      {
           Window window( Vec2i{ 800, 600 }, "opengl_st_render_api_test" );
           Camera2D camera{ Vec2f{ 0, 0 }, 100, 100 };

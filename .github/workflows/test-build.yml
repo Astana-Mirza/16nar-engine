@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ windows-latest, ubuntu-latest ]
+        shared: [ "True", "False" ]
 
     runs-on: ${{ matrix.os }}
 
@@ -41,20 +42,17 @@ jobs:
     - name: Create default Conan profile
       run: conan profile detect --force
 
-    - name: Conan install dependencies
+    - name: install Conan dependencies
       run:  conan install .
             --settings=build_type=${{ env.BUILD_TYPE }}
             --settings=compiler.cppstd=17
+            --options=*:shared=${{ matrix.shared }}
             --build=missing
 
-    - name: Configure CMake
-      run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-           -DBUILD_SHARED_LIBS=OFF -DNARENGINE_BUILD_TESTS=ON
-           -DNARENGINE_RENDER_VULKAN=OFF ${{ matrix.cmake-extra-options }}
+    - name: Build and test Conan package
+      run:  conan create .
+            --settings=build_type=${{ env.BUILD_TYPE }}
+            --settings=compiler.cppstd=17
+            --options=*:shared=${{ matrix.shared }}
+            --build=missing
 
-    - name: Build
-      run: cmake --build ${{ github.workspace }}/build --config ${{env.BUILD_TYPE}}
-
-    - name: Test
-      working-directory: ${{ github.workspace }}/build
-      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
