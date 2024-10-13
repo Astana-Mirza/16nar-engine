@@ -1,0 +1,14 @@
+include "package_common.fbs";
+
+namespace _16nar.data.package;
+
+/// @brief Collection of resources.
+table Package
+{
+     resources:     [Resource]     (required);
+}
+
+root_type Package;
+
+file_identifier "16RP";  // 16nar engine resource package
+file_extension "nrs";

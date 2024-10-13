@@ -15,7 +15,7 @@ class ENGINE_API DynamicLib
 {
 public:
      /// @brief Constructor.
-     /// @param name relative path to the library.
+     /// @param[in] name relative path to the library.
      DynamicLib( const std::string& name );
 
      // no copy construction and assignment
@@ -23,18 +23,20 @@ public:
      DynamicLib& operator= ( const DynamicLib& ) = delete;
 
      /// @brief Move constructor.
-     /// @param lib rvalue reference to DynamicLib.
+     /// @param[in] lib rvalue reference to DynamicLib.
      DynamicLib( DynamicLib&& lib ) noexcept;
 
      /// @brief Move assignment.
-     /// @param lib rvalue reference to DynamicLib.
+     /// @param[in] lib rvalue reference to DynamicLib.
+     /// @return Reference to *this.
      DynamicLib& operator= ( DynamicLib&& lib ) noexcept;
 
-     /// @brief Destructor, which closes the handle.
+     /// @brief Destructor, closes the handle.
      ~DynamicLib();
 
      /// @brief Get the symbol with given name.
-     /// @param name name of the symbol.
+     /// @param[in] name name of the symbol.
+     /// @return loaded symbol, nullptr in case of error.
      void *get_symbol( const std::string& name ) const;
 
 private:

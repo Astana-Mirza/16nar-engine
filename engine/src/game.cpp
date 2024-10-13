@@ -1,144 +1,105 @@
 #include <16nar/game.h>
 
-#include <16nar/system/file_scene_reader.h>
+#include <16nar/system/window.h>
+#include <16nar/system/iprofile.h>
+#include <16nar/system/iscene_reader.h>
+#include <16nar/render/irender_api.h>
+#include <16nar/logger/logger.h>
+
+#include <GLFW/glfw3.h>
+#include <stdexcept>
+
+namespace // anonymous
+{
+
+void glfw_error_handler( int error_code, const char *description )
+{
+     throw std::runtime_error{ std::string{ "GLFW error " }
+                             + std::to_string( error_code )
+                             + ": " + description };
+}
+
+} // anonymous namespace
+
 
 namespace _16nar
 {
 
-
 Game::Game():
-     window_{ std::make_unique< RenderWindow >() },
-     scene_reader_{ std::make_unique< FileSceneReader >() },
-     event_manager_{ std::make_unique< EventManager >() },
-     time_per_frame_{ 1.f / 60.f },
-     current_task_{ TaskType::Running } {}
-
-
-Game& Game::get_game()
+     pkg_manager_{},
+     profile_{},
+     render_api_{},
+     scene_reader_{},
+     window_{}
 {
-     static Game instance;
-     return instance;
+     init();
 }
 
 
-WorldNode& Game::get_world()
+Game::~Game()
 {
-     return get_game().world_;
+     deinit();
 }
 
 
-void Game::run()
+Game& Game::instance()
 {
-     if ( current_task_ == TaskType::Loading )
+     static Game instance_{};
+     return instance_;
+}
+
+
+void Game::init()
+{
+     glfwSetErrorCallback( glfw_error_handler );
+     if ( !glfwInit() )
      {
-          world_.load( *scene_reader_ );
+          throw std::runtime_error{ "GLFW error: failed to initialize" };
      }
-     current_task_ = TaskType::Running;
-     std::chrono::steady_clock clock;
-     world_.setup();
-     auto prev_time = clock.now();
-     while ( current_task_ != TaskType::Exiting )
+     LOG_16NAR_INFO( "16nar engine was initialized" );
+}
+
+
+void Game::deinit()
+{
+     glfwTerminate();
+     LOG_16NAR_INFO( "16nar engine was deinitialized" );
+}
+
+
+IRenderApi& Game::get_render_api()
+{
+     if (!render_api_)
      {
-          if ( current_task_ == TaskType::Loading )
-          {
-               world_.load( *scene_reader_ );
-               world_.setup();
-               current_task_ = TaskType::Running;
-               prev_time = clock.now();
-          }
-          while ( clock.now() - prev_time >= time_per_frame_ )
-          {
-               read_events();
-               world_.loop( time_per_frame_.count() );
-               prev_time = clock.now();
-          }
-          render();
-          if ( current_task_ == TaskType::Exiting )
-          {
-               window_->close();
-               world_.clear();
-               scene_reader_.reset();
-               event_manager_.reset();
-               window_.reset();
-          }
+          throw std::runtime_error{ "game has no render API" };
      }
+     return *render_api_;
 }
 
 
-void Game::exit()
+Window& Game::get_window()
 {
-     current_task_ = TaskType::Exiting;
-}
-
-
-void Game::load_scene( const std::string& name )
-{
-     scene_reader_ = std::move( std::make_unique< FileSceneReader >() );
-     scene_reader_->set_scene( name );
-     current_task_ = TaskType::Loading;
-}
-
-
-void Game::set_window( const std::string& title, unsigned width, unsigned height, uint32_t flags, unsigned bits_per_pixel )
-{
-     window_->create( { width, height, bits_per_pixel }, title, flags );
-}
-
-
-EventManager& Game::get_event_manager()
-{
-     return *event_manager_;
-}
-
-
-Texture& Game::get_texture( ResourceID id )
-{
-     return scene_reader_->get_texture( id );
-}
-
-
-SoundBuffer& Game::get_sound( ResourceID id )
-{
-     return scene_reader_->get_sound( id );
-}
-
-
-Font& Game::get_font( ResourceID id )
-{
-     return scene_reader_->get_font( id );
-}
-
-
-Shader& Game::get_shader( ResourceID id )
-{
-     return scene_reader_->get_shader( id );
-}
-
-
-void Game::render()
-{
-     window_->clear();
-     world_.render( *window_ );
-     window_->display();
-}
-
-
-void Game::read_events()
-{
-     event_manager_->clear_events();
-     Event event;
-     while ( window_->pollEvent( event ) )
+     if ( !window_ )
      {
-          if ( event.type != Event::Closed )
-          {
-               event_manager_->handle_event( event );
-          }
-          else
-          {
-               exit();
-          }
+          throw std::runtime_error{ "game has no window" };
      }
+     return *window_;
 }
 
+
+ISceneReader& Game::get_scene_reader()
+{
+     if ( !scene_reader_ )
+     {
+          throw std::runtime_error{ "game has no scene reader" };
+     }
+     return *scene_reader_;
+}
+
+
+PackageManager& Game::get_pkg_manager()
+{
+     return pkg_manager_;
+}
 
 } // namespace _16nar

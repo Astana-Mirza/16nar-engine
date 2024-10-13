@@ -1,0 +1,133 @@
+include "common.fbs";
+
+namespace _16nar.data.package;
+
+/// @brief Method of texture wrapping.
+enum TextureWrap : uint8
+{
+     Repeat,
+     MirroredRepeat,
+     ClampToEdge,
+     ClampToBorder
+}
+
+
+/// @brief Method of texture filtering.
+enum TextureFilter : uint8
+{
+     Nearest,
+     Linear,
+     NearestMipmapNearest,
+     NearestMipmapLinear,
+     LinearMipmapNearest,
+     LinearMipmapLinear
+}
+
+
+/// @brief Format of buffer data representation.
+enum BufferDataFormat : uint8
+{
+     Rgb,
+     Rgba,
+     Srgb,
+     Srgba
+}
+
+
+/// @brief Type of data representing pixels.
+enum DataType : uint8
+{
+     Byte,
+     Float
+}
+
+
+/// @brief Type of shader.
+enum ShaderType : uint8
+{
+     Vertex,
+     Geometry,
+     Fragment
+}
+
+
+/// @brief Parameters of loading a texture.
+table TextureLoadParams
+{
+     format:        BufferDataFormat;
+     min_filter:    TextureFilter;
+     mag_filter:    TextureFilter;
+     wrap_x:        TextureWrap;
+     wrap_y:        TextureWrap;
+     data_type:     DataType;
+     border_color:  Vec4f               (required);
+     size:          Vec2i               (required);
+     samples:       uint32;
+}
+
+
+/// @brief Parameters of loading a cubemap.
+table CubemapLoadParams
+{
+     format:        BufferDataFormat;
+     min_filter:    TextureFilter;
+     mag_filter:    TextureFilter;
+     wrap_x:        TextureWrap;
+     wrap_y:        TextureWrap;
+     wrap_z:        TextureWrap;
+     data_type:     DataType;
+     border_color:  Vec4f               (required);
+     size:          Vec2i               (required);
+}
+
+
+/// @brief Parameters of loading a shader.
+table Shader
+{
+     entrypoint:    string         (required);
+     type:          ShaderType;
+     from_source:   bool;
+
+}
+
+
+/// @brief Parameters of loading a shader program.
+table ShaderLoadParams
+{
+     shaders:       [Shader]       (required);
+}
+
+
+/// @brief Parameters of a buffer attribute.
+struct AttribParams
+{
+     size:          uint32;
+     data_type:     DataType;
+     normalized:    bool;
+}
+
+
+/// @brief Parameters of vertex buffer loading.
+table VertexBufferLoadParams
+{
+     attrs:         [AttribParams] (required);
+}
+
+
+/// @brief Representation of any load params.
+union AnyLoadParams
+{
+     TextureLoadParams,
+     CubemapLoadParams,
+     ShaderLoadParams,
+     VertexBufferLoadParams
+}
+
+
+/// @brief Representation of general resource.
+table Resource
+{
+     name:          string         (required);
+     params:        AnyLoadParams  (required);
+     data_sizes:    [uint32]       (required);
+}

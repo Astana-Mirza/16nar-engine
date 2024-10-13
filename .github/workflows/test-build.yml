@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "dev" ]
 
 env:
   BUILD_TYPE: Debug
@@ -14,9 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ windows-latest, ubuntu-latest ]
-        include:
-          - runs-on: ubuntu-latest
-            cmake-extra-options: -DCMAKE_CXX_COMPILER=g++-12
+        shared: [ "True", "False" ]
 
     runs-on: ${{ matrix.os }}
 
@@ -26,16 +24,35 @@ jobs:
 
     - name: Install Linux Dependencies
       if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
-      env:
-        UBUNTU_CMAKE_OPTIONS: -DCMAKE_CXX_COMPILER=g++-12
+      run: sudo apt-get update && sudo apt-get install -y xorg-dev
+           libx11-xcb-dev libxcb-glx0-dev libxcb-render-util0-dev libxcb-xkb-dev
+           libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-randr0-dev
+           libxcb-shape0-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-xinerama0-dev
+           libxcb-dri3-dev libxcb-cursor-dev libxcb-dri2-0-dev libxcb-dri3-dev
+           libxcb-present-dev libxcb-composite0-dev libxcb-ewmh-dev libxcb-res0-dev
+           libxcb-util-dev libxcb-util0-dev
 
-    - name: Configure CMake
-      run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} ${{ matrix.cmake-extra-options }}
+    - name: Conan installation
+      id: conan
+      uses: turtlebrowser/get-conan@v1.0
 
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    - name: Conan version
+      run: echo "${{ steps.conan.outputs.version }}"
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}}
+    - name: Create default Conan profile
+      run: conan profile detect --force
+
+    - name: install Conan dependencies
+      run:  conan install .
+            --settings=build_type=${{ env.BUILD_TYPE }}
+            --settings=compiler.cppstd=17
+            --options=*:shared=${{ matrix.shared }}
+            --build=missing
+
+    - name: Build and test Conan package
+      run:  conan create .
+            --settings=build_type=${{ env.BUILD_TYPE }}
+            --settings=compiler.cppstd=17
+            --options=*:shared=${{ matrix.shared }}
+            --build=missing
+

@@ -6,97 +6,75 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <chrono>
 
-#include <16nar/render/quadrant.h>
-#include <16nar/constructor/world_node.h>
-#include <16nar/abstract/scene_reader.h>
-#include <16nar/system/event_manager.h>
+#include <16nar/16nardefs.h>
+#include <16nar/system/package_manager.h>
 
 namespace _16nar
 {
 
-class Node;
+class IProfile;
+class IRenderApi;
+class ISceneReader;
+class Window;
 
 /// @brief Singleton class for main game options management.
 class ENGINE_API Game
 {
 public:
-     using Time = std::chrono::duration< float >;
+     /// @brief Get singleton game object.
+     /// @details @ref get_game() is shorter version of this function.
+     /// @return Singleton game object.
+     static Game& instance();
 
-     /// @brief Method for getting single game object.
-     static Game& get_game();
+     /// @brief Initialize engine, must be called before any function in engine.
+     /// @detail Does nothing if engine is already initialized. It is called in Game constructor.
+     static void init();
 
-     /// @brief Method for getting current scene's world node.
-     static WorldNode& get_world();
+     /// @brief Deinitialize engine, no engine functions must be called after this one.
+     /// @detail Does nothing if engine is already initialized. It is called in Game destructor.
+     static void deinit();
 
+     /// @brief Destructor.
+     ~Game();
+
+     /// @brief Get render API of the game.
+     /// @return render API of the game.
+     IRenderApi& get_render_api();
+
+     /// @brief Get window of the game.
+     /// @return window of the game.
+     Window& get_window();
+
+     /// @brief Get reader of the game's scenes.
+     /// @return reader of the game's scenes.
+     ISceneReader& get_scene_reader();
+
+     /// @brief Get package manager of the game.
+     /// @return package manager of the game.
+     PackageManager& get_pkg_manager();
+
+private:
      Game( const Game& )               = delete;
      void operator=( const Game& )     = delete;
 
-     /// @brief Runs the game loop within loaded scene.
-     void run();
-
-     /// @brief Ends current scene's game loop.
-     void exit();
-
-     /// @brief Loads scene with given name.
-     /// @param name path to the scene.
-     void load_scene( const std::string& name );
-
-     /// @brief Sets window settings and opens it.
-     /// @param title title of the window.
-     /// @param width width of window in pixels.
-     /// @param height height of window in pixels.
-     /// @param flags flags for window settings.
-     /// @param bits_per_pixel how many bits used to represent one pixel.
-     void set_window( const std::string& title, unsigned width, unsigned height,
-                      uint32_t flags = Style::Default,
-                      unsigned bits_per_pixel = 32 );
-
-     /// @brief Gets the event manager of the game.
-     EventManager& get_event_manager();
-
-     /// @brief Gets texture with given id, throws runtime_error if no such texture.
-     /// @param id id of a texture.
-     Texture& get_texture( ResourceID id );
-
-     /// @brief Gets sound buffer with given id, throws runtime_error if no such sound buffer.
-     /// @param id id of a sound buffer.
-     SoundBuffer& get_sound( ResourceID id );
-
-     /// @brief Gets font with given id, throws runtime_error if no such font.
-     /// @param id id of a font.
-     Font& get_font( ResourceID id );
-
-     /// @brief Gets shader with given id, throws runtime_error if no such shader.
-     /// @param id id of a shader.
-     Shader& get_shader( ResourceID id );
-
-private:
      /// @brief Constructor.
      Game();
 
-     /// @brief Type of current game task.
-     enum class TaskType
-     {
-          Running,       ///< Execution of a scene.
-          Loading,       ///< Loading a scene.
-          Exiting        ///< Exiting from game.
-     };
-
-     /// @brief Renders one frame on the window.
-     void render();
-
-     /// @brief Reads all input events for the window.
-     void read_events();
-
-     WorldNode world_;                                          ///< node which manages scene states.
-     std::unique_ptr< RenderWindow > window_;                   ///< pointer to main window of the game.
-     std::unique_ptr< SceneReader > scene_reader_;              ///< pointer to reader of scenes.
-     std::unique_ptr< EventManager > event_manager_;            ///< pointer to input event manager.
-     Time time_per_frame_;                                      ///< minimal time of one rendering frame.
-     TaskType current_task_;                                    ///< current game task.
+private:
+     PackageManager pkg_manager_;                      ///< package manager of the game.
+     std::unique_ptr< IProfile > profile_;             ///< profile of selected architecture.
+     std::unique_ptr< IRenderApi > render_api_;        ///< render API for drawing game objects.
+     std::unique_ptr< ISceneReader > scene_reader_;    ///< reader of the game's scenes.
+     std::unique_ptr< Window > window_;                ///< window of the game.
 };
+
+
+/// @copydoc Game::instance()
+inline Game& get_game()
+{
+     return Game::instance();
+}
 
 } // namespace _16nar
 
