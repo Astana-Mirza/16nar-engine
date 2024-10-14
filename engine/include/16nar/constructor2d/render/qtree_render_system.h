@@ -65,13 +65,18 @@ public:
 
      /// @brief Set render quadrant for next draw call.
      /// @param[in] root root quadrant for drawing.
-     void set_root_quadrant( Quadrant *root );
+     void set_root_quadrant( std::unique_ptr< Quadrant >&& root );
+
+     /// @brief Get root quadrant of this render system.
+     /// @return Root quadrant of this render system (may be nullptr if not set).
+     Quadrant *get_root_quadrant() const;
 
 protected:
      /// @brief Check if the object fits in specified quadrant.
      /// @param[in] obj drawable object.
      /// @param[in] quad quadrant to be checked.
-     static bool check_quadrant( Drawable2D *obj, const Quadrant *quad );
+     /// @return true if object fits in quadrant, false otherwise.
+     static bool check_quadrant( const Drawable2D *obj, const Quadrant *quad );
 
 private:
      /// @brief Call render API to draw the object.
@@ -84,7 +89,7 @@ private:
 private:
      std::unordered_map< Drawable2D*, Quadrant* > quad_map_;     ///< map of drawable objects and their quadrants.
      Quadrant::LayerMap layers_;                                 ///< map of layers and selected drawables on them.
-     Quadrant *root_;                                            ///< root quadrant, covering the whole scene.
+     std::unique_ptr< Quadrant > root_;                          ///< root quadrant, covering the whole scene.
      Shader current_shader_;                                     ///< currently bound shader.
      Camera2D *camera_;                                          ///< camera of the render system.
 };

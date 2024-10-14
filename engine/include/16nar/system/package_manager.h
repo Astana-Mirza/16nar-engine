@@ -53,6 +53,9 @@ public:
      /// @return valid resource if it exists, empty resource otherwise.
      Resource get_resource( std::string_view name ) const;
 
+     /// @brief Release all saved information.
+     void clear();
+
 private:
      /// @brief Map of resource names and resource handlers (names of form "package_name/resource_name").
      using ResourceMap = std::map< std::string, Resource >;

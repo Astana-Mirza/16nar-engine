@@ -112,24 +112,27 @@ int main( int argc, char *argv[] )
      std::memcpy( reinterpret_cast< char * >( fragment_shader_ptr.get() ), fragment_source, std::strlen( fragment_source ) );
      shader.shaders.push_back( { "", std::strlen( fragment_source ) + 1, fragment_shader_ptr, ShaderType::Fragment, true } );
 
-     Game::init();
+     get_game();
 
-     if ( argc < 1 || std::string{ argv[ 1 ] } != "--no-window" )
+     if ( argc <= 1 || std::string{ argv[ 1 ] } != "--no-window" )
      {
-          Window window( Vec2i{ 800, 600 }, "opengl_st_render_api_test" );
           Camera2D camera{ Vec2f{ 0, 0 }, 100, 100 };
-          window.make_context_current();
-          opengl::RenderApi api{ ProfileType::SingleThreaded };
-          constructor2d::Quadrant quad{ FloatRect{ Vec2f{ -1000, -1000 }, 2000, 2000 } };
+          get_game().set_window( std::make_unique< Window >( Vec2i{ 800, 600 }, "opengl_st_render_api_test" ) );
+          get_game().get_window().make_context_current();
+          get_game().set_render_api( std::make_unique< opengl::RenderApi >( ProfileType::SingleThreaded ) );
 
           constructor2d::QTreeRenderSystem render_system;
           render_system.set_camera( &camera );
-          render_system.set_root_quadrant( &quad );
+          render_system.set_root_quadrant(
+               std::make_unique< constructor2d::Quadrant >( FloatRect{ Vec2f{ -1000, -1000 }, 2000, 2000 } )
+          );
 
-          VertexBuffer vb_id = VertexBuffer( api.load( ResourceType::VertexBuffer, vertex_buffer ).id);
+          auto& api = get_game().get_render_api();
+          VertexBuffer vb_id = VertexBuffer( api.load( ResourceType::VertexBuffer, vertex_buffer ).id );
           Shader sh_id = Shader( api.load( ResourceType::Shader, shader ).id );
 
           TestDrawable obj{ vb_id, sh_id, render_system };
+          render_system.add_draw_child( &obj );
           camera.move( Vec2f{ 0, 40 } );
           for ( std::size_t i = 0; i < 80; i++ )
           {
@@ -138,15 +141,16 @@ int main( int argc, char *argv[] )
                render_system.draw_objects();
                std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
 
-               camera.move( Vec2f{ 0, 1 } );
+               camera.move( Vec2f{ 0, 0.2 } );
                camera.rotate( 10 );
                const auto& rect_pos = camera.get_global_bounds().get_pos();
                camera.zoom( 0.9 );
 
-               obj.get_model().move( Vec2f{ 0, -2 } );
+               obj.get_model().move( Vec2f{ 0, -0.5 } );
           }
      }
 
-     Game::deinit();
+     get_game().finalize();
+
      return 0;
 }

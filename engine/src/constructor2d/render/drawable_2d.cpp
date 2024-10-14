@@ -9,7 +9,6 @@ Drawable2D::Drawable2D( const Shader& shader, IRenderSystem2D& render_system ):
      render_system_{ render_system }, layer_{ 0 }
 {
      shader_ = shader;
-     render_system_.add_draw_child( this );
 }
 
 

@@ -16,6 +16,10 @@ namespace _16nar::constructor2d
 class Drawable2D;
 
 /// @brief Class for space partitioning with quadrant tree.
+/// @details Quadrant represents rectangular area and stores all drawable
+/// objects located in this area. Quadrant can be queried to get all its
+/// drawable objects which intersect with given rectangle (typically, camera
+/// view rectangle).
 class ENGINE_API Quadrant
 {
 public:
@@ -24,28 +28,32 @@ public:
 
      using DrawableSet = std::unordered_set< Drawable2D * >;
      using LayerMap = std::map< int, DrawableSet >;
-     using QuadArray = std::array< Quadrant *, quad_count >;
+     using QuadArray = std::array< std::unique_ptr< Quadrant >, quad_count >;
 
      /// @brief Constructor sets area of this quadrant.
      /// @param[in] area area of the quadrant.
      explicit Quadrant( const FloatRect& area );
 
-     /// @brief Destructor deletes all children quadrants recursively.
-     ~Quadrant();
-
      /// @brief Get this quadrant's area.
+     /// @return This quadrant's area.
      const FloatRect& get_area() const;
 
-     /// @brief Get this quadrant's children.
+     /// @brief Get this quadrant's children quadrants.
+     /// @return This quadrant's children quadrants.
      const QuadArray& get_children() const;
 
+     /// @brief Get all drawable objects in this quadrant.
+     /// @return All drawable objects in this quadrant.
+     const DrawableSet& get_draw_children() const;
+
      /// @brief Get this quadrant's parent.
+     /// @return This quadrant's parent quadrant.
      Quadrant *get_parent() const;
 
      /// @brief Add a child quadrant at given index.
      /// @param[in] child pointer to child quadrant to be added.
      /// @param[in] index at which child will be added.
-     void add_child( Quadrant *child, int index );
+     void add_child( std::unique_ptr< Quadrant >&& child, int index );
 
      /// @brief Add a drawable object to this quadrant.
      /// @param[in] child pointer to drawable object to be added.

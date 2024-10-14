@@ -38,6 +38,27 @@ public:
      /// @brief Destructor.
      ~Game();
 
+     /// @brief Release all game resources.
+     /// @details No game logic must be executed after this function.
+     /// Not intended to be called by user.
+     void finalize();
+
+     /// @brief Set render API of the game.
+     /// @param[in] render_api render API object.
+     void set_render_api( std::unique_ptr< IRenderApi >&& render_api );
+
+     /// @brief Set window of the game.
+     /// @param[in] window window object.
+     void set_window( std::unique_ptr< Window >&& window );
+
+     /// @brief Set reader of game scenes.
+     /// @param[in] scene_reader Reader of game scenes.
+     void set_scene_reader( std::unique_ptr< ISceneReader >&& scene_reader );
+
+     /// @brief Set profile of game execution.
+     /// @param[in] profile profile of game execution.
+     void set_profile( std::unique_ptr< IProfile >&& profile );
+
      /// @brief Get render API of the game.
      /// @return render API of the game.
      IRenderApi& get_render_api();
