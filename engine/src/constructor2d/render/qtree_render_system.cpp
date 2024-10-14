@@ -75,7 +75,7 @@ void QTreeRenderSystem::add_draw_child( Drawable2D *child )
           LOG_16NAR_ERROR( "Root quadrant is not set for render system" );
           return;
      }
-     quad_map_[ child ] = root_;
+     quad_map_[ child ] = root_.get();
      root_->add_draw_child( child );
      handle_change( child );
 }
@@ -108,13 +108,15 @@ void QTreeRenderSystem::handle_change( Drawable2D *child )
           current = current->get_parent();
      }
      do
-     {    // go to the lowest possible level
+     {
+          // go to the lowest possible level
+          found = false;
           const auto& children = current->get_children();
           for ( size_t i = 0; i < Quadrant::quad_count && !found; i++ )
           {
-               if ( children[ i ] && check_quadrant( child, children[ i ] ) )
+               if ( children[ i ] && check_quadrant( child, children[ i ].get() ) )
                {
-                    current = children[ i ];
+                    current = children[ i ].get();
                     found = true;
                }
           }
@@ -141,14 +143,20 @@ const Camera2D* QTreeRenderSystem::get_camera() const
 }
 
 
-void QTreeRenderSystem::set_root_quadrant( Quadrant *root )
+void QTreeRenderSystem::set_root_quadrant( std::unique_ptr< Quadrant >&& root )
 {
-     root_ = root;
+     root_ = std::move( root );
      quad_map_.clear();
 }
 
 
-bool QTreeRenderSystem::check_quadrant( Drawable2D *obj, const Quadrant *quad )
+Quadrant *QTreeRenderSystem::get_root_quadrant() const
+{
+     return root_.get();
+}
+
+
+bool QTreeRenderSystem::check_quadrant( const Drawable2D *obj, const Quadrant *quad )
 {
      auto rect = obj->get_global_bounds();
      if ( quad->get_area().contains( rect.get_pos() ) &&

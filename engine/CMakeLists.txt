@@ -176,7 +176,8 @@ if ("${NARENGINE_BUILD_TESTS}")
         target_include_directories("${NAME}_render_opengl_test" PRIVATE
             ${NARENGINE_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
         target_link_directories("${NAME}_render_opengl_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
-        target_link_libraries("${NAME}_render_opengl_test" PRIVATE "${NAME}_render_gl" "Catch2::Catch2WithMain")
+        target_link_libraries("${NAME}_render_opengl_test"
+            PRIVATE "${NAME}_render_gl" "Threads::Threads" "Catch2::Catch2WithMain")
         add_test(NAME "${NAME}_render_opengl_test" COMMAND "${NAME}_render_opengl_test")
      endif() # if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}")
 

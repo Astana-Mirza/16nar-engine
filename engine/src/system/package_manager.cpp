@@ -268,6 +268,22 @@ Resource PackageManager::get_resource( std::string_view name ) const
 }
 
 
+void PackageManager::clear()
+{
+     LOG_16NAR_INFO( "Unloading all resource packages" );
+     auto& render_api = get_game().get_render_api();
+     auto iter = resources_.begin();
+     while ( iter != resources_.end() )
+     {
+          unload_resource( iter->second, render_api );
+          iter = resources_.erase( iter );
+     }
+     names_.clear();
+     packages_.clear();
+     pkg_dir_.clear();
+}
+
+
 bool PackageManager::load_unpacked( std::string_view dirname )
 {
      bool ok = true;

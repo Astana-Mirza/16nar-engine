@@ -22,5 +22,5 @@ class NarengineTestConan(ConanFile):
 
     def test(self):
         if os.getenv("DISPLAY") and self.settings.os != "Windows" and can_run(self):
-            cmd = os.path.join(self.cpp.build.bindir, "test_package --no-window")
+            cmd = os.path.join(self.cpp.build.bindir, "test_package")
             self.run(cmd, env="conanrun")

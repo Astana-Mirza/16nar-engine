@@ -42,6 +42,40 @@ Game::~Game()
 }
 
 
+void Game::finalize()
+{
+     pkg_manager_.clear();
+     scene_reader_.reset();
+     render_api_.reset();
+     profile_.reset();
+     window_.reset();
+}
+
+
+void Game::set_render_api( std::unique_ptr< IRenderApi >&& render_api )
+{
+     render_api_ = std::move( render_api );
+}
+
+
+void Game::set_window( std::unique_ptr< Window >&& window )
+{
+     window_ = std::move( window );
+}
+
+
+void Game::set_scene_reader( std::unique_ptr< ISceneReader >&& scene_reader )
+{
+     scene_reader_ = std::move( scene_reader );
+}
+
+
+void Game::set_profile( std::unique_ptr< IProfile >&& profile )
+{
+     profile_ = std::move( profile );
+}
+
+
 Game& Game::instance()
 {
      static Game instance_{};
