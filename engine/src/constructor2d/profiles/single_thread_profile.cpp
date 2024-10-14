@@ -29,8 +29,7 @@ void SingleThreadProfile::run()
           run_scene();
           if ( current_task_ == TaskType::Exiting )
           {
-               //render_system_.reset();
-               get_game().get_window().close();
+               get_game().finalize();
           }
      }
 }

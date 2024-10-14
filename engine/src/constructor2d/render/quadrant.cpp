@@ -9,14 +9,6 @@ Quadrant::Quadrant( const FloatRect& area ):
      drawables_{}, area_{ area }, children_{}, parent_{ nullptr }
 {}
 
-Quadrant::~Quadrant()
-{
-     for ( auto quad : children_ )
-     {
-          delete quad;
-     }
-}
-
 
 const FloatRect& Quadrant::get_area() const
 {
@@ -30,16 +22,22 @@ const Quadrant::QuadArray& Quadrant::get_children() const
 }
 
 
+const Quadrant::DrawableSet& Quadrant::get_draw_children() const
+{
+     return drawables_;
+}
+
+
 Quadrant *Quadrant::get_parent() const
 {
      return parent_;
 }
 
 
-void Quadrant::add_child( Quadrant *child, int index )
+void Quadrant::add_child( std::unique_ptr< Quadrant >&& child, int index )
 {
      child->parent_ = this;
-     children_[ index ] = child;
+     children_[ index ] = std::move( child );
 }
 
 
@@ -66,7 +64,7 @@ void Quadrant::find_objects( const FloatRect& area, LayerMap& layers ) const
                     layers[ ptr->get_layer() ].insert( ptr );
                }
           }
-          for ( const auto ptr : children_ )
+          for ( const auto& ptr : children_ )
           {
                if ( ptr )
                {
