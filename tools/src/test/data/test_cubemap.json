@@ -1,0 +1,15 @@
+{
+     "type": "cubemap",
+     "name": "test_cubemap",
+     "format": "rgb",
+     "min_filter": "nearest_mipmap_linear",
+     "mag_filter": "nearest",
+     "wrap_x": "repeat",
+     "wrap_y": "repeat",
+     "wrap_z": "clamp_to_edge",
+     "data_type": "byte",
+     "raw": false,
+     "size": [ 64, 64 ],
+     "border_color": [ 0.8, 0.24, 0.55, 1.0 ],
+     "files": [ "cubemap0.png", "cubemap1.png", "cubemap2.png", "cubemap3.png", "cubemap4.png", "cubemap5.png" ]
+}
