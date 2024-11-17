@@ -1,0 +1,24 @@
+{
+     "type": "vertex_buffer",
+     "name": "test_vertex_buffer",
+     "buffer": {
+          "file": "vertex_buffer.bin",
+          "type": "dynamic_draw"
+     },
+     "index_buffer": {
+          "file": "index_buffer.bin",
+          "type": "static_draw"
+     },
+     "attributes": [
+          {
+               "data_type": "float",
+               "size": 2,
+               "normalized": true
+          },
+          {
+               "data_type": "float",
+               "size": 2,
+               "normalized": false
+          }
+     ]
+}

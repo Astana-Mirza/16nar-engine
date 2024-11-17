@@ -1,0 +1,18 @@
+{
+     "type": "shader",
+     "name": "test_shader",
+     "shaders":[
+          {
+               "entrypoint": "main",
+               "type": "vertex",
+               "file": "vertex_shader.glsl",
+               "from_source": true
+          },
+          {
+               "entrypoint": "main",
+               "type": "fragment",
+               "file": "fragment_shader.glsl",
+               "from_source": true
+          }
+     ]
+}
