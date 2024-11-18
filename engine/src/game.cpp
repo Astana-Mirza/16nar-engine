@@ -1,5 +1,6 @@
 #include <16nar/game.h>
 
+#include <16nar/tools/flatbuffers_asset_reader.h>
 #include <16nar/system/window.h>
 #include <16nar/system/iprofile.h>
 #include <16nar/system/iscene_reader.h>
@@ -26,7 +27,7 @@ namespace _16nar
 {
 
 Game::Game():
-     pkg_manager_{},
+     pkg_manager_{ std::make_unique< tools::FlatBuffersAssetReader >() },
      profile_{},
      render_api_{},
      scene_reader_{},

@@ -30,7 +30,9 @@ enum BufferDataFormat : uint8
      Rgb,
      Rgba,
      Srgb,
-     Srgba
+     Srgba,
+     Depth,
+     DepthStencil
 }
 
 
@@ -48,6 +50,21 @@ enum ShaderType : uint8
      Vertex,
      Geometry,
      Fragment
+}
+
+
+/// @brief Type of buffer indicating purpose of its data.
+enum BufferType : uint8
+{
+     StreamDraw,
+     StreamRead,
+     StreamCopy,
+     StaticDraw,
+     StaticRead,
+     StaticCopy,
+     DynamicDraw,
+     DynamicRead,
+     DynamicCopy
 }
 
 
@@ -110,7 +127,9 @@ struct AttribParams
 /// @brief Parameters of vertex buffer loading.
 table VertexBufferLoadParams
 {
-     attrs:         [AttribParams] (required);
+     attrs:              [AttribParams] (required);
+     buffer_type:        BufferType;
+     index_buffer_type:  BufferType;
 }
 
 

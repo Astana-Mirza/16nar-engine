@@ -29,6 +29,13 @@ struct ResourceData
      ResourceType type;                      ///< type of resource.
 };
 
+
+/// @brief Data of resource package used in engine.
+struct PackageData
+{
+     std::vector< ResourceData > resources;  ///< resources of the package.
+};
+
 } // namespace _16nar::tools
 
 #endif // #ifndef _16NAR_TOOLS_RESOURCE_PACKAGE_H

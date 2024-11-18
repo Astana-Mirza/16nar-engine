@@ -3,13 +3,15 @@
 #ifndef _16NAR_PACKAGE_MANAGER_H
 #define _16NAR_PACKAGE_MANAGER_H
 
+#include <16nar/16nardefs.h>
+#include <16nar/tools/iasset_reader.h>
+
 #include <string_view>
 #include <string>
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <16nar/16nardefs.h>
+#include <memory>
 
 namespace _16nar
 {
@@ -17,46 +19,54 @@ namespace _16nar
 class IRenderApi;
 
 /// @brief Class for control over resource packages.
+/// @details Game object must contain render API in order to use this class.
+/// Render API is used to load grapthical resources. If it is not set, the
+/// application will terminate.
 class PackageManager
 {
 public:
-     PackageManager() = default;
+     /// @brief Constructor.
+     /// @param[in] reader asset reader.
+     PackageManager( std::unique_ptr< tools::IAssetReader >&& reader );
 
      /// @brief Load resource package and create all its resources.
-     /// @details Package can be packed into single file with .nrs extension.
+     /// @details Package can be packed into single file.
      /// If package is unpacked, then resources should be in directory with same name.
      /// @param[in] filename path to resource package file or directory.
-     /// @param[in] unpacked true if package compiled into .nrs file, false otherwise.
+     /// @param[in] unpacked true if package compiled into single file, false otherwise.
      /// @return true if package is loaded successfully, false otherwise.
-     bool load_package( std::string_view name, bool unpacked = false );
+     bool load_package( std::string_view name, bool unpacked = false ) noexcept;
 
      /// @brief Unload resource package and all its resources.
      /// @param[in] filename path to resource package file.
-     void unload_package( std::string_view name );
+     void unload_package( std::string_view name ) noexcept;
 
      /// @brief Check if given package is loaded.
      /// @param[in] name name of package file.
      /// @return true if package is loaded, false otherwise.
-     bool is_package_loaded( std::string_view name ) const;
+     bool is_package_loaded( std::string_view name ) const noexcept;
 
      /// @brief Check if given resource is loaded.
      /// @param[in] name name of resource.
      /// @return true if resource is loaded, false otherwise.
-     bool is_resource_loaded( std::string_view name ) const;
+     bool is_resource_loaded( std::string_view name ) const noexcept;
 
      /// @brief Set directory containing resource packages.
      /// @param[in] dirname path to directory.
-     void set_package_dir( std::string_view dirname );
+     void set_package_dir( std::string_view dirname ) noexcept;
 
      /// @brief Get loaded resource.
      /// @param[in] name name of resource.
      /// @return valid resource if it exists, empty resource otherwise.
-     Resource get_resource( std::string_view name ) const;
+     Resource get_resource( std::string_view name ) const noexcept;
 
      /// @brief Release all saved information.
-     void clear();
+     void clear() noexcept;
 
 private:
+     /// @brief Pointer to abstract asset reader.
+     using AssetReaderPtr = std::unique_ptr< tools::IAssetReader >;
+
      /// @brief Map of resource names and resource handlers (names of form "package_name/resource_name").
      using ResourceMap = std::map< std::string, Resource >;
 
@@ -68,13 +78,14 @@ private:
      /// from files in it. It is intended for usage in debug builds.
      /// @param[in] filename path to resource package directory.
      /// @return true if package is loaded successfully, false otherwise.
-     bool load_unpacked( std::string_view dirname );
+     bool load_unpacked( std::string_view dirname ) noexcept;
 
 private:
      ResourceMap resources_;                      ///< all currently loaded resources.
      NameMap names_;                              ///< names of all currently loaded resources.
      std::unordered_set< std::string > packages_; ///< all currently loaded packages.
      std::string pkg_dir_;                        ///< path to directory containig resource packages.
+     AssetReaderPtr reader_;                      ///< asset reaer.
 };
 
 } // namespace _16nar

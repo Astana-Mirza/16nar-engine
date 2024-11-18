@@ -1,0 +1,37 @@
+{
+     "resources": [
+          {
+               "type": "texture",
+               "name": "test_pkg_texture",
+               "format": "rgba",
+               "min_filter": "nearest",
+               "mag_filter": "nearest_mipmap_linear",
+               "wrap_x": "repeat",
+               "wrap_y": "clamp_to_edge",
+               "data_type": "byte",
+               "samples": 0,
+               "raw": false,
+               "size": [ 256, 256 ],
+               "border_color": [ 0.8, 0.24, 0.55, 1.0 ],
+               "file": "texture.png"
+          },
+          {
+               "type": "shader",
+               "name": "test_pkg_shader",
+               "shaders":[
+                    {
+                         "entrypoint": "main",
+                         "type": "vertex",
+                         "file": "vertex_shader.glsl",
+                         "from_source": true
+                    },
+                    {
+                         "entrypoint": "main",
+                         "type": "fragment",
+                         "file": "fragment_shader.glsl",
+                         "from_source": true
+                    }
+               ]
+          }
+     ]
+}
