@@ -91,8 +91,10 @@ int main( int argc, char *argv[] )
           0.0f,  10.0f, 0.0f
      };
 
+     GameConfig config{};
+     config.log_level = ILogWriter::LogLevel::Debug;
+     Game::init( config );
      Logger::instance().add_writer( std::make_unique< TerminalLogWriter >() );
-     Logger::instance().set_log_level( ILogWriter::LogLevel::Debug );
 
      LoadParams< ResourceType::VertexBuffer > vertex_buffer;
      LoadParams< ResourceType::Shader > shader;
@@ -111,8 +113,6 @@ int main( int argc, char *argv[] )
      DataSharedPtr fragment_shader_ptr{ new std::byte[ std::strlen( fragment_source ) + 1 ]{}, std::default_delete< std::byte[] >() };
      std::memcpy( reinterpret_cast< char * >( fragment_shader_ptr.get() ), fragment_source, std::strlen( fragment_source ) );
      shader.shaders.push_back( { "", std::strlen( fragment_source ) + 1, fragment_shader_ptr, ShaderType::Fragment, true } );
-
-     get_game();
 
      if ( argc <= 1 || std::string{ argv[ 1 ] } != "--no-window" )
      {
@@ -149,8 +149,6 @@ int main( int argc, char *argv[] )
                obj.get_model().move( Vec2f{ 0, -0.5 } );
           }
      }
-
-     get_game().finalize();
 
      return 0;
 }

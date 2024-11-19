@@ -29,13 +29,15 @@ public:
      /// @param[in] reader asset reader.
      PackageManager( std::unique_ptr< tools::IAssetReader >&& reader );
 
+     /// @brief Destructor.
+     ~PackageManager();
+
      /// @brief Load resource package and create all its resources.
      /// @details Package can be packed into single file.
      /// If package is unpacked, then resources should be in directory with same name.
      /// @param[in] filename path to resource package file or directory.
-     /// @param[in] unpacked true if package compiled into single file, false otherwise.
      /// @return true if package is loaded successfully, false otherwise.
-     bool load_package( std::string_view name, bool unpacked = false ) noexcept;
+     bool load_package( std::string_view name ) noexcept;
 
      /// @brief Unload resource package and all its resources.
      /// @param[in] filename path to resource package file.
@@ -50,6 +52,10 @@ public:
      /// @param[in] name name of resource.
      /// @return true if resource is loaded, false otherwise.
      bool is_resource_loaded( std::string_view name ) const noexcept;
+
+     /// @brief Set unpacked mode of package loading.
+     /// @param[in] mode true if packages' resources stored in separate files, false otherwise.
+     void set_unpacked_mode( bool mode ) noexcept;
 
      /// @brief Set directory containing resource packages.
      /// @param[in] dirname path to directory.
@@ -86,6 +92,7 @@ private:
      std::unordered_set< std::string > packages_; ///< all currently loaded packages.
      std::string pkg_dir_;                        ///< path to directory containig resource packages.
      AssetReaderPtr reader_;                      ///< asset reaer.
+     bool unpacked_mode_;                         ///< are packages' resources stored in separate files (false by default).
 };
 
 } // namespace _16nar

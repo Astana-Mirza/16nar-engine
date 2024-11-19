@@ -15,18 +15,25 @@ namespace _16nar
 {
 
 PackageManager::PackageManager( std::unique_ptr< tools::IAssetReader >&& reader ):
-     resources_{}, names_{}, packages_{}, pkg_dir_{}, reader_{ std::move( reader ) }
+     resources_{}, names_{}, packages_{}, pkg_dir_{},
+     reader_{ std::move( reader ) }, unpacked_mode_{ false }
 {}
 
 
-bool PackageManager::load_package( std::string_view name, bool unpacked ) noexcept
+PackageManager::~PackageManager()
+{
+     clear();
+}
+
+
+bool PackageManager::load_package( std::string_view name ) noexcept
 {
      if ( is_package_loaded( name ) )
      {
           LOG_16NAR_DEBUG( "Package '" << name << "' is already loaded" );
           return true;
      }
-     if ( unpacked )
+     if ( unpacked_mode_ )
      {
           return load_unpacked( name );
      }
@@ -162,6 +169,12 @@ bool PackageManager::is_resource_loaded( std::string_view name ) const noexcept
 }
 
 
+void PackageManager::set_unpacked_mode( bool mode ) noexcept
+{
+     unpacked_mode_ = mode;
+}
+
+
 void PackageManager::set_package_dir( std::string_view dirname ) noexcept
 {
      pkg_dir_ = dirname;
@@ -182,6 +195,11 @@ Resource PackageManager::get_resource( std::string_view name ) const noexcept
 
 void PackageManager::clear() noexcept
 {
+     if ( resources_.empty() && names_.empty()
+          && packages_.empty() && pkg_dir_.empty() )
+     {
+          return;
+     }
      LOG_16NAR_DEBUG( "Unloading all resource packages..." );
      auto& render_api = get_game().get_render_api();
      auto iter = resources_.begin();
