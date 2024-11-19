@@ -66,7 +66,6 @@ RenderApi::RenderApi( ProfileType profile )
           }
           break;
           default:
-               LOG_16NAR_ERROR( "Cannot create OpenGL render API, wrong profile" );
                throw std::runtime_error{ "cannot create OpenGL render API, wrong profile" };
           break;
      }

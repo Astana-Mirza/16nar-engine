@@ -66,11 +66,12 @@ set(NARENGINE_BASE_INCLUDE_DIRS
 )
 set(NARENGINE_BASE_LINK_LIBS
     PUBLIC "${NAME}_math" "${NAME}_tools"
-    PRIVATE "glfw" "flatbuffers::libflatbuffers" "Threads::Threads")
+    PRIVATE "glfw" "flatbuffers::libflatbuffers" "nlohmann_json::nlohmann_json" "Threads::Threads")
 set(NARENGINE_BASE_LINK_DIRS PUBLIC ${NARENGINE_COMMON_LINK_DIRS})
 set(NARENGINE_BASE_COMPILER_DEFS PUBLIC ${NARENGINE_COMMON_COMPILER_DEFS})
 set(NARENGINE_BASE_SOURCES
     "${NARENGINE_SRC_DIR}/game.cpp"
+    "${NARENGINE_SRC_DIR}/system/game_config.cpp"
     "${NARENGINE_SRC_DIR}/system/monitor.cpp"
     "${NARENGINE_SRC_DIR}/system/window.cpp"
     "${NARENGINE_SRC_DIR}/system/exceptions.cpp"
