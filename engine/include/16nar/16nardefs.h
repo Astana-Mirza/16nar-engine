@@ -27,7 +27,18 @@ using ResID = uint32_t;
 enum class ProfileType
 {
      SingleThreaded,     ///< executing application in single thread. 
-     MultiThreaded       ///< executing appliction in multiple threads, each having its own purpose.
+     MultiThreaded,      ///< executing appliction in multiple threads, each having its own purpose.
+     Unknown             ///< unknown profile, set on error.
+};
+
+
+/// @brief Type of render API.
+enum class RenderApiType
+{
+#if defined( NARENGINE_RENDER_OPENGL )
+     OpenGl,             ///< OpenGL render API.
+#endif // NARENGINE_RENDER_OPENGL
+     Unknown             ///< unknown render API, set on error.
 };
 
 

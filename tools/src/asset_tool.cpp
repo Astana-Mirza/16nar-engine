@@ -65,6 +65,8 @@ std::unique_ptr< _16nar::tools::IAssetReader > create_reader( const std::string&
 {
      switch ( format )
      {
+          case _16nar::tools::PackageFormat::FlatBuffers:
+               return std::make_unique< _16nar::tools::FlatBuffersAssetReader >();
           case _16nar::tools::PackageFormat::Json:
                return std::make_unique< _16nar::tools::JsonAssetReader >( in_dir );
           default:
