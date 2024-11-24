@@ -16,6 +16,8 @@ class NarengineRecipe(ConanFile):
         "shared": [True, False],
         "log_level": [1, 2, 3, 4, 5, 6, 7, 8, 9],
         "with_utils": [True, False],
+        "with_tools_json": [True, False],
+        "with_tools_flatbuffers": [True, False],
         "with_render_opengl": [True, False],
         "with_arch_constructor2d": [True, False]
     }
@@ -23,6 +25,8 @@ class NarengineRecipe(ConanFile):
         "shared": True,
         "log_level": 9,
         "with_utils": True,
+        "with_tools_json": True,
+        "with_tools_flatbuffers": True,
         "with_render_opengl": True,
         "with_arch_constructor2d": True
     }
@@ -30,13 +34,15 @@ class NarengineRecipe(ConanFile):
     generators = "CMakeToolchain", "CMakeDeps"
 
     def requirements(self):
+        self.requires("glfw/3.4")
+        self.requires("glm/1.0.1", transitive_headers=True)
+        if self.options.with_tools_flatbuffers:
+            self.requires("flatbuffers/24.3.25")
+        if self.options.with_tools_json:
+            self.requires("nlohmann_json/3.11.3")
+            self.requires("stb/cci.20240213")
         if self.options.with_render_opengl:
             self.requires("opengl/system")
-        self.requires("glfw/3.4")
-        self.requires("flatbuffers/24.3.25")
-        self.requires("nlohmann_json/3.11.3")
-        self.requires("stb/cci.20240213")
-        self.requires("glm/1.0.1", transitive_headers=True)
 
         self.test_requires("catch2/3.6.0")
 
@@ -49,9 +55,11 @@ class NarengineRecipe(ConanFile):
     def build(self):
         cmake = CMake(self)
         cmake.configure({
-            "NARENGINE_RENDER_OPENGL": "ON" if self.options.with_render_opengl else "OFF",
             "NARENGINE_LOG_LEVEL": self.options.log_level,
             "NARENGINE_BUILD_UTILS": "ON" if self.options.with_utils else "OFF",
+            "NARENGINE_TOOLS_JSON": "ON" if self.options.with_tools_json else "OFF",
+            "NARENGINE_TOOLS_FLATBUFFERS": "ON" if self.options.with_tools_flatbuffers else "OFF",
+            "NARENGINE_RENDER_OPENGL": "ON" if self.options.with_render_opengl else "OFF",
             "NARENGINE_BUILD_CONSTRUCTOR2D": "ON" if self.options.with_arch_constructor2d else "OFF"
         })
         cmake.build()
@@ -70,8 +78,9 @@ class NarengineRecipe(ConanFile):
         self.cpp_info.set_property("cmake_find_mode", "both")
 
         self.cpp_info.components["16nar_tools"].libs = ["16nar_tools"]
-        self.cpp_info.components["16nar_math"].system_libs = [
-            "flatbuffers::libflatbuffers", "glm::glm", "stb::stb", "nlohmann_json::nlohmann_json"]
+        self.cpp_info.components["16nar_tools"].system_libs = ["glm::glm"]
+        if self.options.with_tools_flatbuffers:
+            self.cpp_info.components["16nar_tools"].system_libs += ["flatbuffers::libflatbuffers"]
         self.cpp_info.components["16nar_tools"].set_property("cmake_target_name",
             nmspc_name + "::16nar_tools")
 
