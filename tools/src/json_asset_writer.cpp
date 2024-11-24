@@ -1,7 +1,7 @@
 #include <16nar/tools/json_asset_writer.h>
 
 #include <16nar/tools/json_utils.inl>
-#include <16nar/tools/binary_utils.h>
+#include <16nar/tools/utils.h>
 
 #include <string>
 #include <array>

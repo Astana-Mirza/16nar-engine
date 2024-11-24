@@ -1,10 +1,9 @@
 /// @file
 /// @brief Utility for engine resource management.
 
-#include <16nar/tools/json_asset_reader.h>
-#include <16nar/tools/json_asset_writer.h>
-#include <16nar/tools/flatbuffers_asset_reader.h>
-#include <16nar/tools/flatbuffers_asset_writer.h>
+#include <16nar/16nardefs.h>
+#include <16nar/tools/resource_package.h>
+#include <16nar/tools/utils.h>
 
 #include <vector>
 #include <string>
@@ -47,8 +46,12 @@ bool quiet = false;
 bool str_to_format( const std::string& str, _16nar::tools::PackageFormat& format )
 {
      static const std::unordered_map< std::string, _16nar::tools::PackageFormat > formats = {
+#if defined( NARENGINE_TOOLS_JSON )
           { "json",        _16nar::tools::PackageFormat::Json },
-          { "flatbuffers", _16nar::tools::PackageFormat::FlatBuffers }
+#endif // NARENGINE_TOOLS_JSON
+#if defined( NARENGINE_TOOLS_FLATBUFFERS )
+          { "flatbuffers", _16nar::tools::PackageFormat::FlatBuffers },
+#endif // NARENGINE_TOOLS_FLATBUFFERS
      };
      auto iter = formats.find( str );
      if ( iter == formats.cend() )
@@ -57,38 +60,6 @@ bool str_to_format( const std::string& str, _16nar::tools::PackageFormat& format
      }
      format = iter->second;
      return true;
-}
-
-
-std::unique_ptr< _16nar::tools::IAssetReader > create_reader( const std::string& in_dir,
-     _16nar::tools::PackageFormat format )
-{
-     switch ( format )
-     {
-          case _16nar::tools::PackageFormat::FlatBuffers:
-               return std::make_unique< _16nar::tools::FlatBuffersAssetReader >();
-          case _16nar::tools::PackageFormat::Json:
-               return std::make_unique< _16nar::tools::JsonAssetReader >( in_dir );
-          default:
-               std::cerr << "Error: wrong reader format (" << static_cast< std::size_t >( format ) << ")\n";
-     }
-     return {};
-}
-
-
-std::unique_ptr< _16nar::tools::IAssetWriter > create_writer( const std::string& out_dir,
-     _16nar::tools::PackageFormat format )
-{
-     switch ( format )
-     {
-          case _16nar::tools::PackageFormat::FlatBuffers:
-               return std::make_unique< _16nar::tools::FlatBuffersAssetWriter >();
-          case _16nar::tools::PackageFormat::Json:
-               return std::make_unique< _16nar::tools::JsonAssetWriter >( out_dir );
-          default:
-               std::cerr << "Error: wrong writer format (" << static_cast< std::size_t >( format ) << ")\n";
-     }
-     return {};
 }
 
 
@@ -107,10 +78,15 @@ void print_usage( std::ostream& out )
           << "\n\t\t--unpack PACKAGE_NAME, -u PACKAGE_NAME\n\t\tUnpack package and place all resource files to output directory.\n"
           << "\n\t\t--quiet, -q\n\t\tDisable text output to terminal.\n"
           << "\n\tFORMATS:\n"
+#if defined( NARENGINE_TOOLS_JSON )
           << "\t\tjson\n\t\tJSON format. When used as output format, will generate binary assets without converting"
           << " to any specific format. For example, PNG file will not be created when unpacking texture asset from"
-          << " flatbuffer format. Instead, there will be JSON file with description and BIN file with raw texture data.\n"
-          << "\n\t\tflatbuffers\n\t\tFlatBuffers buffer format, but size of the buffer (uint32_t) will be prepended to buffer.\n";
+          << " flatbuffers format. Instead, there will be JSON file with description and BIN file with raw texture data.\n"
+#endif // NARENGINE_TOOLS_JSON
+#if defined( NARENGINE_TOOLS_FLATBUFFERS )
+          << "\n\t\tflatbuffers\n\t\tFlatBuffers buffer format, but size of the buffer (uint32_t) will be prepended to buffer.\n"
+#endif // NARENGINE_TOOLS_FLATBUFFERS
+          ;
 }
 
 
@@ -431,8 +407,8 @@ int main( int argc, char *argv[] )
      }
 
      // convert assets
-     auto reader = create_reader( base_dir, src_format );
-     auto writer = create_writer( out_dir, dst_format );
+     auto reader = create_asset_reader( base_dir, src_format );
+     auto writer = create_asset_writer( out_dir, dst_format );
      if ( !reader || !writer )
      {
           return EXIT_FAILURE;

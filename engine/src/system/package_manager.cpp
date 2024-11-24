@@ -5,9 +5,6 @@
 #include <16nar/system/exceptions.h>
 #include <16nar/game.h>
 
-#include <16nar/gen/package_generated.h>
-#include <16nar/gen/resource_generated.h>
-
 #include <fstream>
 #include <vector>
 #include <filesystem>

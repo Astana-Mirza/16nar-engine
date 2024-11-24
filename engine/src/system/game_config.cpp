@@ -12,7 +12,9 @@
 #    include <shlobj.h>
 #endif
 
-#include <nlohmann/json.hpp>
+#if defined( NARENGINE_TOOLS_JSON )
+#    include <nlohmann/json.hpp>
+#endif // NARENGINE_TOOLS_JSON
 
 namespace _16nar
 {
@@ -57,6 +59,7 @@ GameConfig::GameConfig( const std::string& name ):
 }
 
 
+#if defined( NARENGINE_TOOLS_JSON )
 GameConfig GameConfig::load_json( std::istream& input )
 {
      GameConfig config{};
@@ -83,7 +86,7 @@ GameConfig GameConfig::load_json( std::istream& input )
      config.resources_unpacked = json.at( "resources_unpacked" );
      return config;
 }
-
+#endif // NARENGINE_TOOLS_JSON
 
 std::filesystem::path GameConfig::get_app_dir()
 {
