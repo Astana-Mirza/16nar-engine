@@ -19,11 +19,11 @@ public:
 
      /// @brief Get default file extension for current format.
      /// @return Default file extension for current format.
-     virtual std::string get_file_ext() const noexcept = 0;
+     virtual const char *get_file_ext() const noexcept = 0;
 
      /// @brief Get default package extension for current format.
      /// @return Default package extension for current format.
-     virtual std::string get_pkg_ext() const noexcept = 0;
+     virtual const char *get_pkg_ext() const noexcept = 0;
 
 };
 

@@ -5,7 +5,7 @@
 namespace _16nar::constructor2d
 {
 
-Drawable2D::Drawable2D( const Shader& shader, IRenderSystem2D& render_system ):
+Drawable2D::Drawable2D( const Shader& shader, IRenderSystem2D& render_system ) noexcept:
      render_system_{ render_system }, layer_{ 0 }
 {
      shader_ = shader;
@@ -18,19 +18,19 @@ Drawable2D::~Drawable2D()
 }
 
 
-IRenderSystem2D& Drawable2D::get_render_system() const
+IRenderSystem2D& Drawable2D::get_render_system() const noexcept
 {
      return render_system_;
 }
 
 
-int Drawable2D::get_layer() const
+int Drawable2D::get_layer() const noexcept
 {
      return layer_;
 }
 
 
-void Drawable2D::set_layer( int layer )
+void Drawable2D::set_layer( int layer ) noexcept
 {
      layer_ = layer;
 }

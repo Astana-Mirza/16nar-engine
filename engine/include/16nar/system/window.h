@@ -91,7 +91,8 @@ public:
      /// @param[in] size size dimensions of the window, in screen coordinates, closest video mode will be requested.
      /// @param[in] title title of the window.
      /// @param[in] monitor monitor on which the window will be displayed.
-     Window( Vec2i size, const std::string& title, const Monitor& monitor, const OpenSettings& settings = OpenSettings{} );
+     Window( Vec2i size, const std::string& title, const Monitor& monitor,
+          const OpenSettings& settings = OpenSettings{} );
 
 #if defined( NARENGINE_RENDER_OPENGL ) || defined( NARENGINE_RENDER_OPENGL_ES )
      /// @brief Constructor, makes non-fullscreen window sharing context with another window.
@@ -99,7 +100,8 @@ public:
      /// @param[in] title title of the window.
      /// @param[in] other window to share the context with. On Windows, its context must not be active.
      /// @param[in] settings settings for opening the window.
-     Window( Vec2i size, const std::string& title, const Window& other, const OpenSettings& settings = OpenSettings{} );
+     Window( Vec2i size, const std::string& title, const Window& other,
+          const OpenSettings& settings = OpenSettings{} );
 
      /// @brief Constructor, makes fullscreen window on a monitor.
      /// @param[in] size size dimensions of the window, in screen coordinates, closest video mode will be requested.
@@ -115,7 +117,8 @@ public:
      void make_context_current();
 
      /// @brief Switch buffers for OpenGL rendering.
-     /// @details Throws std::runtime_error if there is no current context on the window.
+     /// @details Terminates application if there is no current context on the window,
+     /// so use this function with caution. Does nothing if window is not opened.
      void swap_buffers();
 
 #endif // NARENGINE_RENDER_OPENGL || NARENGINE_RENDER_OPENGL_ES
@@ -126,11 +129,13 @@ public:
      /// @brief Close the window.
      /// @details Window cannot be reopened. New window should be created for this purpose.
      /// Operations with closed window will cause runtime_error.
+     /// @throws std::runtime_error.
      void close();
 
      /// @brief Set window position.
      /// @param[in] pos window position, in screen coordinates.
      /// @details Always throws std::runtime_error on Wayland.
+     /// @throws std::runtime_error.
      void set_pos( const Vec2i& pos );
 
      /// @brief Set title of the window.
@@ -140,6 +145,7 @@ public:
      /// @brief Set window's content area size, for fullscreen windows, closest video mode will be requested.
      /// @param[in] size desired size, in screen coordinates.
      /// @details Always throws std::runtime_error on Wayland.
+     /// @throws std::runtime_error.
      void set_size( const Vec2i& size );
 
      /// @brief Set size limits for window.
@@ -147,6 +153,7 @@ public:
      /// Always throws std::runtime_error on Wayland.
      /// @param[in] min minimal size of the window.
      /// @param[in] max maximal size of the window.
+     /// @throws std::runtime_error.
      void set_size_limit( const Vec2i& min, const Vec2i& max );
 
      /// @brief Set aspect ratio for window.
@@ -154,82 +161,101 @@ public:
      /// Always throws std::runtime_error on Wayland.
      /// @param[in] w width (numerator).
      /// @param[in] h height (denominator).
+     /// @throws std::runtime_error.
      void set_aspect_ratio( int w, int h );
 
      /// @brief Switch window to fullscreen mode.
      /// @param[in] monitor monitor to keep fullscreen window.
+     /// @throws std::runtime_error.
      void make_fullscreen( const Monitor& monitor );
 
      /// @brief Switch window to non-fullscreen mode.
      /// @param[in] pos new position of the window, in screen coordinates.
      /// @param[in] size new size of the window, in screen coordinates.
+     /// @throws std::runtime_error.
      void make_not_fullscreen( const Vec2i& pos, const Vec2i& size );
 
      /// @brief Iconify window (to task bar).
+     /// @throws std::runtime_error.
      void iconify();
 
      /// @brief Maximize window, do not confuse with fullscreen.
+     /// @throws std::runtime_error.
      void maximize();
 
      /// @brief Restore window from being iconified or maximized.
+     /// @throws std::runtime_error.
      void restore();
 
      /// @brief Set focus on window.
      /// @details Always throws std::runtime_error on Wayland.
+     /// @throws std::runtime_error.
      void focus();
 
      /// @brief Request attention, usually blinking on task bar.
+     /// @throws std::runtime_error.
      void request_attention();
 
      /// @brief Set window and decorations opacity.
      /// @details Cannot be used with transparent framebuffer (will throw runtime_error).
      /// @param[in] opacity desired window opacity from 0 to 1.
+     /// @throws std::runtime_error.
      void set_opacity( float opacity );
 
      /// @brief Check if window is open.
      /// @return true if window is open, false otherwise.
-     bool is_open() const;
+     bool is_open() const noexcept;
 
      /// @brief Check if window is focused.
      /// @return true if window is focused, false otherwise.
+     /// @throws std::runtime_error.
      bool is_focused() const;
 
      /// @brief Check if window is iconified (to status bar).
      /// @details Always returns false on Wayland.
      /// @return true if window is iconified, false otherwise, always false on Wayland.
+     /// @throws std::runtime_error.
      bool is_iconified() const;
 
      /// @brief Check if window is maximized.
      /// @return true if window is maximized, false otherwise.
+     /// @throws std::runtime_error.
      bool is_maximized() const;
 
      /// @brief Check if window is resizable.
      /// @return true if window is resizable, false otherwise.
+     /// @throws std::runtime_error.
      bool is_resizable() const;
 
      /// @brief Check if window is decorated.
      /// @return true if window is decorated, false otherwise.
+     /// @throws std::runtime_error.
      bool is_decorated() const;
 
      /// @brief Check if window is auto iconified on focus loss.
      /// @return true if window is auto iconified, false otherwise.
+     /// @throws std::runtime_error.
      bool is_auto_iconify() const;
 
      /// @brief Check if window has transparent framebuffer.
      /// @return true if window has transparent framebuffer, false otherwise.
+     /// @throws std::runtime_error.
      bool is_transparent_framebuffer() const;
 
      /// @brief Check if the window is in fullscreen mode.
      /// @return true if window is in fullscreen mode, false otherwise.
+     /// @throws std::runtime_error.
      bool is_fullscreen() const;
 
      /// @brief Get window position, in screen coordinates.
      /// @details Always throws std::runtime_error on Wayland.
      /// @return window position.
+     /// @throws std::runtime_error.
      Vec2i get_pos() const;
 
      /// @brief Get window's content area size, in screen coordinates.
      /// @return window size.
+     /// @throws std::runtime_error.
      Vec2i get_size() const;
 
      /// @brief Get window's edges size, including window's decorations, in screen coordinates.
@@ -237,19 +263,23 @@ public:
      /// @param[out] top size of top edge of the window.
      /// @param[out] right size of right edge of the window.
      /// @param[out] bottom size of bottom edge of the window.
+     /// @throws std::runtime_error.
      void get_size_decorated( int& left, int& top, int& right, int& bottom ) const;
 
      /// @brief Get window's framebuffer size, in pixels.
      /// @return window's framebuffer size.
+     /// @throws std::runtime_error.
      Vec2i get_framebuffer_size() const;
 
      /// @brief Get window's content scale.
      /// @return window's content scale.
+     /// @throws std::runtime_error.
      Vec2f get_content_scale() const;
 
      /// @brief Get window's monitor.
      /// @details For fullscreen windows only. Throws runtime_error for non-fullscreen windows.
      /// @return window's monitor.
+     /// @throws std::runtime_error.
      Monitor get_monitor() const;
 
 private:

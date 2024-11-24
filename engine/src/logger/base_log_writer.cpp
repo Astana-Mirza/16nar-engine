@@ -28,7 +28,7 @@ std::string BaseLogWriter::get_timestamp() const
 #elif defined( _WIN32 ) || defined( _WIN64 )
      ( void ) localtime_s( &time_struct, &curr_time );
 #else
-    /// thread-unsafe
+     // thread-unsafe
      time_struct = *std::localtime( &curr_time );
 #endif
      std::strftime( std::data( strbuf ), std::size( strbuf ), "%F %T", &time_struct );

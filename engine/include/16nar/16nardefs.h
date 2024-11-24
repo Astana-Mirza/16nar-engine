@@ -61,8 +61,8 @@ struct Resource
      ResourceType type = ResourceType::Unknown; ///< type of the resource.
      ResID        id   = 0;                     ///< id of the resource.
 
-     inline bool operator==( const Resource& rhs ) const { return type == rhs.type && id == rhs.id; }
-     inline bool operator!=( const Resource& rhs ) const { return !( *this == rhs ); }
+     inline bool operator==( const Resource& rhs ) const noexcept { return type == rhs.type && id == rhs.id; }
+     inline bool operator!=( const Resource& rhs ) const noexcept { return !( *this == rhs ); }
 };
 
 
@@ -71,13 +71,13 @@ struct Resource
 template < ResourceType R >
 struct TypedResource : public Resource
 {
-     inline TypedResource()                                      { type = R; }
-     inline TypedResource( const TypedResource& other )          { type = R; id = other.id; }
-     inline explicit TypedResource( ResID resId )                { type = R; id = resId; }
-     inline TypedResource& operator=( const TypedResource& rhs ) { type = R; id = rhs.id; return *this; }
-     inline TypedResource& operator=( ResID resId )              { type = R; id = resId; return *this; }
-     inline bool operator==( const TypedResource& rhs ) const    { return id == rhs.id; }
-     inline bool operator!=( const TypedResource& rhs ) const    { return !( *this == rhs ); }
+     inline TypedResource() noexcept                                       { type = R; }
+     inline TypedResource( const TypedResource& other ) noexcept           { type = R; id = other.id; }
+     inline explicit TypedResource( ResID resId ) noexcept                 { type = R; id = resId; }
+     inline TypedResource& operator=( const TypedResource& rhs ) noexcept  { type = R; id = rhs.id; return *this; }
+     inline TypedResource& operator=( ResID resId ) noexcept               { type = R; id = resId; return *this; }
+     inline bool operator==( const TypedResource& rhs ) const noexcept     { return id == rhs.id; }
+     inline bool operator!=( const TypedResource& rhs ) const noexcept     { return !( *this == rhs ); }
 };
 
 
@@ -98,7 +98,7 @@ template< typename Key > struct hash;
 template<>
 struct hash< ::_16nar::Resource >
 {
-     inline size_t operator()( const ::_16nar::Resource& id ) const
+     inline size_t operator()( const ::_16nar::Resource& id ) const noexcept
      {
           return id.id ^ static_cast< ::_16nar::ResID >( id.type );
      }

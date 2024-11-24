@@ -5,7 +5,7 @@ namespace _16nar
 
 Logger& Logger::instance()
 {
-     static Logger logger;
+     static Logger logger{};
      return logger;
 }
 

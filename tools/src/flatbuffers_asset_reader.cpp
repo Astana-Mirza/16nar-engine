@@ -222,13 +222,13 @@ _16nar::tools::ResourceData read_resource( const _16nar::data::package::Resource
 namespace _16nar::tools
 {
 
-std::string FlatBuffersAssetReader::get_file_ext() const noexcept
+const char *FlatBuffersAssetReader::get_file_ext() const noexcept
 {
      return _16nar::data::package::ResourceExtension();
 }
 
 
-std::string FlatBuffersAssetReader::get_pkg_ext() const noexcept
+const char *FlatBuffersAssetReader::get_pkg_ext() const noexcept
 {
      return _16nar::data::package::PackageExtension();
 }

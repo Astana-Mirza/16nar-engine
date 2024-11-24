@@ -17,7 +17,7 @@ public:
           _16nar::constructor2d::Drawable2D( shader, render_system ),
           rect_{ rect } {}
 
-     virtual _16nar::DrawInfo get_draw_info() const override
+     virtual _16nar::DrawInfo get_draw_info() const noexcept override
      {
           return _16nar::DrawInfo{};
      }

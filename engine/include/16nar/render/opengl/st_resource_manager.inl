@@ -8,6 +8,12 @@ namespace _16nar::opengl
 {
 
 template < typename T >
+StResourceManager< T >::StResourceManager( const ResourceManagerMap& managers ):
+     resources_{}, managers_{ managers }, next_{ 1 }
+{}
+
+
+template < typename T >
 StResourceManager< T >::~StResourceManager()
 {
      clear();
@@ -17,10 +23,18 @@ StResourceManager< T >::~StResourceManager()
 template < typename T >
 ResID StResourceManager< T >::load( const std::any& params )
 {
-     const LoadParamsType& load_params = std::any_cast< const LoadParamsType& >( params );
+     const auto *params_ptr = std::any_cast< LoadParamsType >( &params );
+     if ( !params_ptr )
+     {
+          throw ResourceException{ "wrong resource load parameters" };
+     }
      HandlerType handler;
      ResID id = next_;
-     if ( !T::load( managers_, load_params, handler ) )
+     if ( id == ResID{} )     // overflow
+     {
+          throw ExceededIdException{};
+     }
+     if ( !T::load( managers_, *params_ptr, handler ) )
      {
           throw ResourceException{ "cannot load resource ", id };
      }

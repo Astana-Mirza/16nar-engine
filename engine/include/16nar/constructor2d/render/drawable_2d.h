@@ -18,22 +18,22 @@ public:
      /// @brief Constructor which links object to render system.
      /// @param[in] shader shader used to draw this object.
      /// @param[in] render_system render system used to draw this object.
-     Drawable2D( const Shader& shader, IRenderSystem2D& render_system );
+     Drawable2D( const Shader& shader, IRenderSystem2D& render_system ) noexcept;
 
      /// @brief Destructor which removes object from render system.
      virtual ~Drawable2D();
 
      /// @brief Get render system used for drawing the object.
      /// @return render system used for drawing the object.
-     IRenderSystem2D& get_render_system() const;
+     IRenderSystem2D& get_render_system() const noexcept;
 
      /// @brief Get the scene layer of the object.
      /// @return scene layer of the object.
-     int get_layer() const;
+     int get_layer() const noexcept;
 
      /// @brief Set scene layer of this object.
      /// @param[in] layer scene layer.
-     void set_layer( int layer );
+     void set_layer( int layer ) noexcept;
 
      /// @brief Get local bounds of the object (in its own coordinates).
      /// @return local bounds of the object.

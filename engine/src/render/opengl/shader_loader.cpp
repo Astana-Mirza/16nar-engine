@@ -5,6 +5,8 @@
 #include <16nar/system/exceptions.h>
 #include <16nar/logger/logger.h>
 
+#include <new>
+
 namespace _16nar::opengl
 {
 namespace
@@ -12,21 +14,39 @@ namespace
 
 void log_compile_error( unsigned int descriptor )
 {
-     GLint max_length = 0;
-     glGetShaderiv( descriptor, GL_INFO_LOG_LENGTH, &max_length );
-     std::vector< GLchar > err_msg( max_length );
-     glGetShaderInfoLog( descriptor, max_length, &max_length, &err_msg[ 0 ] );
-     LOG_16NAR_ERROR( "Unable to load shader program: " << err_msg.data() );
+     try
+     {
+          GLint max_length = 0;
+          glGetShaderiv( descriptor, GL_INFO_LOG_LENGTH, &max_length );
+          std::vector< GLchar > err_msg( max_length );
+          glGetShaderInfoLog( descriptor, max_length, &max_length, &err_msg[ 0 ] );
+          LOG_16NAR_ERROR( "Unable to load shader program: " << err_msg.data() );
+     }
+     catch ( const std::bad_alloc& ex )
+     {
+          LOG_16NAR_ERROR( "Could not allocate memory for shader compilation error message: "
+               << ex.what() );
+          return;
+     }
 }
 
 
 void log_link_error( unsigned int descriptor )
 {
-     GLint max_length = 0;
-     glGetProgramiv( descriptor, GL_INFO_LOG_LENGTH, &max_length );
-     std::vector< GLchar > err_msg( max_length );
-     glGetProgramInfoLog( descriptor, max_length, &max_length, &err_msg[ 0 ] );
-     LOG_16NAR_ERROR( "Unable to load shader program: " << err_msg.data() );
+     try
+     {
+          GLint max_length = 0;
+          glGetProgramiv( descriptor, GL_INFO_LOG_LENGTH, &max_length );
+          std::vector< GLchar > err_msg( max_length );
+          glGetProgramInfoLog( descriptor, max_length, &max_length, &err_msg[ 0 ] );
+          LOG_16NAR_ERROR( "Unable to load shader program: " << err_msg.data() );
+     }
+     catch ( const std::bad_alloc& ex )
+     {
+          LOG_16NAR_ERROR( "Could not allocate memory for shader link error message: "
+               << ex.what() );
+          return;
+     }
 }
 
 
@@ -51,7 +71,8 @@ bool load_shader_from_source( const LoadParams< ResourceType::Shader >::ShaderPa
 }
 
 
-bool load_shader( const LoadParams< ResourceType::Shader >::ShaderParams& params, unsigned int& descriptor )
+bool load_shader( const LoadParams< ResourceType::Shader >::ShaderParams& params,
+     unsigned int& descriptor )
 {
      descriptor = glCreateShader( shader_type_to_int( params.type ) );
      glShaderBinary( 1, &descriptor, GL_SHADER_BINARY_FORMAT_SPIR_V, params.data.get(), params.size);
@@ -89,6 +110,7 @@ bool ShaderLoader::load( const ResourceManagerMap&, const LoadParamsType& params
 {
      GLint is_linked = 0;
      std::vector< unsigned int > descriptors;
+     // std::bad_alloc may be thrown here, but not later, so pushing data to vector will be safe
      descriptors.reserve( params.shaders.size() );
 
      for ( const auto& shader : params.shaders )

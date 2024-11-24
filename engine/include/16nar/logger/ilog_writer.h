@@ -27,6 +27,7 @@ public:
      /// @brief Write string to log.
      /// @param[in] level level of logging verbosity.
      /// @param[in] str string to be written to log.
+     /// @throws std::out_of_range, std::bad_alloc, std::ios_base::failure.
      virtual void write( LogLevel level, std::string_view str ) = 0;
 };
 

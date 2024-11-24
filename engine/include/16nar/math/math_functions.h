@@ -10,12 +10,14 @@ namespace _16nar
 
 /// @brief Convert degrees to radians.
 /// @param[in] degrees degrees to be converted to radians.
-ENGINE_API float deg2rad( float degrees );
+/// @return value in radians.
+ENGINE_API float deg2rad( float degrees ) noexcept;
 
 
 /// @brief Convert radians to degrees.
 /// @param[in] radians radians to be converted to degrees.
-ENGINE_API float rad2deg( float radians );
+/// @return value in degrees.
+ENGINE_API float rad2deg( float radians ) noexcept;
 
 } // namespace _16nar
 

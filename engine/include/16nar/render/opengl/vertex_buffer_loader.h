@@ -22,7 +22,8 @@ public:
      /// @param[in] params parameters of vertex buffer loading.
      /// @param[out] handler handler of the vertex buffer.
      /// @return true on success, false otherwise.
-     static bool load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler );
+     static bool load( const ResourceManagerMap&,
+          const LoadParamsType& params, HandlerType& handler );
 
      /// @brief Unload vertex buffer from OpenGL.
      /// @param[in] handler handler of the vertex buffer.

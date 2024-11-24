@@ -16,6 +16,7 @@ class ENGINE_API DynamicLib
 public:
      /// @brief Constructor.
      /// @param[in] name relative path to the library.
+     /// @throws std::runtime_error.
      DynamicLib( const std::string& name );
 
      // no copy construction and assignment
@@ -37,6 +38,7 @@ public:
      /// @brief Get the symbol with given name.
      /// @param[in] name name of the symbol.
      /// @return loaded symbol, nullptr in case of error.
+     /// @throws std::runtime_error.
      void *get_symbol( const std::string& name ) const;
 
 private:

@@ -24,7 +24,8 @@ public:
      /// @param[in] params parameters of cubemap loading.
      /// @param[out] handler handler of the cubemap.
      /// @return true on success, false otherwise.
-     static bool load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler );
+     static bool load( const ResourceManagerMap&,
+          const LoadParamsType& params, HandlerType& handler );
 
      /// @brief Unload cubemap from OpenGL.
      /// @param[in] handler handler of the cubemap.

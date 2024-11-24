@@ -10,25 +10,25 @@ Quadrant::Quadrant( const FloatRect& area ):
 {}
 
 
-const FloatRect& Quadrant::get_area() const
+const FloatRect& Quadrant::get_area() const noexcept
 {
      return area_;
 }
 
 
-const Quadrant::QuadArray& Quadrant::get_children() const
+const Quadrant::QuadArray& Quadrant::get_children() const noexcept
 {
      return children_;
 }
 
 
-const Quadrant::DrawableSet& Quadrant::get_draw_children() const
+const Quadrant::DrawableSet& Quadrant::get_draw_children() const noexcept
 {
      return drawables_;
 }
 
 
-Quadrant *Quadrant::get_parent() const
+Quadrant *Quadrant::get_parent() const noexcept
 {
      return parent_;
 }

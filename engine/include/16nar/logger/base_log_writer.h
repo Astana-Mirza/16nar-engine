@@ -16,10 +16,12 @@ public:
      /// @brief Convert log level to string.
      /// @param[in] level log level.
      /// @return string representation of log level.
+     /// @throws std::out_of_range, std::bad_alloc.
      virtual std::string log_level_to_string( ILogWriter::LogLevel level ) const;
 
      /// @brief Get string representation of current time.
      /// @return string representation of current time.
+     /// @throws std::bad_alloc.
      virtual std::string get_timestamp() const;
 };
 

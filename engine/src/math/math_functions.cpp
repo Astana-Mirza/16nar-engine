@@ -5,13 +5,13 @@
 namespace _16nar
 {
 
-float deg2rad( float degrees )
+float deg2rad( float degrees ) noexcept
 {
      return glm::radians( degrees );
 }
 
 
-float rad2deg( float radians )
+float rad2deg( float radians ) noexcept
 {
      return glm::degrees( radians );
 }

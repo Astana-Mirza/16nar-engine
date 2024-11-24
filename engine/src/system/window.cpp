@@ -42,7 +42,8 @@ Window::Window( Vec2i size, const std::string& title, const OpenSettings& settin
 }
 
 
-Window::Window( Vec2i size, const std::string& title, const Monitor& monitor, const OpenSettings& settings ):
+Window::Window( Vec2i size, const std::string& title,
+     const Monitor& monitor, const OpenSettings& settings ):
      window_{ nullptr }
 {
      init_glfw_hints( settings );
@@ -54,7 +55,8 @@ Window::Window( Vec2i size, const std::string& title, const Monitor& monitor, co
 
 #if defined( NARENGINE_RENDER_OPENGL ) || defined( NARENGINE_RENDER_OPENGL_ES )
 
-Window::Window( Vec2i size, const std::string& title, const Window& other, const OpenSettings& settings ):
+Window::Window( Vec2i size, const std::string& title,
+     const Window& other, const OpenSettings& settings ):
      window_{ nullptr }
 {
      init_glfw_hints( settings );
@@ -87,7 +89,10 @@ void Window::make_context_current()
 
 void Window::swap_buffers()
 {
-     check_window_open( window_ );
+     if ( !window_ )
+     {
+          return;
+     }
      glfwSwapBuffers( window_ );
 }
 
@@ -213,7 +218,7 @@ void Window::set_opacity( float opacity )
 }
 
 
-bool Window::is_open() const
+bool Window::is_open() const noexcept
 {
      return window_ != nullptr;
 }

@@ -13,7 +13,7 @@ namespace _16nar
 TransformMatrix::TransformMatrix( float x0, float y0, float z0, float w0,
                                   float x1, float y1, float z1, float w1, 
                                   float x2, float y2, float z2, float w2, 
-                                  float x3, float y3, float z3, float w3 ):
+                                  float x3, float y3, float z3, float w3 ) noexcept:
      mat_{ x0, y0, z0, w0,
            x1, y1, z1, w1,
            x2, y2, z2, w2,
@@ -21,61 +21,46 @@ TransformMatrix::TransformMatrix( float x0, float y0, float z0, float w0,
 {}
 
 
-TransformMatrix::TransformMatrix( const TransformMatrix& other ):
-     mat_{ other.mat_ }
-{}
-
-
-TransformMatrix& TransformMatrix::operator=( const TransformMatrix& other )
-{
-     if ( &other != this )
-     {
-          mat_ = other.mat_;
-     }
-     return *this;
-}
-
-
-const float& TransformMatrix::get( std::size_t i, std::size_t j ) const
+const float& TransformMatrix::get( std::size_t i, std::size_t j ) const noexcept
 {
      return mat_[ i ][ j ];
 }
 
 
-float& TransformMatrix::get( std::size_t i, std::size_t j )
+float& TransformMatrix::get( std::size_t i, std::size_t j ) noexcept
 {
      return mat_[ i ][ j ];
 }
 
 
-TransformMatrix& TransformMatrix::operator*=( const TransformMatrix& other )
+TransformMatrix& TransformMatrix::operator*=( const TransformMatrix& other ) noexcept
 {
      mat_ *= other.mat_;
      return *this;
 }
 
 
-Vec4f TransformMatrix::operator*( const Vec4f& vector ) const
+Vec4f TransformMatrix::operator*( const Vec4f& vector ) const noexcept
 {
      return Vec4f{ mat_ * vector.vec_ };
 }
 
 
-Vec3f TransformMatrix::operator*( const Vec3f& vector ) const
+Vec3f TransformMatrix::operator*( const Vec3f& vector ) const noexcept
 {
      auto result = mat_ * glm::vec4{ vector.vec_, 1.0f };
      return Vec3f{ result.x, result.y, result.z };
 }
 
 
-Vec2f TransformMatrix::operator*( const Vec2f& vector ) const
+Vec2f TransformMatrix::operator*( const Vec2f& vector ) const noexcept
 {
      auto result = mat_ * glm::vec4{ vector.vec_, 0.0f, 1.0f };
      return Vec2f{ result.x, result.y };
 }
 
 
-FloatRect TransformMatrix::operator*( const FloatRect& rect ) const
+FloatRect TransformMatrix::operator*( const FloatRect& rect ) const noexcept
 {
      Vec2f v1 = ( *this ) * rect.get_pos();
      Vec2f v2 = ( *this ) * Vec2f{ rect.get_pos().x() + rect.get_width(), rect.get_pos().y() };
@@ -93,19 +78,19 @@ FloatRect TransformMatrix::operator*( const FloatRect& rect ) const
 }
 
 
-TransformMatrix TransformMatrix::affine_inv() const
+TransformMatrix TransformMatrix::affine_inv() const noexcept
 {
      return TransformMatrix{ glm::affineInverse( mat_ ) };
 }
 
 
-TransformMatrix TransformMatrix::inv_transpose() const
+TransformMatrix TransformMatrix::inv_transpose() const noexcept
 {
      return TransformMatrix{ glm::inverseTranspose( mat_ ) };
 }
 
 
-bool TransformMatrix::equals( const TransformMatrix& mat, float precision ) const
+bool TransformMatrix::equals( const TransformMatrix& mat, float precision ) const noexcept
 {
      for ( std::size_t i = 0; i < 4; i++ )
      {
@@ -123,21 +108,21 @@ bool TransformMatrix::equals( const TransformMatrix& mat, float precision ) cons
 
 // 2D API
 
-TransformMatrix& TransformMatrix::move( const Vec2f& offset )
+TransformMatrix& TransformMatrix::move( const Vec2f& offset ) noexcept
 {
      mat_ = glm::translate( mat_, glm::vec3{ offset.vec_, 0.0f } );
      return *this;
 }
 
 
-TransformMatrix& TransformMatrix::scale( const Vec2f& factors )
+TransformMatrix& TransformMatrix::scale( const Vec2f& factors ) noexcept
 {
      mat_ = glm::scale( mat_, glm::vec3{ factors.vec_, 1.0f } );
      return *this;
 }
 
 
-TransformMatrix& TransformMatrix::scale( const Vec2f& factors, const Vec2f& pivot )
+TransformMatrix& TransformMatrix::scale( const Vec2f& factors, const Vec2f& pivot ) noexcept
 {
      mat_ = glm::translate( glm::mat4( 1.0f ), glm::vec3{ pivot.vec_, 0.0f } ) *
             glm::scale( glm::mat4( 1.0f ), glm::vec3{ factors.vec_, 1.0f } ) *
@@ -146,14 +131,14 @@ TransformMatrix& TransformMatrix::scale( const Vec2f& factors, const Vec2f& pivo
 }
 
 
-TransformMatrix& TransformMatrix::rotate( float angle )
+TransformMatrix& TransformMatrix::rotate( float angle ) noexcept
 {
      mat_ = glm::rotate( glm::mat4( 1.0f ), angle, glm::vec3{ 0.0f, 0.0f, 1.0f } ) * mat_;
      return *this;
 }
 
 
-TransformMatrix& TransformMatrix::rotate( float angle, const Vec2f& pivot )
+TransformMatrix& TransformMatrix::rotate( float angle, const Vec2f& pivot ) noexcept
 {
      mat_ = glm::translate( glm::mat4( 1.0f ), glm::vec3{ pivot.vec_, 0.0f } ) *
             glm::rotate( glm::mat4( 1.0f ), angle, glm::vec3{ 0.0f, 0.0f, 1.0f } ) *
@@ -164,21 +149,21 @@ TransformMatrix& TransformMatrix::rotate( float angle, const Vec2f& pivot )
 
 // 3D API
 
-TransformMatrix& TransformMatrix::move( const Vec3f& offset )
+TransformMatrix& TransformMatrix::move( const Vec3f& offset ) noexcept
 {
      mat_ = glm::translate( mat_, offset.vec_ );
      return *this;
 }
 
 
-TransformMatrix& TransformMatrix::scale( const Vec3f& factors )
+TransformMatrix& TransformMatrix::scale( const Vec3f& factors ) noexcept
 {
      mat_ = glm::scale( mat_, factors.vec_ );
      return *this;
 }
 
 
-TransformMatrix& TransformMatrix::scale( const Vec3f& factors, const Vec3f& pivot )
+TransformMatrix& TransformMatrix::scale( const Vec3f& factors, const Vec3f& pivot ) noexcept
 {
      mat_ = glm::translate( glm::mat4( 1.0f ), pivot.vec_ ) *
             glm::scale( glm::mat4( 1.0f ), factors.vec_ ) *
@@ -187,14 +172,14 @@ TransformMatrix& TransformMatrix::scale( const Vec3f& factors, const Vec3f& pivo
 }
 
 
-TransformMatrix& TransformMatrix::rotate( float angle, const Vec3f& axis )
+TransformMatrix& TransformMatrix::rotate( float angle, const Vec3f& axis ) noexcept
 {
      mat_ = glm::rotate( glm::mat4( 1.0f ), angle, axis.vec_ ) * mat_;
      return *this;
 }
 
 
-TransformMatrix& TransformMatrix::rotate( float angle, const Vec3f& axis, const Vec3f& pivot )
+TransformMatrix& TransformMatrix::rotate( float angle, const Vec3f& axis, const Vec3f& pivot ) noexcept
 {
      mat_ = glm::translate( glm::mat4( 1.0f ), pivot.vec_ ) *
             glm::rotate( glm::mat4( 1.0f ), angle, axis.vec_ ) *
@@ -205,14 +190,14 @@ TransformMatrix& TransformMatrix::rotate( float angle, const Vec3f& axis, const 
 
 // Operators
 
-TransformMatrix operator*( const TransformMatrix& lhs, const TransformMatrix& rhs )
+TransformMatrix operator*( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept
 {
      TransformMatrix tmp = lhs;
      return tmp *= rhs;
 }
 
 
-bool operator==( const TransformMatrix& lhs, const TransformMatrix& rhs )
+bool operator==( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept
 {
      for ( std::size_t i = 0; i < 4; i++ )
      {
@@ -228,7 +213,7 @@ bool operator==( const TransformMatrix& lhs, const TransformMatrix& rhs )
 }
 
 
-bool operator!=( const TransformMatrix& lhs, const TransformMatrix& rhs )
+bool operator!=( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept
 {
      return !( lhs == rhs );
 }

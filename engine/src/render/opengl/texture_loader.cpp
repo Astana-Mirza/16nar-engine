@@ -8,7 +8,8 @@
 namespace _16nar::opengl
 {
 
-bool TextureLoader::load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler )
+bool TextureLoader::load( const ResourceManagerMap&,
+     const LoadParamsType& params, HandlerType& handler )
 {
      unsigned int texture_type = 0;
      glGenTextures( 1, &handler.descriptor );

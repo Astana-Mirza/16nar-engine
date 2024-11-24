@@ -28,16 +28,20 @@ public:
      static Logger& instance();
 
      /// @brief Write string to log.
+     /// @throws May throw std::out_of_range, std::bad_alloc,
+     /// std::system_error and std::ios_base::failure.
      /// @param[in] level log level.
      /// @param[in] str string to be written to log.
      void log( ILogWriter::LogLevel level, std::string_view str );
 
      /// @brief Set current log level.
      /// @param[in] level new log level.
+     /// @throws std::system_error.
      void set_log_level( ILogWriter::LogLevel level );
 
      /// @brief Add log writer to the storage.
      /// @param[in] writer log writer to be added.
+     /// @throws std::bad_alloc, std::system_error.
      void add_writer( WriterPtr&& writer );
 
 private:

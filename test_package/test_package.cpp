@@ -30,7 +30,7 @@ public:
           draw_info_.shader = shader;
      }
 
-     virtual DrawInfo get_draw_info() const override
+     virtual DrawInfo get_draw_info() const noexcept override
      {
           draw_info_.shader_setup = [ matr = model_matr_ ]( const IShaderProgram& shader )
           {

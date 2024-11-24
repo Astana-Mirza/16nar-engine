@@ -6,14 +6,14 @@
 namespace _16nar
 {
 
-Camera2D::Camera2D( const Vec2f& center, float width, float height ):
+Camera2D::Camera2D( const Vec2f& center, float width, float height ) noexcept:
      matr_{}, global_bounds_{ Vec2f{ center.x() - width / 2, center.y() - height / 2 }, width, height},
      center_{ center }, half_width_{ width / 2 }, half_height_{ height / 2 }, scale_{ 1.0f },
      rotation_{ 0.0f }, transformed_{ false }
 {}
 
 
-FloatRect Camera2D::get_global_bounds() const
+const FloatRect& Camera2D::get_global_bounds() const noexcept
 {
      if ( transformed_ )
      {
@@ -23,14 +23,14 @@ FloatRect Camera2D::get_global_bounds() const
 }
 
 
-void Camera2D::set_center( const Vec2f& pos )
+void Camera2D::set_center( const Vec2f& pos ) noexcept
 {
      center_ = pos;
      transformed_ = true;
 }
 
 
-void Camera2D::set_size( float width, float height )
+void Camera2D::set_size( float width, float height ) noexcept
 {
      half_width_ = width / 2;
      half_height_ = height / 2;
@@ -38,14 +38,14 @@ void Camera2D::set_size( float width, float height )
 }
 
 
-void Camera2D::set_rotation( float angle )
+void Camera2D::set_rotation( float angle ) noexcept
 {
      rotation_ = angle >= 0.0f ? std::fmod( angle, 360.0f ) : ( 360.0f - std::fmod( -angle, 360.0f ) );
      transformed_ = true;
 }
 
 
-void Camera2D::set_zoom( float zoom )
+void Camera2D::set_zoom( float zoom ) noexcept
 {
      if ( zoom > 0.0f )
      {
@@ -55,7 +55,7 @@ void Camera2D::set_zoom( float zoom )
 }
 
 
-void Camera2D::reset( const Vec2f& center, float width, float height )
+void Camera2D::reset( const Vec2f& center, float width, float height ) noexcept
 {
      matr_ = {};
      half_width_ = width / 2;
@@ -67,43 +67,43 @@ void Camera2D::reset( const Vec2f& center, float width, float height )
 }
 
 
-const Vec2f& Camera2D::get_center() const
+const Vec2f& Camera2D::get_center() const noexcept
 {
      return center_;
 }
 
 
-Vec2f Camera2D::get_size() const
+Vec2f Camera2D::get_size() const noexcept
 {
      return Vec2f{ half_width_ * 2.0f, half_height_ * 2.0f };
 }
 
 
-float Camera2D::get_rotation() const
+float Camera2D::get_rotation() const noexcept
 {
      return rotation_;
 }
 
 
-float Camera2D::get_zoom() const
+float Camera2D::get_zoom() const noexcept
 {
      return 1.0f / scale_;
 }
 
 
-void Camera2D::move( const Vec2f& offset )
+void Camera2D::move( const Vec2f& offset ) noexcept
 {
      set_center( center_ + offset );
 }
 
 
-void Camera2D::rotate( float angle )
+void Camera2D::rotate( float angle ) noexcept
 {
      set_rotation( rotation_ + angle );
 }
 
 
-void Camera2D::zoom( float factor )
+void Camera2D::zoom( float factor ) noexcept
 {
      if ( factor > 0.0f )
      {
@@ -113,7 +113,7 @@ void Camera2D::zoom( float factor )
 }
 
 
-const TransformMatrix& Camera2D::get_transform_matr() const
+const TransformMatrix& Camera2D::get_transform_matr() const noexcept
 {
      if ( transformed_ )
      {
@@ -123,13 +123,13 @@ const TransformMatrix& Camera2D::get_transform_matr() const
 }
 
 
-TransformMatrix Camera2D::get_inverse_transform_matr() const
+TransformMatrix Camera2D::get_inverse_transform_matr() const noexcept
 {
      return get_transform_matr().affine_inv();
 }
 
 
-void Camera2D::params_calculate() const
+void Camera2D::params_calculate() const noexcept
 {
      matr_ = {};
      matr_.move( -center_ )

@@ -2,6 +2,7 @@
 
 #include <16nar/render/opengl/shader_program.h>
 #include <16nar/render/opengl/glad.h>
+#include <16nar/system/exceptions.h>
 
 namespace _16nar::opengl
 {
@@ -13,21 +14,38 @@ StRenderDevice::StRenderDevice( const ResourceManagerMap& managers ):
 
 void StRenderDevice::render( const RenderParams& params )
 {
+     // managers are handled by render API, so at() must never throw here
      const auto& texture_manager = managers_.at( ResourceType::Texture );
-     for ( std::size_t i = 0; i < params.textures.size(); i++ )
+     std::vector< Handler< ResourceType::Texture > > handlers;
+     handlers.reserve( params.textures.size() );
+     for ( const auto& texture : params.textures )
      {
-          const auto texture_descriptor = std::any_cast< Handler< ResourceType::Texture > >(
-               texture_manager->get_handler( params.textures[ i ].id ) );
-          glActiveTexture( GL_TEXTURE0 + i );
-          glBindTexture( GL_TEXTURE_2D, texture_descriptor.descriptor );
+          std::any tex_param_any = texture_manager->get_handler( texture.id );
+          const auto *tex_param_ptr = std::any_cast< Handler< ResourceType::Texture > >( &tex_param_any );
+          if ( !tex_param_ptr )
+          {
+               throw ResourceException{ "wrong handler for texture id ", texture.id };
+          }
+          handlers.emplace_back( *tex_param_ptr );
      }
 
-     const auto vertex_buffer_handler = std::any_cast< Handler< ResourceType::VertexBuffer > >(
-          managers_.at( ResourceType::VertexBuffer )->get_handler( params.vertex_buffer.id ) );
+     std::any vb_any =
+          managers_.at( ResourceType::VertexBuffer )->get_handler( params.vertex_buffer.id );
+     const auto *vb_ptr = std::any_cast< Handler< ResourceType::VertexBuffer > >( &vb_any );
+     if ( !vb_ptr )
+     {
+          throw ResourceException{ "wrong handler for vertex buffer id ", params.vertex_buffer.id };
+     }
 
-     glBindVertexArray( vertex_buffer_handler.vao_descriptor );
+     for ( std::size_t i = 0; i < handlers.size(); i++ )
+     {
+          glActiveTexture( GL_TEXTURE0 + i );
+          glBindTexture( GL_TEXTURE_2D, handlers[ i ].descriptor );
+     }
 
-     if ( vertex_buffer_handler.ebo_descriptor != 0 )
+     glBindVertexArray( vb_ptr->vao_descriptor );
+
+     if ( vb_ptr->ebo_descriptor != 0 )
      {
           glDrawElementsInstanced( primitive_type_to_int( params.primitive ),
                params.vertex_count, GL_UNSIGNED_INT, nullptr, params.instance_count );
@@ -68,11 +86,16 @@ void StRenderDevice::bind_shader( const Shader& shader )
           return;
      }
 
-     const auto shader_handler = std::any_cast< Handler< ResourceType::Shader > >(
-          managers_.at( ResourceType::Shader )->get_handler( shader.id ) );
+     // managers are handled by render API, so at() must never throw here
+     std::any shader_handler_any = managers_.at( ResourceType::Shader )->get_handler( shader.id );
+     const auto *shader_handler = std::any_cast< Handler< ResourceType::Shader > >( &shader_handler_any );
+     if ( !shader_handler )
+     {
+          throw ResourceException{ "wrong handler for shader id ", shader.id };
+     }
 
-     current_shader_ = shader_handler;
-     glUseProgram( shader_handler.descriptor );
+     current_shader_ = *shader_handler;
+     glUseProgram( shader_handler->descriptor );
 }
 
 
@@ -94,9 +117,14 @@ void StRenderDevice::bind_framebuffer( const FrameBuffer& framebuffer )
           glBindFramebuffer( GL_FRAMEBUFFER, 0 );
           return;
      }
-     const auto frame_buffer_handler = std::any_cast< Handler< ResourceType::FrameBuffer > >(
-          managers_.at( ResourceType::FrameBuffer )->get_handler( framebuffer.id ) );
-     glBindFramebuffer( GL_FRAMEBUFFER, frame_buffer_handler.descriptor );
+     // managers are handled by render API, so at() must never throw here
+     std::any fb_any = managers_.at( ResourceType::FrameBuffer )->get_handler( framebuffer.id );
+     const auto *fb_ptr = std::any_cast< Handler< ResourceType::FrameBuffer > >( &fb_any );
+     if ( !fb_ptr )
+     {
+          throw ResourceException{ "wrong handler for framebuffer id ", framebuffer.id };
+     }
+     glBindFramebuffer( GL_FRAMEBUFFER, fb_ptr->descriptor );
 }
 
 

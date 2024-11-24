@@ -297,7 +297,7 @@ TEST_CASE( "Packages reading and writing in JSON format", "[json_resources]" )
      REQUIRE( fr_shader.type == _16nar::ShaderType::Fragment );
      REQUIRE( fr_shader.from_source == true );
 
-     std::ofstream ofs{ "data/out/test_package_out." + writer.get_pkg_ext() };
+     std::ofstream ofs{ std::string{ "data/out/test_package_out." } + writer.get_pkg_ext() };
      writer.write_package( ofs, pkg );
      ofs.close();
 
