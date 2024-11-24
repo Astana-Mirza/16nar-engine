@@ -5,7 +5,7 @@ namespace _16nar
 {
 
 template < typename T >
-bool Rectangle< T >::contains( const Vec< 2, T >& point ) const
+bool Rectangle< T >::contains( const Vec< 2, T >& point ) const noexcept
 {
      return ( point.x() >= pos_.x() )
          && ( point.y() >= pos_.y() )
@@ -15,7 +15,7 @@ bool Rectangle< T >::contains( const Vec< 2, T >& point ) const
 
 
 template < typename T >
-bool Rectangle< T >::intersects( const Rectangle< T >& rect ) const
+bool Rectangle< T >::intersects( const Rectangle< T >& rect ) const noexcept
 {
      return ( pos_.x() <= rect.pos_.x() + rect.width_ )
          && ( pos_.x() + width_ >= rect.pos_.x() )
@@ -25,7 +25,7 @@ bool Rectangle< T >::intersects( const Rectangle< T >& rect ) const
 
 
 template < typename T >
-bool operator==( const Rectangle< T >& lhs, const Rectangle< T >& rhs )
+bool operator==( const Rectangle< T >& lhs, const Rectangle< T >& rhs ) noexcept
 {
      return ( lhs.get_pos() == rhs.get_pos() )
          && ( lhs.get_width() == rhs.get_width() )
@@ -34,7 +34,7 @@ bool operator==( const Rectangle< T >& lhs, const Rectangle< T >& rhs )
 
 
 template < typename T >
-bool operator!=( const Rectangle< T >& lhs, const Rectangle< T >& rhs )
+bool operator!=( const Rectangle< T >& lhs, const Rectangle< T >& rhs ) noexcept
 {
      return !( lhs == rhs );
 }

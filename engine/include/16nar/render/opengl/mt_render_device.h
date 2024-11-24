@@ -18,7 +18,8 @@ namespace _16nar::opengl
 class MtRenderDevice : public StRenderDevice
 {
 public:
-     /// @copydoc StRenderDevice::StRenderDevice(const ResourceManagerMap&)
+     /// @brief Constructor.
+     /// @param[in] managers resource managers used in rendering.
      MtRenderDevice( const ResourceManagerMap& managers );
 
      /// @copydoc IRenderDevice::render(const RenderParams&)

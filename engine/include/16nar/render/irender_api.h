@@ -26,17 +26,23 @@ public:
      /// @param[in] type type of the resource.
      /// @param[in] params parameters for loading a resource.
      /// @return identifier of a resource with type.
+     /// @throws May throw implementation-defined exceptions.
+     /// Current implementations may throw ResourceException, ExceededIdException.
      virtual Resource load( ResourceType type, const std::any& params ) = 0;
 
      /// @brief Unload a resource.
      /// @param[in] resource identifier of a resource with type.
+     /// @throws May throw implementation-defined exceptions.
+     /// Current implementations may throw ResourceException.
      virtual void unload( const Resource& resource ) = 0;
 
      /// @brief Get render device of current graphics API.
      /// @return render device of current graphics API.
-     virtual IRenderDevice& get_device() const = 0;
+     virtual IRenderDevice& get_device() const noexcept = 0;
 
      /// @brief Process rendering.
+     /// @throws May throw implementation-defined exceptions.
+     /// Current implementations may throw ResourceException, ExceededIdException.
      virtual void process() = 0;
 
      /// @brief End current frame and prepare for new frame.

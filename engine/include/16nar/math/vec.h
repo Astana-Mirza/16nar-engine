@@ -39,19 +39,13 @@ public:
      using type = T;
 
      /// @brief Default constructor.
-     Vec(): vec_{} {}
-
-     /// @brief Copy constructor.
-     /// @param[in] other vector to be copied
-     Vec( const Vec& other ):
-          vec_{ other.vec_ }
-     {}
+     Vec() noexcept: vec_{ T{} } {}
 
      /// @brief Constructor for 2-dimensional vector.
      /// @param[in] v0 first element.
      /// @param[in] v1 second element.
      _16NAR_ENABLE_IF( N == 2 )
-     Vec( T v0, T v1 ):
+     Vec( T v0, T v1 ) noexcept:
           vec_{ v0, v1 }
      {}
 
@@ -60,7 +54,7 @@ public:
      /// @param[in] v1 second element.
      /// @param[in] v2 third element.
      _16NAR_ENABLE_IF( N == 3 )
-     Vec( T v0, T v1, T v2 ):
+     Vec( T v0, T v1, T v2 ) noexcept:
           vec_{ v0, v1, v2 }
      {}
 
@@ -70,13 +64,14 @@ public:
      /// @param[in] v2 third element.
      /// @param[in] v3 fourth element.
      _16NAR_ENABLE_IF( N == 4 )
-     Vec( T v0, T v1, T v2, T v3 ):
+     Vec( T v0, T v1, T v2, T v3 ) noexcept:
           vec_{ v0, v1, v2, v3 }
      {}
 
      /// @brief Copy assignment operator.
      /// @param[in] other vector to be copied.
-     inline Vec& operator=( const Vec& other )
+     /// @return reference to current object.
+     inline Vec& operator=( const Vec& other ) noexcept
      {
           vec_ = other.vec_;
           return *this;
@@ -84,7 +79,8 @@ public:
 
      /// @brief Assignment add operator.
      /// @param[in] other vector to be added.
-     inline Vec& operator+=( const Vec& other )
+     /// @return reference to current object.
+     inline Vec& operator+=( const Vec& other ) noexcept
      {
           vec_ += other.vec_;
           return *this;
@@ -92,7 +88,8 @@ public:
 
      /// @brief Assignment subtract operator.
      /// @param[in] other vector to be subtracted.
-     inline Vec& operator-=( const Vec& other )
+     /// @return reference to current object.
+     inline Vec& operator-=( const Vec& other ) noexcept
      {
           vec_ -= other.vec_;
           return *this;
@@ -100,95 +97,110 @@ public:
 
      /// @brief Assignment multiplication operator with scalar.
      /// @param[in] num scalar value.
-     inline Vec& operator*=( T num )
+     /// @return reference to current object.
+     inline Vec& operator*=( T num ) noexcept
      {
           vec_ *= num;
           return *this;
      }
 
      /// @brief Negate operator.
-     inline Vec operator-() const
+     /// @return negated vector.
+     inline Vec operator-() const noexcept
      {
           return Vec{ -vec_ };
      }
 
      /// @brief Subscription operator.
      /// @param[in] i index of element to get.
-     inline T& operator[]( std::size_t i )
+     /// @return i-th element.
+     inline T& operator[]( std::size_t i ) noexcept
      {
           return vec_[ static_cast< typename glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
      }
 
      /// @brief Subscription operator (const).
      /// @param[in] i index of element to get.
-     inline const T& operator[]( std::size_t i ) const
+     /// @return i-th element.
+     inline const T& operator[]( std::size_t i ) const noexcept
      {
           return vec_[ static_cast< typename glm::vec< N, T, glm::qualifier::defaultp >::length_type >( i ) ];
      }
 
      /// @brief Get element x.
-     inline T& x()
+     /// @return element x.
+     inline T& x() noexcept
      {
           return vec_.x;
      }
 
      /// @brief Get element x (const).
-     inline const T& x() const
+     /// @return element x.
+     inline const T& x() const noexcept
      {
           return vec_.x;
      }
 
      /// @brief Get element y.
-     inline T& y()
+     /// @return element y.
+     inline T& y() noexcept
      {
           return vec_.y;
      }
 
      /// @brief Get element y (const).
-     inline const T& y() const
+     /// @return element y.
+     inline const T& y() const noexcept
      {
           return vec_.y;
      }
 
      /// @brief Get element z.
-     _16NAR_ENABLE_IF( N > 2 ) inline T& z()
+     /// @return element z.
+     _16NAR_ENABLE_IF( N > 2 ) inline T& z() noexcept
      {
           return vec_.z;
      }
 
      /// @brief Get element z (const).
-     _16NAR_ENABLE_IF( N > 2 ) inline const T& z() const
+     /// @return element z.
+     _16NAR_ENABLE_IF( N > 2 ) inline const T& z() const noexcept
      {
           return vec_.z;
      }
 
      /// @brief Get element w.
-     _16NAR_ENABLE_IF( N > 3 ) inline T& w()
+     /// @return element w.
+     _16NAR_ENABLE_IF( N > 3 ) inline T& w() noexcept
      {
           return vec_.w;
      }
 
      /// @brief Get element w (const).
-     _16NAR_ENABLE_IF( N > 3 ) inline const T& w() const
+     /// @return element w.
+     _16NAR_ENABLE_IF( N > 3 ) inline const T& w() const noexcept
      {
           return vec_.w;
      }
 
      /// @brief Get underlying matrix data.
-     inline const T *data() const
+     /// @return underlying matrix data.
+     inline const T *data() const noexcept
      {
           return &vec_[ 0 ];
      }
 
      /// @brief Get length of the vector.
+     /// @return length of the vector.
      _16NAR_ENABLE_IF( std::is_floating_point< T >::value )
-     inline T length() const
+     inline T length() const noexcept
      {
           return glm::length( vec_ );
      }
 
      /// @brief Normalize a vector.
-     inline Vec normalize() const
+     /// @return normalized vector.
+     inline Vec normalize() const noexcept
      {
           return Vec{ glm::normalize( vec_ ) };
      }
@@ -196,25 +208,29 @@ public:
      /// @brief Check equality of vectors with given precision.
      /// @param[in] vec vector to check equality.
      /// @param[in] precision precision to compare with.
-     bool equals( const Vec& vec, float precision ) const;
+     /// @return true if vectors are equal with precision, false otherwise.
+     bool equals( const Vec& vec, float precision = 0.0f ) const noexcept;
 
      /// @brief Find distance to given vector.
      /// @param[in] vec vector to calculate distance.
-     inline T distance( const Vec& vec ) const
+     /// @return distance to given vector.
+     inline T distance( const Vec& vec ) const noexcept
      {
           return glm::distance( vec_, vec.vec_ );
      }
 
      /// @brief Find dot product of vectors.
      /// @param[in] vec vector.
-     inline T dot( const Vec& vec ) const
+     /// @return dot product of vectors.
+     inline T dot( const Vec& vec ) const noexcept
      {
           return glm::dot( vec_, vec.vec_ );
      }
 
      /// @brief Find cross product of vectors.
      /// @param[in] vec first vector.
-     _16NAR_ENABLE_IF( N == 3 ) inline Vec cross( const Vec& vec ) const
+     /// @return cross product of vectors.
+     _16NAR_ENABLE_IF( N == 3 ) inline Vec cross( const Vec& vec ) const noexcept
      {
           return Vec{ glm::cross( vec_, vec.vec_ ) };
      }
@@ -223,7 +239,7 @@ public:
      /// @param[in] incident vector of sight directed to the plane.
      /// @param[in] normal normal vector of the plane.
      /// @return self if dot( normal, incident ) < 0.0, -self otherwise.
-     inline Vec faceforward( const Vec& incident, const Vec& normal ) const
+     inline Vec faceforward( const Vec& incident, const Vec& normal ) const noexcept
      {
           return Vec{ glm::faceforward( vec_, incident.vec_, normal.vec_ ) };
      }
@@ -231,7 +247,7 @@ public:
      /// @brief Reflect vector from a plane defined by its normal.
      /// @param[in] normal normal of the plane (must be normalized).
      /// @return self - 2 * dot( normal, self ) * normal.
-     inline Vec reflect( const Vec& normal ) const
+     inline Vec reflect( const Vec& normal ) const noexcept
      {
           return Vec{ glm::reflect( vec_, normal.vec_ ) };
      }
@@ -239,17 +255,18 @@ public:
      /// @brief Refract vector.
      /// @param[in] normal normal to the plane of refraction (must be normalized).
      /// @param[in] eta ratio of indices of refraction (n1 / n2).
+     /// @return refracted vector.
      _16NAR_ENABLE_IF( std::is_floating_point< T >::value )
-     inline Vec refract( const Vec& normal, T eta ) const
+     inline Vec refract( const Vec& normal, T eta ) const noexcept
      {
           return Vec{ glm::refract( vec_, normal.vec_, eta ) };
      }
 
 private:
      /// @brief Constructor with inner vector representation.
-     /// @detail For inner use.
+     /// @details For inner use.
      /// @param[in] vec inner vector representation.
-     explicit Vec( const glm::vec< N, T, glm::qualifier::defaultp >& vec ) : vec_{ vec } {}
+     explicit Vec( const glm::vec< N, T, glm::qualifier::defaultp >& vec ) noexcept : vec_{ vec } {}
 
      glm::vec< N, T, glm::qualifier::defaultp > vec_;  ///< inner vector representation.
 }; // class Vec
@@ -260,8 +277,9 @@ private:
 /// @tparam T type of vectors' elements.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
+/// @return true if vectors are equal, false otherwise.
 template < std::size_t N, typename T >
-inline bool operator==( const Vec< N, T >& lhs, const Vec< N, T >& rhs );
+inline bool operator==( const Vec< N, T >& lhs, const Vec< N, T >& rhs ) noexcept;
 
 
 /// @brief Inverse comprasion operator for two vectors.
@@ -269,8 +287,9 @@ inline bool operator==( const Vec< N, T >& lhs, const Vec< N, T >& rhs );
 /// @tparam T type of vectors' elements.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
+/// @return true if vectors are not equal, false otherwise.
 template < std::size_t N, typename T >
-inline bool operator!=( const Vec< N, T >& lhs, const Vec< N, T >& rhs );
+inline bool operator!=( const Vec< N, T >& lhs, const Vec< N, T >& rhs ) noexcept;
 
 
 /// @brief Add operator.
@@ -278,8 +297,9 @@ inline bool operator!=( const Vec< N, T >& lhs, const Vec< N, T >& rhs );
 /// @tparam T type of vectors' elements.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
+/// @return sum of vectors.
 template < std::size_t N, typename T >
-inline Vec< N, T > operator+( const Vec< N, T >& lhs, const Vec< N, T >& rhs );
+inline Vec< N, T > operator+( const Vec< N, T >& lhs, const Vec< N, T >& rhs ) noexcept;
 
 
 /// @brief Subtract operator.
@@ -287,8 +307,9 @@ inline Vec< N, T > operator+( const Vec< N, T >& lhs, const Vec< N, T >& rhs );
 /// @tparam T type of vectors' elements.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
+/// @return difference of vectors.
 template < std::size_t N, typename T >
-inline Vec< N, T > operator-( const Vec< N, T >& lhs, const Vec< N, T >& rhs );
+inline Vec< N, T > operator-( const Vec< N, T >& lhs, const Vec< N, T >& rhs ) noexcept;
 
 
 /// @brief Multiplication by a scalar operator.
@@ -296,8 +317,9 @@ inline Vec< N, T > operator-( const Vec< N, T >& lhs, const Vec< N, T >& rhs );
 /// @tparam T type of vector's elements and scalar.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
+/// @return product of vector and scalar.
 template < std::size_t N, typename T >
-inline Vec< N, T > operator*( const Vec< N, T >& lhs, T rhs );
+inline Vec< N, T > operator*( const Vec< N, T >& lhs, T rhs ) noexcept;
 
 
 /// @brief Multiplication by a scalar operator.
@@ -305,8 +327,9 @@ inline Vec< N, T > operator*( const Vec< N, T >& lhs, T rhs );
 /// @tparam T type of vector's elements and scalar.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
+/// @return product of vector and scalar.
 template < std::size_t N, typename T >
-inline Vec< N, T > operator*( T lhs, const Vec< N, T >& rhs );
+inline Vec< N, T > operator*( T lhs, const Vec< N, T >& rhs ) noexcept;
 
 
 using Vec2f = Vec< 2, float >;

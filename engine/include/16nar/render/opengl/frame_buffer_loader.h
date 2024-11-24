@@ -25,6 +25,7 @@ public:
      /// @param[in] params parameters of framebuffer loading.
      /// @param[out] handler handler of the framebuffer.
      /// @return true on success, false otherwise.
+     /// @throws ResourceException.
      static bool load( const ResourceManagerMap& managers, const LoadParamsType& params, HandlerType& handler );
 
      /// @brief Unload framebuffer from OpenGL.

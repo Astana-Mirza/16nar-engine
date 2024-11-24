@@ -69,7 +69,7 @@ public:
 
      /// @brief Get root quadrant of this render system.
      /// @return Root quadrant of this render system (may be nullptr if not set).
-     Quadrant *get_root_quadrant() const;
+     Quadrant *get_root_quadrant() const noexcept;
 
 protected:
      /// @brief Check if the object fits in specified quadrant.

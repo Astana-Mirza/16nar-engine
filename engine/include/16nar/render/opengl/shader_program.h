@@ -14,37 +14,37 @@ class ShaderProgram : public IShaderProgram
 public:
      /// @brief Constructor.
      /// @param[in] descriptor descriptor of compiled and linked shader program.
-     ShaderProgram( unsigned int descriptor );
+     ShaderProgram( unsigned int descriptor ) noexcept;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, float value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, float value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, int)
-     virtual void set_uniform( std::string_view name, int value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, int) const noexcept
+     virtual void set_uniform( std::string_view name, int value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, bool)
-     virtual void set_uniform( std::string_view name, bool value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, bool) const noexcept
+     virtual void set_uniform( std::string_view name, bool value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec2i&)
-     virtual void set_uniform( std::string_view name, const Vec2i& value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec2i&) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec2i& value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec2f&)
-     virtual void set_uniform( std::string_view name, const Vec2f& value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec2f&) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec2f& value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec3i&)
-     virtual void set_uniform( std::string_view name, const Vec3i& value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec3i&) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec3i& value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec3f&)
-     virtual void set_uniform( std::string_view name, const Vec3f& value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec3f&) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec3f& value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec4i&)
-     virtual void set_uniform( std::string_view name, const Vec4i& value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec4i&) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec4i& value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec4f&)
-     virtual void set_uniform( std::string_view name, const Vec4f& value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, const Vec4f&) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec4f& value ) const noexcept override;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, const TransformMatrix&)
-     virtual void set_uniform( std::string_view name, const TransformMatrix& value ) const override;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, const TransformMatrix&) const noexcept
+     virtual void set_uniform( std::string_view name, const TransformMatrix& value ) const noexcept override;
 
 private:
      unsigned int descriptor_;          ///< descriptor of shader program.

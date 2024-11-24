@@ -13,10 +13,10 @@ class ENGINE_API FlatBuffersAssetWriter final : public IAssetWriter
 {
 public:
      /// @copydoc IFileOperator::get_file_ext() const noexcept
-     std::string get_file_ext() const noexcept override;
+     const char *get_file_ext() const noexcept override;
 
      /// @copydoc IFileOperator::get_pkg_ext() const noexcept
-     std::string get_pkg_ext() const noexcept override;
+     const char *get_pkg_ext() const noexcept override;
 
      /// @copydoc IAssetWriter::write_asset(std::ostream&, const ResourceData&)
      void write_asset( std::ostream& output, const ResourceData& resource ) override;

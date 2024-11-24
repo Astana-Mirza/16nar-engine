@@ -34,7 +34,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM( ProfileType, {
 } )
 
 
-GameConfig::GameConfig() noexcept:
+GameConfig::GameConfig():
      app_data_dir{ "." }, app_dir{ "." }, app_name{},
      render_api{ RenderApiType::Unknown },
      profile{ ProfileType::Unknown },

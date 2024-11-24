@@ -17,30 +17,30 @@ public:
      /// @param[in] pos position of the rectangle.
      /// @param[in] width witdh of the rectangle.
      /// @param[in] height height of the rectangle.
-     Rectangle( const Vec< 2, T >& pos, T width, T height ):
+     Rectangle( const Vec< 2, T >& pos, T width, T height ) noexcept:
           pos_{ pos }, width_{ width }, height_{ height } {}
 
-     /// @brief Copy constructor.
-     /// @param[in] other rectangle to be copied.
-     Rectangle( const Rectangle& other ):
-          pos_{ other.pos_ }, width_{ other.width_ }, height_{ other.height_ } {}
-
      /// @brief Get position of the rectangle.
-     inline const Vec< 2, T >& get_pos() const { return pos_; }
+     /// @return position of the rectangle.
+     inline const Vec< 2, T >& get_pos() const noexcept { return pos_; }
 
      /// @brief Get width of the rectangle.
-     inline T get_width() const { return width_; }
+     /// @return width of the rectangle.
+     inline T get_width() const noexcept { return width_; }
 
      /// @brief Get height of the rectangle.
-     inline T get_height() const { return height_; }
+     /// @return height of the rectangle.
+     inline T get_height() const noexcept { return height_; }
 
      /// @brief Check if rectangle contains point.
      /// @param[in] point point in space.
-     bool contains( const Vec< 2, T >& point ) const;
+     /// @return true if rectangle contains point, false otherwise.
+     bool contains( const Vec< 2, T >& point ) const noexcept;
 
      /// @brief Check if rectangle intersects with another one.
      /// @param[in] rect rectangle to check intersection.
-     bool intersects( const Rectangle& rect ) const;
+     /// @return true if rectangles intersect, false otherwise.
+     bool intersects( const Rectangle& rect ) const noexcept;
 
 private:
      Vec< 2, T > pos_;             ///< position of the rectangle.
@@ -53,16 +53,18 @@ private:
 /// @tparam T type of rectangles' coordinates.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
+/// @return true if rectangles are equal, false otherwise.
 template < typename T >
-bool operator==( const Rectangle< T >& lhs, const Rectangle< T >& rhs );
+bool operator==( const Rectangle< T >& lhs, const Rectangle< T >& rhs ) noexcept;
 
 
 /// @brief Inverse comprasion operator for two rectangles.
 /// @tparam T type of rectangles' coordinates.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
+/// @return true if rectangles are not equal, false otherwise.
 template < typename T >
-bool operator!=( const Rectangle< T >& lhs, const Rectangle< T >& rhs );
+bool operator!=( const Rectangle< T >& lhs, const Rectangle< T >& rhs ) noexcept;
 
 
 using FloatRect = Rectangle< float >;

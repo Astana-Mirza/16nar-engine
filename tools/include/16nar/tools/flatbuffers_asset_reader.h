@@ -13,10 +13,10 @@ class ENGINE_API FlatBuffersAssetReader final : public IAssetReader
 {
 public:
      /// @copydoc IFileOperator::get_file_ext() const noexcept
-     std::string get_file_ext() const noexcept override;
+     const char *get_file_ext() const noexcept override;
 
      /// @copydoc IFileOperator::get_pkg_ext() const noexcept
-     std::string get_pkg_ext() const noexcept override;
+     const char *get_pkg_ext() const noexcept override;
 
      /// @copydoc IAssetReader::read_asset(std::istream&)
      ResourceData read_asset( std::istream& input ) override;

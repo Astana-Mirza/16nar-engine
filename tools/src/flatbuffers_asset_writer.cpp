@@ -238,13 +238,13 @@ flatbuffers::Offset< _16nar::data::package::Resource > write_resource(
 namespace _16nar::tools
 {
 
-std::string FlatBuffersAssetWriter::get_file_ext() const noexcept
+const char *FlatBuffersAssetWriter::get_file_ext() const noexcept
 {
      return _16nar::data::package::ResourceExtension();
 }
 
 
-std::string FlatBuffersAssetWriter::get_pkg_ext() const noexcept
+const char *FlatBuffersAssetWriter::get_pkg_ext() const noexcept
 {
      return _16nar::data::package::PackageExtension();
 }

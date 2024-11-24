@@ -18,18 +18,18 @@ namespace _16nar
 struct ENGINE_API GameConfig
 {
      /// @brief Default constructor.
-     GameConfig() noexcept;
+     GameConfig();
 
      /// @brief Constructor.
      /// @details Ensures that all directories neccessary for application are created.
      /// @param[in] name name of the application.
-     /// @throws std::bad_alloc, std::runtime_error.
+     /// @throws std::runtime_error.
      GameConfig( const std::string& name );
 
      /// @brief Load configuration from JSON format.
      /// @param input input data stream.
      /// @return loaded configuration.
-     /// @throws std::bad_alloc, std::runtime_error.
+     /// @throws std::runtime_error.
      static GameConfig load_json( std::istream& input );
 
      /// @brief Get current application directory.
@@ -41,7 +41,7 @@ struct ENGINE_API GameConfig
      /// @details On Windows, returns %appdata%. On Linux, returns $XDG_DATA_HOME
      /// if this environment variable is set, $HOME/.local/share otherwise.
      /// @return common applications data directory.
-     /// @throws std::bad_alloc, std::runtime_error.
+     /// @throws std::runtime_error.
      static std::filesystem::path get_app_data_dir();
 
      std::string app_data_dir;               ///< path to directory with data used by application (current is default).

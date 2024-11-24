@@ -19,23 +19,22 @@ class StResourceManager : public IResourceManager
 public:
      /// @brief Constructor.
      /// @param[in] managers resource managers for access to related resources.
-     StResourceManager( const ResourceManagerMap& managers ) : managers_{ managers } {}
+     /// @throws std::bad_alloc.
+     StResourceManager( const ResourceManagerMap& managers );
 
      /// @brief Destructor, requests unload of all loaded resources.
      ~StResourceManager();
 
      /// @copydoc IResourceManager::load(const std::any&)
-     /// @details Throws ResourceException if unable to load a resource.
      virtual ResID load( const std::any& params ) override;
 
      /// @copydoc IResourceManager::unload(ResId)
-     /// @details Throws ResourceException if unable to unload a resource.
      virtual void unload( ResID id ) override;
 
      /// @copydoc IResourceManager::clear()
      virtual void clear() override;
 
-     /// @copydoc IResourceManager::get_handler(ResID)
+     /// @copydoc IResourceManager::get_handler(ResID) const
      virtual std::any get_handler( ResID id ) const override;
 
 private:

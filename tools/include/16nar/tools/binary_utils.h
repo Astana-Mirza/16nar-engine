@@ -14,7 +14,7 @@ namespace _16nar::tools
 /// @param[in] path path to file.
 /// @param[out] data_size size of read data.
 /// @param[in] zero_terminate does the data need to be zero terminated.
-/// @throw std::runtime_error if file does not exist.
+/// @throws std::runtime_error if file does not exist.
 /// @return pointer to read data.
 DataSharedPtr read_binary( const std::string& path,
      std::size_t& data_size, bool zero_terminate = false );
@@ -23,7 +23,7 @@ DataSharedPtr read_binary( const std::string& path,
 /// @param[in] path path to file.
 /// @param[in] data data to be written.
 /// @param[in] zero_terminated is the data zero terminated (in this case, last zero byte will not be written).
-/// @throw std::runtime_error if unable to open file.
+/// @throws std::runtime_error if unable to open file.
 /// @param[in] data_size size of read data.
 void write_binary( const std::string& path,
      DataSharedPtr data, std::size_t data_size, bool zero_terminated = false );
@@ -37,7 +37,7 @@ std::string correct_path( const std::string& base_dir, const std::string& path )
 
 /// @brief Get channel count used for the data format.
 /// @param[in] format data format.
-/// @throw std::runtime_error if format cannot be saved or loaded.
+/// @throws std::runtime_error if format cannot be saved or loaded.
 /// @return channel count used for the data format.
 int get_channel_count( BufferDataFormat format );
 

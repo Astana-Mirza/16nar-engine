@@ -50,7 +50,7 @@ public:
      };
 
      /// @brief Constructor with primary monitor.
-     /// @detail Throws runtime_error if no monitors were found.
+     /// @throws std::runtime_error if no monitors were found.
      Monitor();
 
      /// @brief Copy constructor.

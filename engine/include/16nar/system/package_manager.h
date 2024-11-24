@@ -21,37 +21,41 @@ class IRenderApi;
 /// @brief Class for control over resource packages.
 /// @details Game object must contain render API in order to use this class.
 /// Render API is used to load grapthical resources. If it is not set, the
-/// application will terminate.
-class PackageManager
+/// application will fail.
+class ENGINE_API PackageManager
 {
 public:
      /// @brief Constructor.
      /// @param[in] reader asset reader.
      PackageManager( std::unique_ptr< tools::IAssetReader >&& reader );
 
-     /// @brief Destructor.
+     /// @brief Destructor, unloads all packages.
      ~PackageManager();
 
      /// @brief Load resource package and create all its resources.
      /// @details Package can be packed into single file.
      /// If package is unpacked, then resources should be in directory with same name.
+     /// If load of a resource from a package fails, then all previously loaded resources
+     /// from this package should be unloaded. If this unload fails (exception is thrown
+     /// by render API), it will not be caught here, because it means something bad happened.
      /// @param[in] filename path to resource package file or directory.
      /// @return true if package is loaded successfully, false otherwise.
-     bool load_package( std::string_view name ) noexcept;
+     bool load_package( const std::string& name );
 
      /// @brief Unload resource package and all its resources.
+     /// @details Unload may throw, exception is not caught in this function.
      /// @param[in] filename path to resource package file.
-     void unload_package( std::string_view name ) noexcept;
+     void unload_package( const std::string& name );
 
      /// @brief Check if given package is loaded.
      /// @param[in] name name of package file.
      /// @return true if package is loaded, false otherwise.
-     bool is_package_loaded( std::string_view name ) const noexcept;
+     bool is_package_loaded( const std::string& name ) const;
 
      /// @brief Check if given resource is loaded.
      /// @param[in] name name of resource.
      /// @return true if resource is loaded, false otherwise.
-     bool is_resource_loaded( std::string_view name ) const noexcept;
+     bool is_resource_loaded( const std::string& name ) const;
 
      /// @brief Set unpacked mode of package loading.
      /// @param[in] mode true if packages' resources stored in separate files, false otherwise.
@@ -59,15 +63,17 @@ public:
 
      /// @brief Set directory containing resource packages.
      /// @param[in] dirname path to directory.
-     void set_package_dir( std::string_view dirname ) noexcept;
+     /// @throws std::bad_alloc.
+     void set_package_dir( const std::string& dirname );
 
      /// @brief Get loaded resource.
      /// @param[in] name name of resource.
      /// @return valid resource if it exists, empty resource otherwise.
-     Resource get_resource( std::string_view name ) const noexcept;
+     Resource get_resource( const std::string& name ) const;
 
      /// @brief Release all saved information.
-     void clear() noexcept;
+     /// @details Unload may throw, exception is not caught in this function.
+     void clear();
 
 private:
      /// @brief Pointer to abstract asset reader.
@@ -84,7 +90,7 @@ private:
      /// from files in it. It is intended for usage in debug builds.
      /// @param[in] filename path to resource package directory.
      /// @return true if package is loaded successfully, false otherwise.
-     bool load_unpacked( std::string_view dirname ) noexcept;
+     bool load_unpacked( const std::string& dirname );
 
 private:
      ResourceMap resources_;                      ///< all currently loaded resources.

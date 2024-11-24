@@ -36,19 +36,19 @@ public:
 
      /// @brief Get this quadrant's area.
      /// @return This quadrant's area.
-     const FloatRect& get_area() const;
+     const FloatRect& get_area() const noexcept;
 
      /// @brief Get this quadrant's children quadrants.
      /// @return This quadrant's children quadrants.
-     const QuadArray& get_children() const;
+     const QuadArray& get_children() const noexcept;
 
      /// @brief Get all drawable objects in this quadrant.
      /// @return All drawable objects in this quadrant.
-     const DrawableSet& get_draw_children() const;
+     const DrawableSet& get_draw_children() const noexcept;
 
      /// @brief Get this quadrant's parent.
      /// @return This quadrant's parent quadrant.
-     Quadrant *get_parent() const;
+     Quadrant *get_parent() const noexcept;
 
      /// @brief Add a child quadrant at given index.
      /// @param[in] child pointer to child quadrant to be added.

@@ -2,6 +2,7 @@
 
 #include <16nar/render/irender_api.h>
 #include <16nar/logger/logger.h>
+#include <16nar/system/exceptions.h>
 #include <16nar/game.h>
 
 #include <16nar/gen/package_generated.h>
@@ -26,7 +27,7 @@ PackageManager::~PackageManager()
 }
 
 
-bool PackageManager::load_package( std::string_view name ) noexcept
+bool PackageManager::load_package( const std::string& name )
 {
      if ( is_package_loaded( name ) )
      {
@@ -39,11 +40,10 @@ bool PackageManager::load_package( std::string_view name ) noexcept
      }
 
      LOG_16NAR_DEBUG( "Loading package '" << name << "'..." );
-     std::string pkg_name{ name };
      std::string path{ name };
      if ( !pkg_dir_.empty() )
      {
-          path = ( std::filesystem::path{ pkg_dir_ } / ( pkg_name + "." + reader_->get_pkg_ext() ) ).string();
+          path = ( std::filesystem::path{ pkg_dir_ } / ( name + "." + reader_->get_pkg_ext() ) ).string();
      }
      std::ifstream ifs{ path, std::ios_base::in | std::ios_base::binary };
      if ( !ifs.is_open() )
@@ -61,7 +61,7 @@ bool PackageManager::load_package( std::string_view name ) noexcept
      }
      catch ( const std::exception& ex )
      {
-          LOG_16NAR_ERROR( "Error loading package '" << pkg_name
+          LOG_16NAR_ERROR( "Error loading package '" << name
                << "': " << ex.what() );
           return false;
      }
@@ -71,7 +71,7 @@ bool PackageManager::load_package( std::string_view name ) noexcept
           if ( loaded.find( load_data.name ) != loaded.cend() )
           {
                LOG_16NAR_ERROR( "Asset '" << load_data.name << "' from package '"
-                    << pkg_name << "' has duplicate name" );
+                    << name << "' has duplicate name" );
                ok = false;
                break;
           }
@@ -80,46 +80,46 @@ bool PackageManager::load_package( std::string_view name ) noexcept
           {
                resource = render_api.load( load_data.type, load_data.params );
           }
-          catch ( const std::exception& ex )
+          catch ( const ResourceException& ex )
           {
                LOG_16NAR_ERROR( "Error loading asset '" << load_data.name << "' from package '"
-                    << pkg_name << "': " << ex.what() );
+                    << name << "': " << ex.what() );
                ok = false;
                break;
           }
-          std::string full_name = pkg_name + "/" + load_data.name;
+          std::string full_name = name + "/" + load_data.name;
           auto [ new_iter, insert_ok ] = loaded.emplace( full_name, resource );
           if ( !insert_ok )
           {
                LOG_16NAR_ERROR( "Asset '" << load_data.name << "' from package '"
-                    << pkg_name << "' cannot be saved" );
+                    << name << "' cannot be saved" );
                render_api.unload( resource );
                ok = false;
                break;
           }
           if ( !loaded_names.emplace( resource, new_iter ).second )
           {
-               LOG_16NAR_ERROR( "Asset '" << load_data.name << "' from package '"
-                    << pkg_name << "' cannot be saved" );
+               LOG_16NAR_ERROR( "Asset name '" << load_data.name << "' from package '"
+                    << name << "' cannot be saved" );
                // unload will happen later because ok is false
                ok = false;
                break;
           }
      }
-     if ( ok && !packages_.emplace( pkg_name ).second )
+     if ( ok && !packages_.emplace( name ).second )
      {
-          LOG_16NAR_ERROR( "Package '" << pkg_name << "' cannot be saved" );
+          LOG_16NAR_ERROR( "Package '" << name << "' cannot be saved" );
           ok = false;
      }
      if ( ok )
      {
           resources_.merge( loaded );
           names_.merge( loaded_names );
-          LOG_16NAR_INFO( "Package '" << pkg_name << "' loaded successfully" );
+          LOG_16NAR_INFO( "Package '" << name << "' loaded successfully" );
      }
      else
      {
-          LOG_16NAR_ERROR( "Cannot load package '" << pkg_name << "'" );
+          LOG_16NAR_ERROR( "Cannot load package '" << name << "'" );
           for ( const auto& res : loaded )
           {
                render_api.unload( res.second );
@@ -129,15 +129,15 @@ bool PackageManager::load_package( std::string_view name ) noexcept
 }
 
 
-void PackageManager::unload_package( std::string_view name ) noexcept
+void PackageManager::unload_package( const std::string& name )
 {
      LOG_16NAR_DEBUG( "Unloading package '" << name << "'..." );
-     auto pkg_iter = packages_.find( std::string{ name } );
+     auto pkg_iter = packages_.find( name );
      if ( pkg_iter == packages_.cend() )
      {
           return;
      }
-     std::string prefix = std::string{ name } + '/';
+     std::string prefix = name + '/';
      auto& render_api = get_game().get_render_api();
      for ( auto iter = resources_.cbegin(); iter != resources_.cend(); /* skip ++iter due to erase */ )
      {
@@ -157,15 +157,15 @@ void PackageManager::unload_package( std::string_view name ) noexcept
 }
 
 
-bool PackageManager::is_package_loaded( std::string_view name ) const noexcept
+bool PackageManager::is_package_loaded( const std::string& name ) const
 {
-     return packages_.find( std::string{ name } ) != packages_.cend();
+     return packages_.find( name ) != packages_.cend();
 }
 
 
-bool PackageManager::is_resource_loaded( std::string_view name ) const noexcept
+bool PackageManager::is_resource_loaded( const std::string& name ) const
 {
-     return resources_.find( std::string{ name } ) != resources_.cend();
+     return resources_.find( name ) != resources_.cend();
 }
 
 
@@ -175,15 +175,15 @@ void PackageManager::set_unpacked_mode( bool mode ) noexcept
 }
 
 
-void PackageManager::set_package_dir( std::string_view dirname ) noexcept
+void PackageManager::set_package_dir( const std::string& dirname )
 {
      pkg_dir_ = dirname;
 }
 
 
-Resource PackageManager::get_resource( std::string_view name ) const noexcept
+Resource PackageManager::get_resource( const std::string& name ) const
 {
-     auto iter = resources_.find( std::string{ name } );
+     auto iter = resources_.find( name );
      if ( iter == resources_.cend() )
      {
           LOG_16NAR_ERROR( "No such resource '" << name << "'" );
@@ -193,7 +193,7 @@ Resource PackageManager::get_resource( std::string_view name ) const noexcept
 }
 
 
-void PackageManager::clear() noexcept
+void PackageManager::clear()
 {
      if ( resources_.empty() && names_.empty()
           && packages_.empty() && pkg_dir_.empty() )
@@ -215,18 +215,17 @@ void PackageManager::clear() noexcept
 }
 
 
-bool PackageManager::load_unpacked( std::string_view dirname ) noexcept
+bool PackageManager::load_unpacked( const std::string& dirname )
 {
      LOG_16NAR_DEBUG( "Loading package '" << dirname << "' (unpacked)..." );
      bool ok = true;
-     std::string pkg_name{ dirname };
      ResourceMap loaded;
      NameMap loaded_names;
      auto& render_api = get_game().get_render_api();
      std::string path{ dirname };
      if ( !pkg_dir_.empty() )
      {
-          path = ( std::filesystem::path{ pkg_dir_ } / pkg_name ).string();
+          path = ( std::filesystem::path{ pkg_dir_ } / dirname ).string();
      }
      for ( const auto& dir_entry : std::filesystem::directory_iterator{ path } )
      {
@@ -239,7 +238,7 @@ bool PackageManager::load_unpacked( std::string_view dirname ) noexcept
           if ( !ifs.is_open() )
           {
                LOG_16NAR_ERROR( "Cannot open asset '" << dir_entry.path()
-                    << "' during loading package '" << pkg_name << "'" );
+                    << "' during loading package '" << dirname << "'" );
                ok = false;
                break;
           }
@@ -249,28 +248,38 @@ bool PackageManager::load_unpacked( std::string_view dirname ) noexcept
           try
           {
                load_data = reader_->read_asset( ifs );
-               if ( loaded.find( load_data.name ) != loaded.cend() )
-               {
-                    LOG_16NAR_ERROR( "Asset '" << dir_entry.path() << "' from package '"
-                         << pkg_name << "' has duplicate name" );
-                    ok = false;
-                    break;
-               }
-               resource = render_api.load( load_data.type, load_data.params );
           }
           catch ( const std::exception& ex )
           {
                LOG_16NAR_ERROR( "Cannot load asset '" << dir_entry.path()
-                    << "' from package '" << pkg_name << "': " << ex.what() );
+                    << "' from package '" << dirname << "': " << ex.what() );
                ok = false;
                break;
           }
-          std::string full_path = pkg_name + '/' + load_data.name;
+          if ( loaded.find( load_data.name ) != loaded.cend() )
+          {
+               LOG_16NAR_ERROR( "Asset '" << dir_entry.path() << "' from package '"
+                    << dirname << "' has duplicate name" );
+               ok = false;
+               break;
+          }
+          try
+          {
+               resource = render_api.load( load_data.type, load_data.params );
+          }
+          catch ( const ResourceException& ex )
+          {
+               LOG_16NAR_ERROR( "Error loading asset '" << load_data.name << "' from package '"
+                    << dirname << "': " << ex.what() );
+               ok = false;
+               break;
+          }
+          std::string full_path = dirname + '/' + load_data.name;
           auto [ new_iter, insert_ok ] = loaded.emplace( full_path, resource );
           if ( !insert_ok )
           {
                LOG_16NAR_ERROR( "Asset '" << load_data.name << "' from package '"
-                    << pkg_name << "' cannot be saved" );
+                    << dirname << "' cannot be saved" );
                render_api.unload( resource );
                ok = false;
                break;
@@ -278,26 +287,26 @@ bool PackageManager::load_unpacked( std::string_view dirname ) noexcept
           if ( !loaded_names.emplace( resource, new_iter ).second )
           {
                LOG_16NAR_ERROR( "Asset '" << load_data.name << "' from package '"
-                    << pkg_name << "' cannot be saved" );
+                    << dirname << "' cannot be saved" );
                // unload will happen later because ok is false
                ok = false;
                break;
           }
      }
-     if ( ok && !packages_.emplace( pkg_name ).second )
+     if ( ok && !packages_.emplace( dirname ).second )
      {
-          LOG_16NAR_ERROR( "Package '" << pkg_name << "' cannot be saved" );
+          LOG_16NAR_ERROR( "Package '" << dirname << "' cannot be saved" );
           ok = false;
      }
      if ( ok )
      {
           resources_.merge( loaded );
           names_.merge( loaded_names );
-          LOG_16NAR_INFO( "Package '" << pkg_name << "' (unpacked) loaded successfully" );
+          LOG_16NAR_INFO( "Package '" << dirname << "' (unpacked) loaded successfully" );
      }
      else
      {
-          LOG_16NAR_ERROR( "Cannot load package '" << pkg_name << "'" );
+          LOG_16NAR_ERROR( "Cannot load package '" << dirname << "'" );
           for ( const auto& res : loaded )
           {
                render_api.unload( res.second );

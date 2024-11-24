@@ -61,8 +61,9 @@ void QTreeRenderSystem::select_objects()
 
 void QTreeRenderSystem::draw_objects()
 {
-     get_game().get_render_api().process();
-     get_game().get_render_api().end_frame();
+     auto& render_api = get_game().get_render_api();
+     render_api.process();
+     render_api.end_frame();
      get_game().get_window().swap_buffers();
      current_shader_ = 0;
 }
@@ -150,7 +151,7 @@ void QTreeRenderSystem::set_root_quadrant( std::unique_ptr< Quadrant >&& root )
 }
 
 
-Quadrant *QTreeRenderSystem::get_root_quadrant() const
+Quadrant *QTreeRenderSystem::get_root_quadrant() const noexcept
 {
      return root_.get();
 }

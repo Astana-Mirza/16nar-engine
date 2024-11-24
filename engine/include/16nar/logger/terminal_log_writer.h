@@ -14,7 +14,7 @@ class ENGINE_API TerminalLogWriter : public BaseLogWriter
 public:
      /// @brief Constructor.
      /// @param[in] colorized should the output be colorized.
-     TerminalLogWriter( bool colorized = true );
+     TerminalLogWriter( bool colorized = true ) noexcept;
 
      /// @copydoc ILogWriter::write(ILogWriter::LogLevel,std::string_view)
      virtual void write( ILogWriter::LogLevel level, std::string_view str ) override;

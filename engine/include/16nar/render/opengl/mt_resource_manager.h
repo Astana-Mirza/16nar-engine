@@ -32,32 +32,37 @@ class MtResourceManager : public IResourceManager
 public:
      /// @brief Constructor.
      /// @param[in] managers resource managers for access to related resources.
-     MtResourceManager( const ResourceManagerMap& managers ) : managers_{ managers } {}
+     MtResourceManager( const ResourceManagerMap& managers );
 
      /// @brief Destructor, requests unload of all loaded resources.
      ~MtResourceManager();
 
-     /// @copydoc IResourceManager::load(const std::any&)
+     /// @brief Implementation of @ref IResourceManager::load(const std::any&)
      /// @details The resource will be loaded during render processing, so
      /// due to game loop the load is not made immediately,
      /// but request is saved and its ID is given.
+     /// @param[in] params resource load params.
+     /// @throws ResourceException, ExceededIdException.
+     /// @return resource identifier.
      virtual ResID load( const std::any& params ) override;
 
-     /// @copydoc IResourceManager::unload(ResId)
+     /// @brief Implementation of @ref IResourceManager::unload(ResId)
+     /// @details The resource will be loaded during render processing, so
+     /// due to game loop the load is not made immediately, but request is saved.
      virtual void unload( ResID id ) override;
 
      /// @copydoc IResourceManager::clear()
      virtual void clear() override;
 
-     /// @copydoc IResourceManager::get_handler(ResID)
+     /// @copydoc IResourceManager::get_handler(ResID) const
      virtual std::any get_handler( ResID id ) const override;
 
-     /// @copydoc IResourceManager::process_load_queue()
-     /// @details Throws ResourceException if unable to load a resource.
+     /// @brief Process all requests in load queue.
+     /// @throws ResourceException, ExceededIdException.
      virtual void process_load_queue() override;
 
-     /// @copydoc IResourceManager::process_unload_queue()
-     /// @details Throws ResourceException if unable to unload a resource.
+     /// @brief Process all requests in unload queue.
+     /// @throws ResourceException.
      virtual void process_unload_queue() override;
 
      /// @copydoc IResourceManager::end_frame()
@@ -77,8 +82,8 @@ private:
      std::array< std::queue< Request >, _16nar_saved_frames > load_queue_; ///< requests to load resources.
      std::array< std::queue< ResID >, _16nar_saved_frames > unload_queue_; ///< requests to unload resources.
      const ResourceManagerMap& managers_;                                  ///< resource managers for access to related resources.
-     ResID next_ = 1;                                                      ///< next ID to be assigned.
-     std::atomic_size_t frame_index_ = 0;                                  ///< index of the frame being rendered.
+     ResID next_;                                                          ///< next ID to be assigned.
+     std::atomic_size_t frame_index_;                                      ///< index of the frame being rendered.
 };
 
 } // namespace _16nar::opengl

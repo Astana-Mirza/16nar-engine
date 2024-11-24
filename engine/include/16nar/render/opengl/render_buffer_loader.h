@@ -24,7 +24,8 @@ public:
      /// @param[in] params parameters of render buffer loading.
      /// @param[out] handler handler of the render buffer.
      /// @return true on success, false otherwise.handler
-     static bool load( const ResourceManagerMap&, const LoadParamsType& params, HandlerType& handler );
+     static bool load( const ResourceManagerMap&,
+          const LoadParamsType& params, HandlerType& handler );
 
      /// @brief Unload render buffer from OpenGL.
      /// @param[in] handler handler of the render buffer.

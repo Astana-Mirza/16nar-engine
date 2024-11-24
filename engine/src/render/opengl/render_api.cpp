@@ -94,22 +94,14 @@ void RenderApi::unload( const Resource& resource )
 }
 
 
-IRenderDevice& RenderApi::get_device() const
+IRenderDevice& RenderApi::get_device() const noexcept
 {
-     if ( !device_ )
-     {
-          throw std::runtime_error{ "render device is not set" };
-     }
      return *device_;
 }
 
 
 void RenderApi::process()
 {
-     if ( !device_ )
-     {
-          throw std::runtime_error{ "render device is not set" };
-     }
      for ( auto& pair : managers_ )
      {
           if ( pair.first != ResourceType::FrameBuffer )
@@ -130,10 +122,6 @@ void RenderApi::process()
 
 void RenderApi::end_frame()
 {
-     if ( !device_ )
-     {
-          throw std::runtime_error{ "render device is not set" };
-     }
      for ( auto& pair : managers_ )
      {
           pair.second->end_frame();

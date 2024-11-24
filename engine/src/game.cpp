@@ -52,29 +52,22 @@ bool Game::initialized_ = false;
 GameConfig Game::config_{};
 
 
-Game::Game() noexcept:
+Game::Game():
      pkg_manager_{},
      profile_{},
      render_api_{},
      scene_reader_{},
      window_{}
 {
-     // call for correct initialization order
-     Logger::instance().log( ILogWriter::LogLevel::Debug, "Creating game object" );
-     try
-     {
-          init();   // initialize with default config, if not initialized earlier.
+     init();   // initialize with default config, if not initialized earlier.
 
-          pkg_manager_ = std::make_unique< PackageManager >( create_asset_reader(
-               config_.app_dir, config_.resources_format ) );
-          pkg_manager_->set_package_dir( config_.app_dir );
-          pkg_manager_->set_unpacked_mode( config_.resources_unpacked );
-     }
-     catch ( const std::exception& ex )
-     {
-          LOG_16NAR_ERROR( "Error: " << ex.what() );
-          deinit();
-     }
+     // call for correct initialization order
+     Logger::instance().log( ILogWriter::LogLevel::Info, "creating game object" );
+
+     pkg_manager_ = std::make_unique< PackageManager >( create_asset_reader(
+          config_.app_dir, config_.resources_format ) );
+     pkg_manager_->set_package_dir( config_.app_dir );
+     pkg_manager_->set_unpacked_mode( config_.resources_unpacked );
 }
 
 
@@ -85,7 +78,7 @@ Game::~Game()
 }
 
 
-void Game::finalize() noexcept
+void Game::finalize()
 {
      pkg_manager_.reset();
      scene_reader_.reset();
@@ -119,7 +112,7 @@ void Game::set_profile( std::unique_ptr< IProfile >&& profile ) noexcept
 }
 
 
-Game& Game::instance() noexcept
+Game& Game::instance()
 {
      static Game instance_{};
      return instance_;
@@ -153,7 +146,7 @@ void Game::init( const GameConfig& config )
 }
 
 
-void Game::deinit() noexcept
+void Game::deinit()
 {
      if ( !initialized_ )
      {
@@ -173,44 +166,24 @@ const GameConfig& Game::get_config() const noexcept
 
 IRenderApi& Game::get_render_api() noexcept
 {
-     if ( !render_api_ )
-     {
-          LOG_16NAR_ERROR( "game has no render API" );
-          std::terminate();
-     }
      return *render_api_;
 }
 
 
 Window& Game::get_window() noexcept
 {
-     if ( !window_ )
-     {
-          LOG_16NAR_ERROR( "game has no window" );
-          std::terminate();
-     }
      return *window_;
 }
 
 
 ISceneReader& Game::get_scene_reader() noexcept
 {
-     if ( !scene_reader_ )
-     {
-          LOG_16NAR_ERROR( "game has no scene reader" );
-          std::terminate();
-     }
      return *scene_reader_;
 }
 
 
 PackageManager& Game::get_pkg_manager() noexcept
 {
-     if ( !pkg_manager_ )
-     {
-          LOG_16NAR_ERROR( "game has no package manager" );
-          std::terminate();
-     }
      return *pkg_manager_;
 }
 

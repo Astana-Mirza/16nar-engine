@@ -8,6 +8,13 @@ namespace _16nar::opengl
 {
 
 template < typename T >
+MtResourceManager< T >::MtResourceManager( const ResourceManagerMap& managers ):
+     resources_{}, load_queue_{}, unload_queue_{}, managers_{ managers },
+     next_{ 1 }, frame_index_{ 0 }
+{}
+
+
+template < typename T >
 MtResourceManager< T >::~MtResourceManager()
 {
      clear();
@@ -17,9 +24,18 @@ MtResourceManager< T >::~MtResourceManager()
 template < typename T >
 ResID MtResourceManager< T >::load( const std::any& params )
 {
+     const auto *params_ptr = std::any_cast< LoadParamsType >( &params );
+     if ( !params_ptr )
+     {
+          throw ResourceException{ "wrong resource load parameters" };
+     }
      ResID id = next_++;
+     if ( id == ResID{} )     // overflow
+     {
+          throw ExceededIdException{};
+     }
      size_t next_index = ( frame_index_ + 1 ) % _16nar_saved_frames;
-     load_queue_[ next_index ].push( std::make_pair( id, std::any_cast< const LoadParamsType& >( params ) ) );
+     load_queue_[ next_index ].push( std::make_pair( id, *params_ptr ) );
      return id;
 }
 

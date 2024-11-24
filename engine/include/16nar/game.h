@@ -29,17 +29,17 @@ public:
      /// execution of this function. So it is recommended to initialize the game
      /// before creation of instance if one needs to check errors.
      /// @return Singleton game object.
-     static Game& instance() noexcept;
+     static Game& instance();
 
      /// @brief Initialize engine, must be called before any function in engine.
      /// @details Does nothing if engine is already initialized. It is called in Game constructor.
      /// @param[in] config config used to initialize the engine.
-     /// @throws std::bad_alloc, std::runtime_error.
+     /// @throws std::runtime_error.
      static void init( const GameConfig& config = {} );
 
      /// @brief Deinitialize engine, no engine functions must be called after this one.
      /// @details Does nothing if engine is already deinitialized. It is called in Game destructor.
-     static void deinit() noexcept;
+     static void deinit();
 
      /// @brief Destructor.
      ~Game();
@@ -47,7 +47,7 @@ public:
      /// @brief Release all game resources.
      /// @details No game logic must be executed after this function.
      /// Not intended to be called by user.
-     void finalize() noexcept;
+     void finalize();
 
      /// @brief Set render API of the game.
      /// @param[in] render_api render API object.
@@ -71,14 +71,17 @@ public:
 
      /// @brief Get render API of the game.
      /// @return render API of the game.
+     /// @details The application will fail if render API is not set when calling this function.
      IRenderApi& get_render_api() noexcept;
 
      /// @brief Get window of the game.
      /// @return window of the game.
+     /// @details The application will fail if window is not set when calling this function.
      Window& get_window() noexcept;
 
      /// @brief Get reader of the game's scenes.
      /// @return reader of the game's scenes.
+     /// @details The application will fail if scene reader is not set when calling this function.
      ISceneReader& get_scene_reader() noexcept;
 
      /// @brief Get package manager of the game.
@@ -90,7 +93,7 @@ private:
      void operator=( const Game& )     = delete;
 
      /// @brief Constructor.
-     Game() noexcept;
+     Game();
 
 private:
      static bool initialized_;                         ///< engine initialization status.
@@ -105,7 +108,7 @@ private:
 
 
 /// @brief Equivalent of @ref Game::instance()
-inline Game& get_game() noexcept
+inline Game& get_game()
 {
      return Game::instance();
 }

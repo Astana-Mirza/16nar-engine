@@ -6,7 +6,7 @@
 namespace _16nar
 {
 
-TerminalLogWriter::TerminalLogWriter( bool colorized ):
+TerminalLogWriter::TerminalLogWriter( bool colorized ) noexcept:
      colorized_{ colorized }
 {}
 

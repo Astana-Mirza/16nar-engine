@@ -7,7 +7,7 @@ namespace _16nar
 {
 
 template < std::size_t N, typename T >
-inline bool operator==( const Vec< N, T >& lhs, const Vec< N, T >& rhs )
+inline bool operator==( const Vec< N, T >& lhs, const Vec< N, T >& rhs ) noexcept
 {
      for ( std::size_t i = 0; i < N; i++ )
      {
@@ -21,14 +21,14 @@ inline bool operator==( const Vec< N, T >& lhs, const Vec< N, T >& rhs )
 
 
 template < std::size_t N, typename T >
-inline bool operator!=( const Vec< N, T >& lhs, const Vec< N, T >& rhs )
+inline bool operator!=( const Vec< N, T >& lhs, const Vec< N, T >& rhs ) noexcept
 {
      return !( lhs == rhs );
 }
 
 
 template < std::size_t N, typename T >
-bool Vec< N, T >::equals( const Vec< N, T >& vec, float precision ) const
+bool Vec< N, T >::equals( const Vec< N, T >& vec, float precision ) const noexcept
 {
      for ( std::size_t i = 0; i < N; i++ )
      {
@@ -42,7 +42,7 @@ bool Vec< N, T >::equals( const Vec< N, T >& vec, float precision ) const
 
 
 template < std::size_t N, typename T >
-inline Vec< N, T > operator+( const Vec< N, T >& lhs, const Vec< N, T >& rhs )
+inline Vec< N, T > operator+( const Vec< N, T >& lhs, const Vec< N, T >& rhs ) noexcept
 {
      auto result = lhs;
      result += rhs;
@@ -51,7 +51,7 @@ inline Vec< N, T > operator+( const Vec< N, T >& lhs, const Vec< N, T >& rhs )
 
 
 template < std::size_t N, typename T >
-inline Vec< N, T > operator-( const Vec< N, T >& lhs, const Vec< N, T >& rhs )
+inline Vec< N, T > operator-( const Vec< N, T >& lhs, const Vec< N, T >& rhs ) noexcept
 {
      auto result = lhs;
      result -= rhs;
@@ -60,7 +60,7 @@ inline Vec< N, T > operator-( const Vec< N, T >& lhs, const Vec< N, T >& rhs )
 
 
 template < std::size_t N, typename T >
-inline Vec< N, T > operator*( const Vec< N, T >& lhs, T rhs )
+inline Vec< N, T > operator*( const Vec< N, T >& lhs, T rhs ) noexcept
 {
     auto result = lhs;
     result *= rhs;
@@ -69,7 +69,7 @@ inline Vec< N, T > operator*( const Vec< N, T >& lhs, T rhs )
 
 
 template < std::size_t N, typename T >
-inline Vec< N, T > operator*( T lhs, const Vec< N, T >& rhs )
+inline Vec< N, T > operator*( T lhs, const Vec< N, T >& rhs ) noexcept
 {
      auto result = rhs;
      result *= lhs;

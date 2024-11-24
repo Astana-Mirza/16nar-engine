@@ -22,13 +22,13 @@ public:
      /// @brief Read single asset data.
      /// @param[in] input input data stream.
      /// @return resource read from data stream.
-     /// @throw std::exception and its derivatives.
+     /// @throws std::exception and its derivatives.
      virtual ResourceData read_asset( std::istream& input ) = 0;
 
      /// @brief Read package data with multiple assets.
      /// @param[in] input input data stream.
      /// @return package read from data stream.
-     /// @throw std::exception and its derivatives.
+     /// @throws std::exception and its derivatives.
      virtual PackageData read_package( std::istream& input ) = 0;
 };
 

@@ -21,6 +21,7 @@ class ENGINE_API RenderApi : public IRenderApi
 public:
      /// @brief Constructor.
      /// @param[in] profile type of profile used in application.
+     /// @throws std::runtime_error.
      RenderApi( ProfileType profile );
 
      /// @copydoc IRenderApi::load(ResourceType, const std::any&)
@@ -29,8 +30,8 @@ public:
      /// @copydoc IRenderApi::unload(const Resource&)
      virtual void unload( const Resource& resource ) override;
 
-     /// @copydoc IRenderApi::get_device()
-     virtual IRenderDevice& get_device() const override;
+     /// @copydoc IRenderApi::get_device() const noexcept
+     virtual IRenderDevice& get_device() const noexcept override;
 
      /// @copydoc IRenderApi::process()
      virtual void process() override;

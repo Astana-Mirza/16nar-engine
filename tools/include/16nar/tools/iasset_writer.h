@@ -22,13 +22,13 @@ public:
      /// @brief Write single asset data.
      /// @param[in] output output data stream.
      /// @param[in] resource resource to be written to data stream.
-     /// @throw std::exception and its derivatives.
+     /// @throws std::exception and its derivatives.
      virtual void write_asset( std::ostream& output, const ResourceData& resource ) = 0;
 
      /// @brief Write package data with multiple assets.
      /// @param[in] output output data stream.
      /// @param[in] package package to be written to data stream.
-     /// @throw std::exception and its derivatives.
+     /// @throws std::exception and its derivatives.
      virtual void write_package( std::ostream& output, const PackageData& package ) = 0;
 };
 

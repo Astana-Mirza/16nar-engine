@@ -22,39 +22,39 @@ class ENGINE_API IShaderProgram
 {
 public:
      /// @brief Default virtual destructor.
-     virtual ~IShaderProgram() = default;
+     virtual ~IShaderProgram() noexcept = default;
 
      /// @brief Set value of the uniform.
      /// @param[in] name name of the uniform.
      /// @param[in] value value of the uniform.
-     virtual void set_uniform( std::string_view name, float value ) const = 0;
+     virtual void set_uniform( std::string_view name, float value ) const noexcept = 0;
+
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, int value ) const noexcept = 0;
 
      /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, int value ) const = 0;
+     virtual void set_uniform( std::string_view name, bool value ) const noexcept = 0;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, bool value ) const = 0;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec2i& value ) const noexcept = 0;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, const Vec2i& value ) const = 0;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec2f& value ) const noexcept = 0;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, const Vec2f& value ) const = 0;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec3i& value ) const noexcept = 0;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, const Vec3i& value ) const = 0;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec3f& value ) const noexcept = 0;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, const Vec3f& value ) const = 0;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec4i& value ) const noexcept = 0;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, const Vec4i& value ) const = 0;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, const Vec4f& value ) const noexcept = 0;
 
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, const Vec4f& value ) const = 0;
-
-     /// @copydoc IShaderProgram::set_uniform(std::string_view, float)
-     virtual void set_uniform( std::string_view name, const TransformMatrix& value ) const = 0;
+     /// @copydoc IShaderProgram::set_uniform(std::string_view, float) const noexcept
+     virtual void set_uniform( std::string_view name, const TransformMatrix& value ) const noexcept = 0;
 };
 
 } // namespace _16nar
