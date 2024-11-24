@@ -2,8 +2,8 @@
 #include <16nar/tools/convertor_utils.inl>
 
 #include <16nar/render/render_defs.h>
-#include <16nar/gen/package_generated.h>
-#include <16nar/gen/resource_generated.h>
+#include <16nar/gen/flatbuffers/package_generated.h>
+#include <16nar/gen/flatbuffers/resource_generated.h>
 
 #include <stdexcept>
 #include <istream>

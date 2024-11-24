@@ -3,14 +3,10 @@
 #include <16nar/system/window.h>
 #include <16nar/system/iprofile.h>
 #include <16nar/system/iscene_reader.h>
+#include <16nar/render/irender_api.h>
 #include <16nar/logger/logger.h>
 
-#include <16nar/tools/json_asset_reader.h>
-#include <16nar/tools/flatbuffers_asset_reader.h>
-
-#if defined( NARENGINE_RENDER_OPENGL )
-#    include <16nar/render/opengl/render_api.h>
-#endif // NARENGINE_RENDER_OPENGL
+#include <16nar/tools/utils.h>
 
 #include <GLFW/glfw3.h>
 #include <stdexcept>
@@ -23,23 +19,6 @@ void glfw_error_handler( int error_code, const char *description )
      throw std::runtime_error{ std::string{ "GLFW error " }
                              + std::to_string( error_code )
                              + ": " + description };
-}
-
-
-std::unique_ptr< _16nar::tools::IAssetReader > create_asset_reader( const std::string& in_dir,
-     _16nar::tools::PackageFormat format )
-{
-     switch ( format )
-     {
-          case _16nar::tools::PackageFormat::FlatBuffers:
-               return std::make_unique< _16nar::tools::FlatBuffersAssetReader >();
-          case _16nar::tools::PackageFormat::Json:
-               return std::make_unique< _16nar::tools::JsonAssetReader >( in_dir );
-          default:
-               throw std::runtime_error{ "wrong asset reader format: "
-                    + std::to_string( static_cast< std::size_t >( format ) ) };
-     }
-     return {};
 }
 
 } // anonymous namespace
@@ -64,7 +43,7 @@ Game::Game():
      // call for correct initialization order
      Logger::instance().log( ILogWriter::LogLevel::Info, "creating game object" );
 
-     pkg_manager_ = std::make_unique< PackageManager >( create_asset_reader(
+     pkg_manager_ = std::make_unique< PackageManager >( tools::create_asset_reader(
           config_.app_dir, config_.resources_format ) );
      pkg_manager_->set_package_dir( config_.app_dir );
      pkg_manager_->set_unpacked_mode( config_.resources_unpacked );

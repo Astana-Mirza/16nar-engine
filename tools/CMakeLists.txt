@@ -14,15 +14,25 @@ if ("${BUILD_SHARED_LIBS}")
     endif() # if ("${WIN32}")
 endif() # if ("${BUILD_SHARED_LIBS}")
 
-set(NARENGINE_TOOLS_LINK_LIBS "flatbuffers::libflatbuffers" "stb::stb" "nlohmann_json::nlohmann_json" "glm::glm")
 set(NARENGINE_TOOLS_LINK_DIRS "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<INSTALL_INTERFACE:lib>")
 set(NARENGINE_TOOLS_SOURCES
-    "${NARENGINE_TOOLS_SRC_DIR}/json_asset_reader.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/json_asset_writer.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/flatbuffers_asset_reader.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/flatbuffers_asset_writer.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/binary_utils.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/utils.cpp"
 )
+if ("${NARENGINE_TOOLS_JSON}")
+    set(NARENGINE_TOOLS_LINK_LIBS ${NARENGINE_TOOLS_LINK_LIBS} "stb::stb" "nlohmann_json::nlohmann_json")
+    set(NARENGINE_TOOLS_SOURCES ${NARENGINE_TOOLS_SOURCES}
+        "${NARENGINE_TOOLS_SRC_DIR}/json_asset_reader.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/json_asset_writer.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/stb_impl.cpp"
+    )
+endif() # if ("${NARENGINE_TOOLS_JSON}")
+if ("${NARENGINE_TOOLS_FLATBUFFERS}")
+    set(NARENGINE_TOOLS_LINK_LIBS ${NARENGINE_TOOLS_LINK_LIBS} "flatbuffers::libflatbuffers")
+    set(NARENGINE_TOOLS_SOURCES ${NARENGINE_TOOLS_SOURCES}
+        "${NARENGINE_TOOLS_SRC_DIR}/flatbuffers_asset_reader.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/flatbuffers_asset_writer.cpp"
+    )
+endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
 add_library("${NAME}_tools" "${NARENGINE_LIB_TYPE}" ${NARENGINE_TOOLS_SOURCES})
 add_dependencies("${NAME}_tools" "gen-cpp" "GENERATE_gen-cpp")
 target_include_directories("${NAME}_tools"
@@ -30,7 +40,7 @@ target_include_directories("${NAME}_tools"
     PUBLIC "$<BUILD_INTERFACE:${NARENGINE_ENGINE_INCLUDE_DIRS}>" "$<INSTALL_INTERFACE:include>")
 target_link_directories("${NAME}_tools" PUBLIC ${NARENGINE_TOOLS_LINK_DIRS})
 target_compile_definitions("${NAME}_tools" PRIVATE ${NARENGINE_TOOLS_COMPILER_DEFS})
-target_link_libraries("${NAME}_tools" PRIVATE ${NARENGINE_TOOLS_LINK_LIBS})
+target_link_libraries("${NAME}_tools" PUBLIC "glm::glm" PRIVATE ${NARENGINE_TOOLS_LINK_LIBS})
 set(NARENGINE_TOOLS_TARGETS ${NARENGINE_TOOLS_TARGETS} "${NAME}_tools")
 
 if ("${NARENGINE_BUILD_UTILS}")
@@ -46,10 +56,18 @@ endif() # if ("${NARENGINE_BUILD_UTILS}")
 # Testing
 if ("${NARENGINE_BUILD_TESTS}")
     enable_testing()
-    add_executable("${NAME}_tools_assets_test"
-        "${NARENGINE_TOOLS_SRC_DIR}/test/json_resources_test.cpp"
-        "${NARENGINE_TOOLS_SRC_DIR}/test/flatbuffers_resources_test.cpp"
-    )
+    if ("${NARENGINE_TOOLS_JSON}")
+        set(NARENGINE_RESOURCES_TEST_SOURCES ${NARENGINE_RESOURCES_TEST_SOURCES}
+            "${NARENGINE_TOOLS_SRC_DIR}/test/json_resources_test.cpp"
+        )
+        # flatbuffers test depends on JSON
+        if ("${NARENGINE_TOOLS_FLATBUFFERS}")
+            set(NARENGINE_RESOURCES_TEST_SOURCES ${NARENGINE_RESOURCES_TEST_SOURCES}
+                "${NARENGINE_TOOLS_SRC_DIR}/test/flatbuffers_resources_test.cpp"
+            )
+        endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
+    endif() # if ("${NARENGINE_TOOLS_JSON}")
+    add_executable("${NAME}_tools_assets_test" ${NARENGINE_RESOURCES_TEST_SOURCES})
     target_include_directories("${NAME}_tools_assets_test" PRIVATE
         "${NARENGINE_TOOLS_INCLUDE_DIR}" ${NARENGINE_ENGINE_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
     target_link_directories("${NAME}_tools_assets_test" PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

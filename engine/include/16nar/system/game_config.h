@@ -26,11 +26,13 @@ struct ENGINE_API GameConfig
      /// @throws std::runtime_error.
      GameConfig( const std::string& name );
 
+#if defined( NARENGINE_TOOLS_JSON )
      /// @brief Load configuration from JSON format.
      /// @param input input data stream.
      /// @return loaded configuration.
      /// @throws std::runtime_error.
      static GameConfig load_json( std::istream& input );
+#endif // NARENGINE_TOOLS_JSON
 
      /// @brief Get current application directory.
      /// @return current application directory (directory of current binary file).
