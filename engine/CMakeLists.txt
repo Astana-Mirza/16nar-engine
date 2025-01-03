@@ -141,6 +141,11 @@ if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
         "${NARENGINE_SRC_DIR}/constructor2d/render/quadrant.cpp"
         "${NARENGINE_SRC_DIR}/constructor2d/render/qtree_render_system.cpp"
         "${NARENGINE_SRC_DIR}/constructor2d/profiles/single_thread_profile.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/system/scene_state.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/system/scene.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/transformable_2d.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/node_2d.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/drawable_node_2d.cpp"
     )
 
     add_library("${NAME}_constructor2d" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CONSTRUCTOR2D_SOURCES})

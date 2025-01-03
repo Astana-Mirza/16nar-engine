@@ -85,17 +85,16 @@ public:
 
 private:
      /// @brief Do calculations of transofrmation matrix and global bounds.
-     void params_calculate() const noexcept;
+     void params_calculate() noexcept;
 
 private:
-     mutable TransformMatrix matr_;     ///< transformation matrix of the view.
-     mutable FloatRect global_bounds_;  ///< bounding rectangle of the camera in the world.
-     Vec2f center_;                     ///< view rectangle of the camera.
-     float half_width_;                 ///< half of width of camera rectangle.
-     float half_height_;                ///< half of height of camera rectangle.
-     float scale_;                      ///< current camera scale (inverse to zoom).
-     float rotation_;                   ///< current camera clockwise rotation, in degrees.
-     mutable bool transformed_;         ///< flag indicating that matrix must be recalculated.
+     TransformMatrix matr_;        ///< transformation matrix of the view.
+     FloatRect global_bounds_;     ///< bounding rectangle of the camera in the world.
+     Vec2f center_;                ///< view rectangle of the camera.
+     float half_width_;            ///< half of width of camera rectangle.
+     float half_height_;           ///< half of height of camera rectangle.
+     float scale_;                 ///< current camera scale (inverse to zoom).
+     float rotation_;              ///< current camera clockwise rotation, in degrees.
 };
 
 } // namespace _16nar

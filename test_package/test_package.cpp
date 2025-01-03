@@ -20,9 +20,8 @@ using namespace _16nar;
 class TestDrawable : public constructor2d::Drawable2D
 {
 public:
-     TestDrawable( const VertexBuffer& vertices, const Shader& shader,
-          constructor2d::IRenderSystem2D& render_system ):
-          Drawable2D( shader, render_system ), draw_info_{}, layer_{ 0 }
+     TestDrawable( const VertexBuffer& vertices, const Shader& shader ):
+          Drawable2D( shader ), draw_info_{}, layer_{ 0 }
      {
           draw_info_.render_params.primitive = PrimitiveType::Triangles;
           draw_info_.render_params.vertex_buffer = vertices;
@@ -131,8 +130,8 @@ int main( int argc, char *argv[] )
           VertexBuffer vb_id = VertexBuffer( api.load( ResourceType::VertexBuffer, vertex_buffer ).id );
           Shader sh_id = Shader( api.load( ResourceType::Shader, shader ).id );
 
-          TestDrawable obj{ vb_id, sh_id, render_system };
-          render_system.add_draw_child( &obj );
+          TestDrawable obj{ vb_id, sh_id };
+          obj.set_render_system( &render_system );
           camera.move( Vec2f{ 0, 40 } );
           for ( std::size_t i = 0; i < 80; i++ )
           {

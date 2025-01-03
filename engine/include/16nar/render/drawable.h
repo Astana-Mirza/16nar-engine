@@ -12,6 +12,9 @@ namespace _16nar
 class ENGINE_API Drawable
 {
 public:
+     /// @brief Default constructor.
+     Drawable() = default;
+
      /// @brief Virtual default destructor.
      virtual ~Drawable() = default;
 

@@ -1,4 +1,4 @@
-include "constructor_nodes.fbs";
+include "constructor2d_nodes.fbs";
 
 namespace _16nar.data.constructor2d;
 

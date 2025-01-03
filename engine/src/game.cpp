@@ -10,6 +10,7 @@
 
 #include <GLFW/glfw3.h>
 #include <stdexcept>
+#include <cassert>
 
 namespace // anonymous
 {
@@ -145,24 +146,28 @@ const GameConfig& Game::get_config() const noexcept
 
 IRenderApi& Game::get_render_api() noexcept
 {
+     assert( render_api_ );
      return *render_api_;
 }
 
 
 Window& Game::get_window() noexcept
 {
+     assert( window_ );
      return *window_;
 }
 
 
 ISceneReader& Game::get_scene_reader() noexcept
 {
+     assert( scene_reader_ );
      return *scene_reader_;
 }
 
 
 PackageManager& Game::get_pkg_manager() noexcept
 {
+     assert( pkg_manager_ );
      return *pkg_manager_;
 }
 

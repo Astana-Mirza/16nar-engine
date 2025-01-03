@@ -15,17 +15,25 @@ class IRenderSystem2D;
 class ENGINE_API Drawable2D : public Drawable
 {
 public:
-     /// @brief Constructor which links object to render system.
+     /// @brief Constructor.
      /// @param[in] shader shader used to draw this object.
-     /// @param[in] render_system render system used to draw this object.
-     Drawable2D( const Shader& shader, IRenderSystem2D& render_system ) noexcept;
+     explicit Drawable2D( const Shader& shader ) noexcept;
 
-     /// @brief Destructor which removes object from render system.
+     /// @brief Destructor.
+     /// @details Destructor removes object from render system, which means that
+     /// current render system pointer must be valid and point to some render system (or be nullptr).
      virtual ~Drawable2D();
 
+     /// @brief Set render system which will draw the object.
+     /// @details This member function removes this object from old render system
+     /// (if any) and adds it to new @b render_system. It means that both render systems
+     /// pointers, new and previous, must be valid and point to some render system (or be nullptr).
+     /// @param[in] render_system render system for drawing the object.
+     void set_render_system( IRenderSystem2D *render_system );
+
      /// @brief Get render system used for drawing the object.
-     /// @return render system used for drawing the object.
-     IRenderSystem2D& get_render_system() const noexcept;
+     /// @return render system used for drawing the object (may be nullptr if not set).
+     IRenderSystem2D *get_render_system() const noexcept;
 
      /// @brief Get the scene layer of the object.
      /// @return scene layer of the object.
@@ -44,8 +52,8 @@ public:
      virtual FloatRect get_global_bounds() const = 0;
 
 private:
-     IRenderSystem2D& render_system_;   ///< render system which draws this object.
-     int layer_;
+     IRenderSystem2D *render_system_;   ///< render system which draws this object.
+     int layer_;                        ///< layer of this object which affects drawing order.
 };
 
 } // namespace _16nar::constructor2d
