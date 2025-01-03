@@ -22,7 +22,7 @@ class ENGINE_API IShaderProgram
 {
 public:
      /// @brief Default virtual destructor.
-     virtual ~IShaderProgram() noexcept = default;
+     virtual ~IShaderProgram() = default;
 
      /// @brief Set value of the uniform.
      /// @param[in] name name of the uniform.

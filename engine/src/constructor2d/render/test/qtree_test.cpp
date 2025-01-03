@@ -12,9 +12,8 @@ class MockDrawable2D : public _16nar::constructor2d::Drawable2D
 {
 public:
      MockDrawable2D( const _16nar::FloatRect& rect,
-          const _16nar::Shader& shader,
-          _16nar::constructor2d::IRenderSystem2D& render_system ):
-          _16nar::constructor2d::Drawable2D( shader, render_system ),
+          const _16nar::Shader& shader ):
+          _16nar::constructor2d::Drawable2D( shader ),
           rect_{ rect } {}
 
      virtual _16nar::DrawInfo get_draw_info() const noexcept override
@@ -53,9 +52,9 @@ TEST_CASE( "Quadrant object detection", "[qtree_render_system]" )
      {
           MockDrawable2D obj1{
                _16nar::FloatRect{ { 30.0f, 30.0f }, 10.0f, 10.0f },
-               _16nar::Shader{}, render_system
+               _16nar::Shader{}
           };
-          render_system.add_draw_child( &obj1 );
+          obj1.set_render_system( &render_system );
 
           const auto& quad3_drawables = render_system.get_root_quadrant()->get_children()[ 3 ]->get_draw_children();
           REQUIRE( quad3_drawables.find( &obj1 ) != quad3_drawables.cend() );

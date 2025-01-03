@@ -194,19 +194,19 @@ private:
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
 /// @return matrix product.
-TransformMatrix operator*( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept;
+ENGINE_API TransformMatrix operator*( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept;
 
 /// @brief Matrix comprasion operator.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
 /// @return true if matrices are equal, false otherwise.
-bool operator==( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept;
+ENGINE_API bool operator==( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept;
 
 /// @brief Matrix inverse comprasion operator.
 /// @param[in] lhs left operand.
 /// @param[in] rhs right operand.
 /// @return true if matrices are not equal, false otherwise.
-bool operator!=( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept;
+ENGINE_API bool operator!=( const TransformMatrix& lhs, const TransformMatrix& rhs ) noexcept;
 
 } // namespace _16nar
 

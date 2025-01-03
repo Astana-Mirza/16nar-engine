@@ -1,102 +1,81 @@
 #include <16nar/constructor2d/system/scene_state.h>
 
+#include <cassert>
+
 namespace _16nar::constructor2d
 {
 
-SceneState::SceneState( std::unique_ptr< RenderSystem >&& render_system,
+SceneState::SceneState( std::unique_ptr< IRenderSystem2D >&& render_system,
                         bool updating, bool rendering ):
-     render_system_{ std::move( render_system ) },
+     render_system_{ std::move( render_system ) }, nodes_{},
      updating_{ updating }, rendering_{ rendering } {}
 
 
-SceneState::~SceneState()
-{
-     for ( Node* node : nodes_ )
-     {
-          delete node;
-     }
-}
-
-
-void SceneState::set_rendering( bool rendering )
+void SceneState::set_rendering( bool rendering ) noexcept
 {
      rendering_ = rendering;
 }
 
 
-void SceneState::set_updating( bool updating )
+void SceneState::set_updating( bool updating ) noexcept
 {
      updating_ = updating;
 }
 
 
-bool SceneState::get_updating() const
+bool SceneState::get_updating() const noexcept
 {
      return updating_;
 }
 
 
-bool SceneState::get_rendering() const
+bool SceneState::get_rendering() const noexcept
 {
      return rendering_;
 }
 
 
-View& SceneState::get_view()
+IRenderSystem2D& SceneState::get_render_system()
 {
-     return view_;
-}
-
-
-RenderSystem& SceneState::get_render_system()
-{
-     if ( !render_system_ )
-     {
-          throw std::runtime_error{ "render system not set" };
-     }
+     assert( render_system_ );
      return *render_system_;
-}
-
-
-void SceneState::add_node( Node *node )
-{
-     nodes_.insert( node );
-}
-
-
-void SceneState::remove_node( Node *node )
-{
-     nodes_.erase( node );
 }
 
 
 void SceneState::setup()
 {
-     for ( Node *node : nodes_ )
+     for ( auto& node : nodes_ )
      {
-          node->setup_call();
+          node->setup_call( *this );
      }
 }
 
 
 void SceneState::loop( float delta )
 {
-     for ( Node *node : nodes_ )
+     for ( auto& node : nodes_ )
      {
-          node->loop_call( false, delta );
+          node->loop_call( *this, delta, false );
      }
 }
 
 
-void SceneState::start_render( RenderDevice& device )
+void SceneState::add_node( std::unique_ptr< Node2D >&& node )
 {
-     render_system_->start_render( view_, device );
+     auto pair = nodes_.insert( std::move( node ) );
 }
 
 
-void SceneState::finish_render( RenderDevice& device )
+std::unique_ptr< Node2D > SceneState::remove_node( Node2D *node )
 {
-     render_system_->finish_render( device );
+     auto iter = nodes_.find( node );
+     if ( iter != nodes_.end() )
+     {
+          auto handle = nodes_.extract( iter );
+          auto ptr{ std::move( handle.value() ) };
+          return ptr;
+     }
+     return std::unique_ptr< Node2D >{};
 }
 
 } // namespace _16nar::constructor2d

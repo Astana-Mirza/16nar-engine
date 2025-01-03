@@ -14,6 +14,9 @@ namespace _16nar
 class ENGINE_API IResourceManager
 {
 public:
+     /// @brief Default constructor.
+     IResourceManager() = default;
+
      /// @brief Default virtual destructor.
      virtual ~IResourceManager() = default;
 
@@ -52,6 +55,11 @@ public:
 
      /// @brief Swap queues and prepare for new frame.
      virtual void end_frame() {}
+
+private:
+     IResourceManager( const IResourceManager& )            = delete;
+     IResourceManager& operator=( const IResourceManager& ) = delete;
+
 };
 
 } // namespace _16nar

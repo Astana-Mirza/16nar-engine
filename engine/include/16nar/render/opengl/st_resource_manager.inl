@@ -14,6 +14,29 @@ StResourceManager< T >::StResourceManager( const ResourceManagerMap& managers ):
 
 
 template < typename T >
+StResourceManager< T >::StResourceManager( StResourceManager&& other ):
+     resources_{ std::move( other.resources_ ) }, managers_{ other.managers_ }, next_{ other.next_ }
+{
+     other.next_ = 1; // reset default value
+}
+
+
+template < typename T >
+StResourceManager< T >& StResourceManager< T >::operator=( StResourceManager&& rhs )
+{
+     if ( this == &rhs )
+     {
+          return *this;
+     }
+     clear();
+     std::swap( resources_, rhs.resources_ );
+     std::swap( next_, rhs.next_ );
+     resources_ = rhs.resources_;
+     return *this;
+}
+
+
+template < typename T >
 StResourceManager< T >::~StResourceManager()
 {
      clear();

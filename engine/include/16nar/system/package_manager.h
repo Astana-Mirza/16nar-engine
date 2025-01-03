@@ -34,7 +34,7 @@ public:
 
      /// @brief Load resource package and create all its resources.
      /// @details Package can be packed into single file.
-     /// If package is unpacked, then resources should be in directory with same name.
+     /// If package is unpacked, then resources should be in directory with the name of package.
      /// If load of a resource from a package fails, then all previously loaded resources
      /// from this package should be unloaded. If this unload fails (exception is thrown
      /// by render API), it will not be caught here, because it means something bad happened.
@@ -67,7 +67,7 @@ public:
      void set_package_dir( const std::string& dirname );
 
      /// @brief Get loaded resource.
-     /// @param[in] name name of resource.
+     /// @param[in] name name of resource in format "package_name/resource_name".
      /// @return valid resource if it exists, empty resource otherwise.
      Resource get_resource( const std::string& name ) const;
 
