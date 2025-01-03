@@ -22,6 +22,17 @@ public:
      /// @throws std::bad_alloc.
      StResourceManager( const ResourceManagerMap& managers );
 
+     // need to define these because of user-defined destructor
+
+     /// @brief Move constructor.
+     /// @param[in] other object to be moved from.
+     StResourceManager( StResourceManager&& other );
+
+     /// @brief Move assignment operator.
+     /// @param[in] rhs object to be moved from.
+     /// @return reference to current object.
+     StResourceManager& operator=( StResourceManager&& rhs );
+
      /// @brief Destructor, requests unload of all loaded resources.
      ~StResourceManager();
 

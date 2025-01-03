@@ -34,8 +34,6 @@ class Drawable2D;
 class ENGINE_API QTreeRenderSystem : public IRenderSystem2D
 {
 public:
-     QTreeRenderSystem() = default;
-
      /// @copydoc IRenderSystem::reset()
      virtual void reset() override;
 

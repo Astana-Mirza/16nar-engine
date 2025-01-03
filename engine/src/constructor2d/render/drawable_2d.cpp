@@ -2,11 +2,13 @@
 
 #include <16nar/constructor2d/render/irender_system_2d.h>
 
+#include <cassert>
+
 namespace _16nar::constructor2d
 {
 
-Drawable2D::Drawable2D( const Shader& shader, IRenderSystem2D& render_system ) noexcept:
-     render_system_{ render_system }, layer_{ 0 }
+Drawable2D::Drawable2D( const Shader& shader ) noexcept:
+     render_system_{ nullptr }, layer_{ 0 }
 {
      shader_ = shader;
 }
@@ -14,11 +16,33 @@ Drawable2D::Drawable2D( const Shader& shader, IRenderSystem2D& render_system ) n
 
 Drawable2D::~Drawable2D()
 {
-     render_system_.delete_draw_child( this );
+     if ( render_system_ )
+     {
+          render_system_->delete_draw_child( this );
+     }
 }
 
 
-IRenderSystem2D& Drawable2D::get_render_system() const noexcept
+void Drawable2D::set_render_system( IRenderSystem2D *render_system )
+{
+     if ( render_system == render_system_ )
+     {
+          // already set
+          return;
+     }
+     if ( render_system_ )
+     {
+          render_system_->delete_draw_child( this );
+     }
+     if ( render_system )
+     {
+          render_system->add_draw_child( this );
+     }
+     render_system_ = render_system;
+}
+
+
+IRenderSystem2D *Drawable2D::get_render_system() const noexcept
 {
      return render_system_;
 }

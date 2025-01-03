@@ -1,129 +1,115 @@
-#include <16nar/constructor/node_2d.h>
+#include <16nar/constructor2d/node_2d.h>
 
-namespace _16nar
+#include <16nar/constructor2d/system/scene_state.h>
+
+namespace _16nar::constructor2d
 {
 
-#ifdef USE_SFML
+Node2D::Node2D():
+     children_{}, name_{}, parent_{ nullptr }, setup_func_{ nullptr },
+     loop_func_{ nullptr }, state_order_{ -1 }
+{}
 
-const Vector2f& Node2D::get_position() const
+
+Node2D *Node2D::get_parent() noexcept
 {
-     return transform_.getPosition();
+     return parent_;
 }
 
 
-float Node2D::get_rotation() const
+const Node2D *Node2D::get_parent() const noexcept
 {
-     return transform_.getRotation();
+     return parent_;
 }
 
 
-const Vector2f& Node2D::get_scale() const
+const std::string& Node2D::get_name() const noexcept
 {
-     return transform_.getScale();
+     return name_;
 }
 
 
-const Vector2f& Node2D::get_origin() const
+TransformMatrix Node2D::get_global_transform_matr( bool include_self ) const noexcept
 {
-     return transform_.getOrigin();
+     TransformMatrix transform = include_self ? get_transform_matr() : TransformMatrix{};
+     for ( const Node2D *node = get_parent(); node != nullptr; node = node->get_parent() )
+     {
+          transform = node->get_transform_matr() * transform;
+     }
+     return transform;
 }
 
 
-const TransformMatrix& Node2D::get_transform_matr() const
+const NodesSet& Node2D::get_children() const noexcept
 {
-     return transform_.getTransform();
+     return children_;
 }
 
 
-const TransformMatrix& Node2D::get_inv_transform_matr() const
+// Member functions not for user to call
+
+
+void Node2D::set_state_order( int state_order ) noexcept
 {
-     return transform_.getInverseTransform();
+     state_order_ = state_order;
 }
 
 
-void Node2D::set_position( float x, float y )
+int Node2D::get_state_order() const noexcept
 {
-     transform_.setPosition( x, y );
-     transformed_ = true;
+     return state_order_;
 }
 
 
-void Node2D::set_position( const Vector2f& position )
+void Node2D::setup_call( SceneState& state )
 {
-     transform_.setPosition( position );
-     transformed_ = true;
+     if ( setup_func_ )
+     {
+          setup_func_( this, state );
+     }
+     for ( auto& child : children_ )
+     {
+          child->setup_call( state );
+     }
 }
 
 
-void Node2D::set_rotation( float angle )
+void Node2D::loop_call( SceneState& state, float delta, bool updated )
 {
-     transform_.setRotation( angle );
-     transformed_ = true;
+     if ( loop_func_ )
+     {
+          loop_func_( this, state, delta );
+     }
+     bool transformed = calculate_matr();
+     updated = updated || transformed || updated_;
+     updated_ = false;
+     for ( auto& child : children_ )
+     {
+          child->loop_call( state, delta, updated );
+     }
 }
 
 
-void Node2D::set_scale( float factor_x, float factor_y )
+void Node2D::add_child( std::unique_ptr< Node2D >&& node )
 {
-     transform_.setScale( factor_x, factor_y );
-     transformed_ = true;
+     auto pair = children_.insert( std::move( node ) );
+     ( *pair.first )->parent_ = this;
+     ( *pair.first )->state_order_ = state_order_;
+     ( *pair.first )->updated_ = true;
 }
 
 
-void Node2D::set_scale( const Vector2f& factors )
+std::unique_ptr< Node2D > Node2D::remove_child( Node2D *node )
 {
-     transform_.setScale( factors );
-     transformed_ = true;
+     auto iter = children_.find( node );
+     if ( iter != children_.end() )
+     {
+          auto handle = children_.extract( iter );
+          auto ptr{ std::move( handle.value() ) };
+          ptr->parent_ = nullptr;
+          return ptr;
+     }
+     return std::unique_ptr< Node2D >{};
 }
 
-
-void Node2D::set_origin( float x, float y )
-{
-     transform_.setOrigin( x, y );
-     transformed_ = true;
-}
-
-
-void Node2D::set_origin( const Vector2f& origin )
-{
-     transform_.setOrigin( origin );
-     transformed_ = true;
-}
-
-
-void Node2D::move( float offset_x, float offset_y )
-{
-     transform_.move( offset_x, offset_y );
-     transformed_ = true;
-}
-
-
-void Node2D::move( const Vector2f& offset )
-{
-     transform_.move( offset );
-     transformed_ = true;
-}
-
-
-void Node2D::rotate( float angle )
-{
-     transform_.rotate( angle );
-     transformed_ = true;
-}
-
-
-void Node2D::scale( float factor_x, float factor_y )
-{
-     transform_.scale( factor_x, factor_y );
-     transformed_ = true;
-}
-
-
-void Node2D::scale( const Vector2f& factor )
-{
-     transform_.scale( factor );
-     transformed_ = true;
-}
-
-#endif // #ifdef USE_SFML
-
-} // namespace _16nar
+} // namespace _16nar::constructor2d

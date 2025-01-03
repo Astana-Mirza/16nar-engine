@@ -68,15 +68,6 @@ public:
           vec_{ v0, v1, v2, v3 }
      {}
 
-     /// @brief Copy assignment operator.
-     /// @param[in] other vector to be copied.
-     /// @return reference to current object.
-     inline Vec& operator=( const Vec& other ) noexcept
-     {
-          vec_ = other.vec_;
-          return *this;
-     }
-
      /// @brief Assignment add operator.
      /// @param[in] other vector to be added.
      /// @return reference to current object.

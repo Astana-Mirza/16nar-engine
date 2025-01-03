@@ -15,6 +15,36 @@ MtResourceManager< T >::MtResourceManager( const ResourceManagerMap& managers ):
 
 
 template < typename T >
+MtResourceManager< T >::MtResourceManager( MtResourceManager&& other ):
+     resources_{ std::move( other.resources_ ) }, load_queue_{ std::move( other.load_queue_ ) },
+     unload_queue_{ std::move( other.unload_queue_ ) }, managers_{ other.managers_ },
+     next_{ other.next_ }, frame_index_{ other.frame_index_ }
+{
+     other.next_ = 1; // reset default value
+     other.frame_index_ = 0;
+}
+
+
+template < typename T >
+MtResourceManager< T >& MtResourceManager< T >::operator=( MtResourceManager&& rhs )
+{
+     if ( this == &rhs )
+     {
+          return *this;
+     }
+     clear();
+     std::swap( resources_, rhs.resources_ );
+     std::swap( load_queue_, rhs.load_queue_ );
+     std::swap( unload_queue_, rhs.unload_queue_ );
+     std::swap( next_, rhs.next_ );
+     frame_index_ = rhs.frame_index_;
+     rhs.frame_index_ = 0;
+     resources_ = rhs.resources_;
+     return *this;
+}
+
+
+template < typename T >
 MtResourceManager< T >::~MtResourceManager()
 {
      clear();
@@ -52,6 +82,7 @@ template < typename T >
 void MtResourceManager< T >::clear()
 {
      next_ = 1;
+     frame_index_ = 0;
      for ( auto& queue : unload_queue_ )
      {
           std::queue< ResID >{}.swap( queue );

@@ -34,6 +34,17 @@ public:
      /// @param[in] managers resource managers for access to related resources.
      MtResourceManager( const ResourceManagerMap& managers );
 
+     // need to define because of user-defined destructor
+
+     /// @brief Move constructor.
+     /// @param[in] other object to be moved from.
+     MtResourceManager( MtResourceManager&& other );
+
+     /// @brief Move assignment operator.
+     /// @param[in] lhs object to be moved from.
+     /// @return reference to current object.
+     MtResourceManager& operator=( MtResourceManager&& rhs );
+
      /// @brief Destructor, requests unload of all loaded resources.
      ~MtResourceManager();
 

@@ -45,9 +45,9 @@ DynamicLib& DynamicLib::operator= ( DynamicLib&& lib ) noexcept
 {
      if ( this != &lib )
      {
-          handle_ = nullptr;
-          std::swap( name_, lib.name_ );
-          std::swap( handle_, lib.handle_ );
+          handle_ = lib.handle_;
+          lib.handle_ = nullptr;
+          name_ = std::move( lib.name_ );
      }
      return *this;
 }
