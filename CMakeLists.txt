@@ -76,13 +76,20 @@ endif()
 # Common settings
 set(NAME 16nar)
 if("${BUILD_SHARED_LIBS}")
+    if ("${WIN32}")
+        # for __declspec( dllexport ) or __declspec( dllimport )
+        set(NARENGINE_WIN_EXPORT ON)
+    endif()
     set(NARENGINE_LIB_TYPE "SHARED")
 else()
     set(NARENGINE_LIB_TYPE "STATIC")
 endif()
 
+configure_file("${PROJECT_SOURCE_DIR}/engine/include/${NAME}config.h.in" "${NAME}/${NAME}config.h")
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/schemas")
 add_subdirectory("${PROJECT_SOURCE_DIR}/tools")
 add_subdirectory("${PROJECT_SOURCE_DIR}/engine")
 
+install(FILES "${PROJECT_BINARY_DIR}/${NAME}/${NAME}config.h" DESTINATION "include/${NAME}")
 install(EXPORT "${NAME}" DESTINATION "lib/cmake" NAMESPACE "${NAME}::")

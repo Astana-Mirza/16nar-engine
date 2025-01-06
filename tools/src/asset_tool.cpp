@@ -2,8 +2,16 @@
 /// @brief Utility for engine resource management.
 
 #include <16nar/16nardefs.h>
-#include <16nar/tools/resource_package.h>
 #include <16nar/tools/utils.h>
+#include <16nar/tools/assets/resource_package.h>
+#if defined( NARENGINE_TOOLS_JSON )
+#    include <16nar/tools/assets/json_asset_reader.h>
+#    include <16nar/tools/assets/json_asset_writer.h>
+#endif // NARENGINE_TOOLS_JSON
+#if defined( NARENGINE_TOOLS_FLATBUFFERS )
+#    include <16nar/tools/assets/flatbuffers_asset_reader.h>
+#    include <16nar/tools/assets/flatbuffers_asset_writer.h>
+#endif // NARENGINE_TOOLS_FLATBUFFERS
 
 #include <vector>
 #include <string>
@@ -43,6 +51,47 @@ std::string package_name;
 bool quiet = false;
 
 
+
+std::unique_ptr< _16nar::tools::IAssetReader > create_asset_reader( const std::string& in_dir,
+     _16nar::tools::PackageFormat format )
+{
+     switch ( format )
+     {
+#if defined( NARENGINE_TOOLS_JSON )
+          case _16nar::tools::PackageFormat::Json:
+               return std::make_unique< _16nar::tools::JsonAssetReader >( in_dir );
+#endif // NARENGINE_TOOLS_JSON
+#if defined( NARENGINE_TOOLS_FLATBUFFERS )
+          case _16nar::tools::PackageFormat::FlatBuffers:
+               return std::make_unique< _16nar::tools::FlatBuffersAssetReader >();
+#endif // NARENGINE_TOOLS_FLATBUFFERS
+          default:
+               std::cerr << "Error: unknown input format." << std::endl;
+     }
+     return std::unique_ptr< _16nar::tools::IAssetReader >();
+}
+
+
+std::unique_ptr< _16nar::tools::IAssetWriter > create_asset_writer( const std::string& out_dir,
+     _16nar::tools::PackageFormat format )
+{
+     switch ( format )
+     {
+#if defined( NARENGINE_TOOLS_JSON )
+          case _16nar::tools::PackageFormat::Json:
+               return std::make_unique< _16nar::tools::JsonAssetWriter >( out_dir );
+#endif // NARENGINE_TOOLS_JSON
+#if defined( NARENGINE_TOOLS_FLATBUFFERS )
+          case _16nar::tools::PackageFormat::FlatBuffers:
+               return std::make_unique< _16nar::tools::FlatBuffersAssetWriter >();
+#endif // NARENGINE_TOOLS_FLATBUFFERS
+          default:
+               std::cerr << "Error: unknown output format." << std::endl;
+     }
+     return std::unique_ptr< _16nar::tools::IAssetWriter >();
+}
+
+
 bool str_to_format( const std::string& str, _16nar::tools::PackageFormat& format )
 {
      static const std::unordered_map< std::string, _16nar::tools::PackageFormat > formats = {
@@ -71,8 +120,8 @@ void print_usage( std::ostream& out )
           << "\t\t--help, -h\n\t\tDisplay this message and exit.\n"
           << "\n\t\t--base-dir DIR, -b DIR\n\t\tDirectory (it must exist) which will be used as base for input files, current directory is default.\n"
           << "\n\t\t--out-dir DIR, -o DIR\n\t\tOutput directory of the utility, current directory is default.\n"
-          << "\n\t\t--src-format FORMAT, -s FORMAT\n\t\tFormat of input file(s), default is json.\n"
-          << "\n\t\t--dst-format FORMAT, -d FORMAT\n\t\tFormat of output file(s), default is flatbuffers.\n"
+          << "\n\t\t--src-format FORMAT, -s FORMAT\n\t\tFormat of input file(s), default is json, if supported.\n"
+          << "\n\t\t--dst-format FORMAT, -d FORMAT\n\t\tFormat of output file(s), default is flatbuffers, if supported.\n"
           << "\n\t\t--pack PACKAGE_NAME, -p PACKAGE_NAME\n\t\tCreate a package with given name from input files."
           << " File extension of the package will be set depending on output format. PACKAGE_NAME is treated relative to output directory.\n"
           << "\n\t\t--unpack PACKAGE_NAME, -u PACKAGE_NAME\n\t\tUnpack package and place all resource files to output directory.\n"

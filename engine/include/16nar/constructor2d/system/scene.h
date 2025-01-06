@@ -5,14 +5,16 @@
 
 #include <16nar/16nardefs.h>
 
+#include <16nar/constructor2d/node_2d.h>
+
 #include <map>
+#include <unordered_map>
 #include <memory>
 
 namespace _16nar::constructor2d
 {
 
 class SceneState;
-class Node2D;
 
 /// @brief Root object of the scene tree.
 /// @details Scene consists of scene states, each of which can be rendered and updated
@@ -20,11 +22,13 @@ class Node2D;
 class ENGINE_API Scene
 {
 public:
-     Scene( const Scene& )            = delete;
-     Scene& operator=( const Scene& ) = delete;
-
+     using NodeNamesMap = std::unordered_map< std::string, Node2D * >;
+     using StatesMap = std::map< int, SceneState >;
      using SetupFuncPtr = void ( * )();
      using LoopFuncPtr = void ( * )( float );
+
+     Scene( const Scene& )            = delete;
+     Scene& operator=( const Scene& ) = delete;
 
      /// @brief Default constructor.
      Scene();
@@ -41,7 +45,7 @@ public:
      /// @param[in] delta time since previous loop call, in seconds.
      void loop( float delta );
 
-     /// @brief Register new simple scene state.
+     /// @brief Register new scene state.
      /// @param[in] order order value which defines order of state updating.
      /// @param[in] state pointer to scene state.
      void register_state( int order, SceneState&& state );
@@ -69,21 +73,22 @@ public:
      /// @brief Get pointer to node by name, returns nullptr if node with given name does not exist.
      /// @param[in] name name of the node.
      /// @return pointer to node, nullptr if node with given name does not exist.
-     //Node2D *get_node( const std::string& name ) const;
+     Node2D *get_node( const std::string& name ) const;
 
      /// @brief Set name for given node, if a node with this name already exists, it will loose name.
      /// @param[in] node pointer to node to be named.
      /// @param[in] name name of the node.
-     //void set_node_name( Node2D *node, const std::string& name );
+     void set_node_name( Node2D *node, const std::string& name );
 
      /// @brief Delete node's name, the node will not be deleted.
      /// @param[in] name name of the node.
-     //void delete_node_name( const std::string& name );
+     void delete_node_name( const std::string& name );
 
 private:
-     std::map< int, SceneState > states_;    ///< states of this scene with their order.
-     SetupFuncPtr setup_func_;               ///< pointer to current scene's setup function.
-     LoopFuncPtr loop_func_;                 ///< pointer to current scene's loop function.
+     StatesMap states_;            ///< states of this scene with their order.
+     NodeNamesMap node_names_;     ///< names of nodes on the scene.
+     SetupFuncPtr setup_func_;     ///< pointer to current scene's setup function.
+     LoopFuncPtr loop_func_;       ///< pointer to current scene's loop function.
 };
 
 

@@ -2,6 +2,8 @@
 
 #include <16nar/constructor2d/system/scene_state.h>
 
+#include <stdexcept>
+
 namespace _16nar::constructor2d
 {
 
@@ -48,6 +50,11 @@ const NodesSet& Node2D::get_children() const noexcept
 
 // Member functions not for user to call
 
+void Node2D::set_name( const std::string& name )
+{
+     name_ = name;
+}
+
 
 void Node2D::set_state_order( int state_order ) noexcept
 {
@@ -93,6 +100,10 @@ void Node2D::loop_call( SceneState& state, float delta, bool updated )
 void Node2D::add_child( std::unique_ptr< Node2D >&& node )
 {
      auto pair = children_.insert( std::move( node ) );
+     if ( !pair.second )
+     {
+          throw std::runtime_error{ "unable to add node to children of '" + name_ + "'" };
+     }
      ( *pair.first )->parent_ = this;
      ( *pair.first )->state_order_ = state_order_;
      ( *pair.first )->updated_ = true;

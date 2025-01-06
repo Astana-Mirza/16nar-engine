@@ -5,7 +5,7 @@
 
 #include <16nar/16nardefs.h>
 #include <16nar/logger/ilog_writer.h>
-#include <16nar/tools/resource_package.h>
+#include <16nar/tools/assets/resource_package.h>
 
 #include <string>
 #include <iosfwd>

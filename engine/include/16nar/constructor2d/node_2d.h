@@ -55,6 +55,13 @@ public:
 
      // Member functions not for user to call
 
+     /// @brief Set name of current node.
+     /// @details Must not be called by user, because node's name must also
+     /// be registered in scene. So, @ref Scene::set_node_name(Node2D *, const std::string&)
+     /// must be called instead.
+     /// @param[in] name name to be set.
+     void set_name( const std::string& name );
+
      /// @brief Set order of scene state to which current node belongs.
      /// @param[in] state_order order of scene state.
      void set_state_order( int state_order ) noexcept;
@@ -80,6 +87,7 @@ public:
 
      /// @brief Add node to set of children.
      /// @details Should not be called by user, unless you are sure about that.
+     /// @throws std::runtime_error if insertion fails (e.g. @b node pointer is already stored).
      /// @param[in] node pointer to node to be added.
      void add_child( std::unique_ptr< Node2D >&& node );
 

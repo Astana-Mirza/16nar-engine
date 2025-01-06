@@ -3,8 +3,8 @@
 #ifndef _16NAR_TOOLS_IASSET_WRITER_H
 #define _16NAR_TOOLS_IASSET_WRITER_H
 
-#include <16nar/tools/resource_package.h>
-#include <16nar/tools/ifile_operator.h>
+#include <16nar/tools/assets/resource_package.h>
+#include <16nar/tools/assets/ifile_operator.h>
 
 #include <string>
 #include <iosfwd>

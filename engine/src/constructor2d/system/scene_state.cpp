@@ -1,5 +1,6 @@
 #include <16nar/constructor2d/system/scene_state.h>
 
+#include <stdexcept>
 #include <cassert>
 
 namespace _16nar::constructor2d
@@ -63,6 +64,10 @@ void SceneState::loop( float delta )
 void SceneState::add_node( std::unique_ptr< Node2D >&& node )
 {
      auto pair = nodes_.insert( std::move( node ) );
+     if ( !pair.second )
+     {
+          throw std::runtime_error{ "unable to add node to children of scene state" };
+     }
 }
 
 

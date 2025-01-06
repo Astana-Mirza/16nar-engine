@@ -1,10 +1,10 @@
 set(NARENGINE_SCHEMAS_DIR "${PROJECT_SOURCE_DIR}/schemas")
-set(NARENGINE_GEN_INCLUDE_DIR "${PROJECT_BINARY_DIR}/schemas/gen-cpp")
-
-set_source_files_properties("${NARENGINE_GEN_INCLUDE_DIR}" PROPERTIES GENERATED TRUE)
 
 if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     set(NARENGINE_FLATBUFFERS_FLAGS "--cpp" "--scoped-enums" "--cpp-std=c++17")
+    set(NARENGINE_FB_GEN_INCLUDE_DIR "${PROJECT_BINARY_DIR}/schemas/flatbuffers-gen-cpp")
+
+    set_source_files_properties("${NARENGINE_FB_GEN_INCLUDE_DIR}" PROPERTIES GENERATED TRUE)
 
     set(NARENGINE_FLATBUFFERS_SCHEMAS
         "flatbuffers/common.fbs"
@@ -20,13 +20,13 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
         )
     endif() # if("${NARENGINE_BUILD_CONSTRUCTOR}")
 
-    flatbuffers_generate_headers(TARGET gen-cpp
+    flatbuffers_generate_headers(TARGET flatbuffers-gen-cpp
         INCLUDE "${NARENGINE_SCHEMAS_DIR}"
         INCLUDE_PREFIX "${NAME}/gen/flatbuffers"
         SCHEMAS ${NARENGINE_FLATBUFFERS_SCHEMAS}
         FLAGS ${NARENGINE_FLATBUFFERS_FLAGS}
     )
-endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
 
-# Installation
-install(DIRECTORY "${NARENGINE_GEN_INCLUDE_DIR}/${NAME}" DESTINATION "include")
+    # Installation
+    install(DIRECTORY "${NARENGINE_FB_GEN_INCLUDE_DIR}/${NAME}" DESTINATION "include")
+endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
