@@ -1,4 +1,4 @@
-#include <16nar/tools/flatbuffers_asset_reader.h>
+#include <16nar/tools/assets/flatbuffers_asset_reader.h>
 #include <16nar/tools/convertor_utils.inl>
 
 #include <16nar/render/render_defs.h>

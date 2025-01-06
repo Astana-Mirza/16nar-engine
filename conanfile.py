@@ -77,13 +77,23 @@ class NarengineRecipe(ConanFile):
         self.cpp_info.set_property("cmake_file_name", "16nar")
         self.cpp_info.set_property("cmake_find_mode", "both")
 
+        # tools
         self.cpp_info.components["16nar_tools"].libs = ["16nar_tools"]
         self.cpp_info.components["16nar_tools"].system_libs = ["glm::glm"]
-        if self.options.with_tools_flatbuffers:
-            self.cpp_info.components["16nar_tools"].system_libs += ["flatbuffers::libflatbuffers"]
         self.cpp_info.components["16nar_tools"].set_property("cmake_target_name",
             nmspc_name + "::16nar_tools")
+        if self.options.with_tools_json:
+            self.cpp_info.components["16nar_assets_json"].libs = ["16nar_assets_json"]
+            self.cpp_info.components["16nar_assets_json"].requires = ["16nar_tools"]
+            self.cpp_info.components["16nar_assets_json"].set_property("cmake_target_name",
+                nmspc_name + "::16nar_assets_json")
+        if self.options.with_tools_flatbuffers:
+            self.cpp_info.components["16nar_assets_fb"].libs = ["16nar_assets_fb"]
+            self.cpp_info.components["16nar_assets_fb"].system_libs = ["flatbuffers::libflatbuffers"]
+            self.cpp_info.components["16nar_assets_fb"].set_property("cmake_target_name",
+                nmspc_name + "::16nar_assets_fb")
 
+        # engine
         self.cpp_info.components["16nar_logger"].libs = ["16nar_logger"]
         self.cpp_info.components["16nar_logger"].set_property("cmake_target_name",
             nmspc_name + "::16nar_logger")
@@ -96,7 +106,7 @@ class NarengineRecipe(ConanFile):
 
         self.cpp_info.components["16nar_base"].libs = ["16nar_base"]
         self.cpp_info.components["16nar_base"].system_libs = ["glfw"]
-        self.cpp_info.components["16nar_base"].requires = ["16nar_math", "16nar_tools"]
+        self.cpp_info.components["16nar_base"].requires = ["16nar_math"]
         self.cpp_info.components["16nar_base"].set_property("cmake_target_name",
             nmspc_name + "::16nar_base")
 

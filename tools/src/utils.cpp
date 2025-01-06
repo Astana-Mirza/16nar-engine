@@ -1,14 +1,5 @@
 #include <16nar/tools/utils.h>
 
-#if defined( NARENGINE_TOOLS_JSON )
-#    include <16nar/tools/json_asset_reader.h>
-#    include <16nar/tools/json_asset_writer.h>
-#endif // NARENGINE_TOOLS_JSON
-#if defined( NARENGINE_TOOLS_FLATBUFFERS )
-#    include <16nar/tools/flatbuffers_asset_reader.h>
-#    include <16nar/tools/flatbuffers_asset_writer.h>
-#endif // NARENGINE_TOOLS_FLATBUFFERS
-
 #include <fstream>
 #include <filesystem>
 #include <stdexcept>
@@ -84,48 +75,6 @@ int get_channel_count( BufferDataFormat format )
                     + std::to_string( static_cast< std::size_t >( format ) ) };
      }
      return 3;
-}
-
-
-std::unique_ptr< IAssetReader > create_asset_reader( const std::string& in_dir,
-     PackageFormat format )
-{
-     switch ( format )
-     {
-#if defined( NARENGINE_TOOLS_FLATBUFFERS )
-          case PackageFormat::FlatBuffers:
-               return std::make_unique< FlatBuffersAssetReader >();
-#endif // NARENGINE_TOOLS_FLATBUFFERS
-#if defined( NARENGINE_TOOLS_JSON )
-          case PackageFormat::Json:
-               return std::make_unique< JsonAssetReader >( in_dir );
-#endif // NARENGINE_TOOLS_JSON
-          default:
-               throw std::runtime_error{ "wrong asset reader format: "
-                    + std::to_string( static_cast< std::size_t >( format ) ) };
-     }
-     return {};
-}
-
-
-std::unique_ptr< IAssetWriter > create_asset_writer( const std::string& out_dir,
-     PackageFormat format )
-{
-     switch ( format )
-     {
-#if defined( NARENGINE_TOOLS_FLATBUFFERS )
-          case PackageFormat::FlatBuffers:
-               return std::make_unique< FlatBuffersAssetWriter >();
-#endif // NARENGINE_TOOLS_FLATBUFFERS
-#if defined( NARENGINE_TOOLS_JSON )
-          case PackageFormat::Json:
-               return std::make_unique< JsonAssetWriter >( out_dir );
-#endif // NARENGINE_TOOLS_JSON
-          default:
-               throw std::runtime_error{ "wrong asset writer format: "
-                    + std::to_string( static_cast< std::size_t >( format ) ) };
-     }
-     return {};
 }
 
 } // namespace _16nar::tools

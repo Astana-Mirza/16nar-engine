@@ -6,8 +6,6 @@
 #include <16nar/render/irender_api.h>
 #include <16nar/logger/logger.h>
 
-#include <16nar/tools/utils.h>
-
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 #include <cassert>
@@ -33,6 +31,7 @@ GameConfig Game::config_{};
 
 
 Game::Game():
+     asset_reader_{},
      pkg_manager_{},
      profile_{},
      render_api_{},
@@ -44,8 +43,7 @@ Game::Game():
      // call for correct initialization order
      Logger::instance().log( ILogWriter::LogLevel::Info, "creating game object" );
 
-     pkg_manager_ = std::make_unique< PackageManager >( tools::create_asset_reader(
-          config_.app_dir, config_.resources_format ) );
+     pkg_manager_ = std::make_unique< PackageManager >();
      pkg_manager_->set_package_dir( config_.app_dir );
      pkg_manager_->set_unpacked_mode( config_.resources_unpacked );
 }
@@ -61,6 +59,7 @@ Game::~Game()
 void Game::finalize()
 {
      pkg_manager_.reset();
+     asset_reader_.reset();
      scene_reader_.reset();
      render_api_.reset();
      profile_.reset();
@@ -89,6 +88,12 @@ void Game::set_scene_reader( std::unique_ptr< ISceneReader >&& scene_reader ) no
 void Game::set_profile( std::unique_ptr< IProfile >&& profile ) noexcept
 {
      profile_ = std::move( profile );
+}
+
+
+void Game::set_asset_reader( std::unique_ptr< tools::IAssetReader >&& asset_reader ) noexcept
+{
+     asset_reader_ = std::move( asset_reader );
 }
 
 
@@ -169,6 +174,13 @@ PackageManager& Game::get_pkg_manager() noexcept
 {
      assert( pkg_manager_ );
      return *pkg_manager_;
+}
+
+
+tools::IAssetReader& Game::get_asset_reader() noexcept
+{
+     assert( asset_reader_ );
+     return *asset_reader_;
 }
 
 } // namespace _16nar

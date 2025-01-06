@@ -1,6 +1,6 @@
-#include <16nar/tools/json_asset_writer.h>
+#include <16nar/tools/assets/json_asset_writer.h>
 
-#include <16nar/tools/json_utils.inl>
+#include <16nar/tools/assets/json_utils.inl>
 #include <16nar/tools/utils.h>
 
 #include <string>

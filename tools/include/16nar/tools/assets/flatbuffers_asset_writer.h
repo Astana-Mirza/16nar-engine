@@ -3,7 +3,7 @@
 #ifndef _16NAR_TOOLS_FLATBUFFERS_ASSET_WRITER_H
 #define _16NAR_TOOLS_FLATBUFFERS_ASSET_WRITER_H
 
-#include <16nar/tools/iasset_writer.h>
+#include <16nar/tools/assets/iasset_writer.h>
 
 namespace _16nar::tools
 {

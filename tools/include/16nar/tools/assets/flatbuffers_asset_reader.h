@@ -3,7 +3,7 @@
 #ifndef _16NAR_TOOLS_FLATBUFFERS_ASSET_READER_H
 #define _16NAR_TOOLS_FLATBUFFERS_ASSET_READER_H
 
-#include <16nar/tools/iasset_reader.h>
+#include <16nar/tools/assets/iasset_reader.h>
 
 namespace _16nar::tools
 {

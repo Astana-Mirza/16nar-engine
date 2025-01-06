@@ -4,7 +4,6 @@
 #define _16NAR_PACKAGE_MANAGER_H
 
 #include <16nar/16nardefs.h>
-#include <16nar/tools/iasset_reader.h>
 
 #include <string_view>
 #include <string>
@@ -25,9 +24,8 @@ class IRenderApi;
 class ENGINE_API PackageManager
 {
 public:
-     /// @brief Constructor.
-     /// @param[in] reader asset reader.
-     PackageManager( std::unique_ptr< tools::IAssetReader >&& reader );
+     /// @brief Default constructor.
+     PackageManager();
 
      /// @brief Destructor, unloads all packages.
      ~PackageManager();
@@ -76,9 +74,6 @@ public:
      void clear();
 
 private:
-     /// @brief Pointer to abstract asset reader.
-     using AssetReaderPtr = std::unique_ptr< tools::IAssetReader >;
-
      /// @brief Map of resource names and resource handlers (names of form "package_name/resource_name").
      using ResourceMap = std::map< std::string, Resource >;
 
@@ -97,7 +92,6 @@ private:
      NameMap names_;                              ///< names of all currently loaded resources.
      std::unordered_set< std::string > packages_; ///< all currently loaded packages.
      std::string pkg_dir_;                        ///< path to directory containig resource packages.
-     AssetReaderPtr reader_;                      ///< asset reaer.
      bool unpacked_mode_;                         ///< are packages' resources stored in separate files (false by default).
 };
 

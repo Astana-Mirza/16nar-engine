@@ -56,6 +56,7 @@ public:
      /// So, @ref Node2D::set_state_order(int) noexcept must be called with current state order.
      /// However, for adding existing nodes @ref Scene::reparent_node_to_state(Node2D*, int)
      /// should be used (it does equivalent tasks).
+     /// @throws std::runtime_error if insertion fails (e.g. @b node pointer is already stored).
      /// @param[in] node pointer to node to be added.
      void add_node( std::unique_ptr< Node2D >&& node );
 

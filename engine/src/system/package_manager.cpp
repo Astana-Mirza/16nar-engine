@@ -12,9 +12,9 @@
 namespace _16nar
 {
 
-PackageManager::PackageManager( std::unique_ptr< tools::IAssetReader >&& reader ):
+PackageManager::PackageManager():
      resources_{}, names_{}, packages_{}, pkg_dir_{},
-     reader_{ std::move( reader ) }, unpacked_mode_{ false }
+     unpacked_mode_{ false }
 {}
 
 
@@ -37,10 +37,11 @@ bool PackageManager::load_package( const std::string& name )
      }
 
      LOG_16NAR_DEBUG( "Loading package '" << name << "'..." );
+     auto& reader = get_game().get_asset_reader();
      std::string path{ name };
      if ( !pkg_dir_.empty() )
      {
-          path = ( std::filesystem::path{ pkg_dir_ } / ( name + "." + reader_->get_pkg_ext() ) ).string();
+          path = ( std::filesystem::path{ pkg_dir_ } / ( name + "." + reader.get_pkg_ext() ) ).string();
      }
      std::ifstream ifs{ path, std::ios_base::in | std::ios_base::binary };
      if ( !ifs.is_open() )
@@ -54,7 +55,7 @@ bool PackageManager::load_package( const std::string& name )
      tools::PackageData pkg{};
      try
      {
-          pkg = reader_->read_package( ifs );
+          pkg = reader.read_package( ifs );
      }
      catch ( const std::exception& ex )
      {
@@ -219,6 +220,7 @@ bool PackageManager::load_unpacked( const std::string& dirname )
      ResourceMap loaded;
      NameMap loaded_names;
      auto& render_api = get_game().get_render_api();
+     auto& reader = get_game().get_asset_reader();
      std::string path{ dirname };
      if ( !pkg_dir_.empty() )
      {
@@ -226,7 +228,7 @@ bool PackageManager::load_unpacked( const std::string& dirname )
      }
      for ( const auto& dir_entry : std::filesystem::directory_iterator{ path } )
      {
-          if ( !dir_entry.is_regular_file() || dir_entry.path().extension() != reader_->get_file_ext() )
+          if ( !dir_entry.is_regular_file() || dir_entry.path().extension() != reader.get_file_ext() )
           {
                continue;
           }
@@ -244,7 +246,7 @@ bool PackageManager::load_unpacked( const std::string& dirname )
           Resource resource{};
           try
           {
-               load_data = reader_->read_asset( ifs );
+               load_data = reader.read_asset( ifs );
           }
           catch ( const std::exception& ex )
           {

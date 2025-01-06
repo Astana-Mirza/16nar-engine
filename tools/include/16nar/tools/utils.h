@@ -5,9 +5,6 @@
 
 #include <16nar/render/render_defs.h>
 
-#include <16nar/tools/iasset_reader.h>
-#include <16nar/tools/iasset_writer.h>
-
 #include <string>
 
 namespace _16nar::tools
@@ -44,19 +41,6 @@ ENGINE_API std::string correct_path( const std::string& base_dir, const std::str
 /// @return channel count used for the data format.
 ENGINE_API int get_channel_count( BufferDataFormat format );
 
-/// @brief Create asset reader of given format.
-/// @param[in] in_dir directory with input data, if needed by format.
-/// @param[in] format format of asset reader.
-/// @return asset reader.
-ENGINE_API std::unique_ptr< IAssetReader > create_asset_reader( const std::string& in_dir,
-     PackageFormat format );
-
-/// @brief Create asset writer of given format.
-/// @param[in] out_dir directory for output data, if needed by format.
-/// @param[in] format format of asset writer.
-/// @return asset writer.
-ENGINE_API std::unique_ptr< IAssetWriter > create_asset_writer( const std::string& out_dir,
-     PackageFormat format );
 
 } // namespace _16nar::tools
 

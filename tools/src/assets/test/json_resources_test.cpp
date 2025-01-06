@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <16nar/tools/json_asset_reader.h>
-#include <16nar/tools/json_asset_writer.h>
+#include <16nar/tools/assets/json_asset_reader.h>
+#include <16nar/tools/assets/json_asset_writer.h>
 #include <16nar/render/render_defs.h>
 
 #include <nlohmann/json.hpp>

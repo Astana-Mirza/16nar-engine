@@ -1,7 +1,7 @@
 #include <16nar/constructor2d/system/scene.h>
 
-#include <16nar/constructor2d/node_2d.h>
 #include <16nar/constructor2d/system/scene_state.h>
+#include <16nar/logger/logger.h>
 
 #include <stdexcept>
 #include <cassert>
@@ -11,7 +11,7 @@ namespace _16nar::constructor2d
 namespace
 {
 
-std::unique_ptr< Node2D > extract_node( std::map< int, SceneState >& states, Node2D *node )
+std::unique_ptr< Node2D > extract_node( Scene::StatesMap& states, Node2D *node )
 {
      Node2D *prev_parent = node->get_parent();
      int prev_order = node->get_state_order();
@@ -45,14 +45,14 @@ std::unique_ptr< Node2D > extract_node( std::map< int, SceneState >& states, Nod
 } // anonymous namespace
 
 Scene::Scene():
-     states_{}, setup_func_{ nullptr }, loop_func_{ nullptr }
+     states_{}, node_names_{}, setup_func_{ nullptr }, loop_func_{ nullptr }
 {}
 
 
 void Scene::swap( Scene& other )
 {
-     //other.node_names_.swap( node_names_ );
      other.states_.swap( states_ );
+     std::swap( other.node_names_, node_names_ );
      std::swap( other.setup_func_, setup_func_ );
      std::swap( other.loop_func_, loop_func_ );
 }
@@ -144,7 +144,7 @@ void Scene::reparent_node_to_state( Node2D *node, int order )
 }
 
 
-/*Node2D *Scene::get_node( const std::string& name ) const
+Node2D *Scene::get_node( const std::string& name ) const
 {
      auto iter = node_names_.find( name );
      if ( iter == node_names_.cend() )
@@ -157,16 +157,14 @@ void Scene::reparent_node_to_state( Node2D *node, int order )
 
 void Scene::set_node_name( Node2D *node, const std::string& name )
 {
-     auto ret = node_names_.insert( { name, node } );
-     if ( !ret.second )
+     auto iter = node_names_.find( name );
+     if ( iter != node_names_.end() )
      {
-          throw std::runtime_error{ "name \"" + name + "\" already exists" };
+          LOG_16NAR_WARNING( "already has node with name '" << name << "', it will loose name" );
+          iter->second->set_name( std::string{} );
+          iter->second = node;
      }
-     if ( node->name_ptr_ )
-     {
-          node_names_.erase( *( node->name_ptr_ ) );          // erase old name
-     }
-     node->name_ptr_ = const_cast< std::string* >( &( ret.first->first ) );
+     node_names_[ name ] = node;
 }
 
 
@@ -175,11 +173,15 @@ void Scene::delete_node_name( const std::string& name )
      auto iter = node_names_.find( name );
      if ( iter != node_names_.end() )
      {
-          //iter->second->name_ptr_ = nullptr;
+          iter->second->set_name( std::string{} );
           node_names_.erase( iter );
      }
+     else
+     {
+          LOG_16NAR_DEBUG( "node with name " << name << " already does not exist" );
+     }
 }
-*/
+
 
 namespace
 {

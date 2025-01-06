@@ -10,6 +10,7 @@
 #include <16nar/16nardefs.h>
 #include <16nar/system/package_manager.h>
 #include <16nar/system/game_config.h>
+#include <16nar/tools/assets/iasset_reader.h>
 
 namespace _16nar
 {
@@ -31,7 +32,7 @@ public:
      /// @return Singleton game object.
      static Game& instance();
 
-     /// @brief Initialize engine, must be called before any function in engine.
+     /// @brief Initialize engine, must be called before any function operating on game object.
      /// @details Does nothing if engine is already initialized. It is called in Game constructor.
      /// @param[in] config config used to initialize the engine.
      /// @throws std::runtime_error.
@@ -48,6 +49,10 @@ public:
      /// @details No game logic must be executed after this function.
      /// Not intended to be called by user.
      void finalize();
+
+     /// @brief Set asset reader of the game.
+     /// @param[in] asset_reader asset reader of the game.
+     void set_asset_reader( std::unique_ptr< tools::IAssetReader >&& asset_reader ) noexcept;
 
      /// @brief Set render API of the game.
      /// @param[in] render_api render API object.
@@ -88,6 +93,10 @@ public:
      /// @return package manager of the game.
      PackageManager& get_pkg_manager() noexcept;
 
+     /// @brief Get asset reader of the game.
+     /// @return asset reader of the game.
+     tools::IAssetReader& get_asset_reader() noexcept;
+
 private:
      Game( const Game& )               = delete;
      void operator=( const Game& )     = delete;
@@ -98,6 +107,8 @@ private:
 private:
      static bool initialized_;                         ///< engine initialization status.
      static GameConfig config_;                        ///< common application configuration.
+
+     std::unique_ptr< tools::IAssetReader > asset_reader_;  ///< asset reader of the game.
 
      std::unique_ptr< PackageManager > pkg_manager_;   ///< package manager of the game.
      std::unique_ptr< IProfile > profile_;             ///< profile of selected architecture.

@@ -16,7 +16,7 @@ namespace _16nar::tools
 enum class PackageFormat
 {
      Json,          ///< JSON.
-     FlatBuffers    ///< FlatBuffers buffer.
+     FlatBuffers,   ///< FlatBuffers buffer.
 };
 
 
