@@ -8,41 +8,6 @@
 
 namespace _16nar::constructor2d
 {
-namespace
-{
-
-std::unique_ptr< Node2D > extract_node( Scene::StatesMap& states, Node2D *node )
-{
-     Node2D *prev_parent = node->get_parent();
-     int prev_order = node->get_state_order();
-     std::unique_ptr< Node2D > ptr{};
-
-     if ( !prev_parent )
-     {
-          auto state_iter = states.find( prev_order );
-          if ( state_iter == states.end() )
-          {
-               throw std::runtime_error{ "node has no parent and has unknown state order "
-                    + std::to_string( prev_order ) };
-          }
-          ptr = state_iter->second.remove_node( node );
-          if ( !ptr )
-          {
-               throw std::runtime_error{ "node's saved state does not have this node as child" };
-          }
-     }
-     else
-     {
-          ptr = prev_parent->remove_child( node );
-          if ( !ptr )
-          {
-               throw std::runtime_error{ "node's parent does not have this node as child" };
-          }
-     }
-     return ptr;
-}
-
-} // anonymous namespace
 
 Scene::Scene():
      states_{}, node_names_{}, setup_func_{ nullptr }, loop_func_{ nullptr }
@@ -87,8 +52,9 @@ void Scene::loop( float delta )
 }
 
 
-void Scene::register_state( int order, SceneState&& state )
+void Scene::register_state( SceneState&& state )
 {
+     int order = state.get_order();
      states_.emplace( order, std::move( state ) );
 }
 
@@ -139,8 +105,7 @@ void Scene::reparent_node_to_state( Node2D *node, int order )
      }
 
      auto ptr = extract_node( states_, node );
-     ptr->set_state_order( order );
-     new_state_iter->second.add_node( std::move( ptr ) );
+     new_state_iter->second.add_child( std::move( ptr ) );
 }
 
 
@@ -180,6 +145,38 @@ void Scene::delete_node_name( const std::string& name )
      {
           LOG_16NAR_DEBUG( "node with name " << name << " already does not exist" );
      }
+}
+
+
+std::unique_ptr< Node2D > Scene::extract_node( Scene::StatesMap& states, Node2D *node )
+{
+     Node2D *prev_parent = node->get_parent();
+     int prev_order = node->get_state_order();
+     std::unique_ptr< Node2D > ptr{};
+
+     if ( !prev_parent )
+     {
+          auto state_iter = states.find( prev_order );
+          if ( state_iter == states.end() )
+          {
+               throw std::runtime_error{ "node has no parent and has unknown state order "
+                    + std::to_string( prev_order ) };
+          }
+          ptr = state_iter->second.remove_child( node );
+          if ( !ptr )
+          {
+               throw std::runtime_error{ "node's saved state does not have this node as child" };
+          }
+     }
+     else
+     {
+          ptr = prev_parent->remove_child( node );
+          if ( !ptr )
+          {
+               throw std::runtime_error{ "node's parent does not have this node as child" };
+          }
+     }
+     return ptr;
 }
 
 

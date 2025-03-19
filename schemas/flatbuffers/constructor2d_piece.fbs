@@ -2,13 +2,15 @@ include "constructor2d_nodes.fbs";
 
 namespace _16nar.data.constructor2d;
 
-/// @brief Record about reusable subtree of the scene.
-table ScenePiece2D
+/// @brief Package of scene pieces.
+table NodePackage2D
 {
+     version:       uint32;
      deps:          Dependencies   (required);
-     nodes:         [AnyNode2D]    (required);
+     pieces:        [ScenePiece2D] (required);
+     schema:        ResourceId     (required);
 }
 
-root_type ScenePiece2D;
+root_type NodePackage2D;
 file_identifier "16C2";  // 16nar engine, constructor 2D architecture
 file_extension "narp";

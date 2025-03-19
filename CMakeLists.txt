@@ -19,8 +19,7 @@ macro(narengine_set_option var default opt_type docstring)
     set("${var}" ${${var}} CACHE "${opt_type}" "${docstring}" FORCE)
 endmacro()
 
-
-project(16nar LANGUAGES CXX)
+project(16nar VERSION "${NARENGINE_VERSION_MAJOR}.${NARENGINE_VERSION_MINOR}.${NARENGINE_VERSION_PATCH}" LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

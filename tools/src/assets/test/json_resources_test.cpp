@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <16nar/tools/assets/json_asset_reader.h>
-#include <16nar/tools/assets/json_asset_writer.h>
+#include <16nar/tools/assets/json/json_asset_reader.h>
+#include <16nar/tools/assets/json/json_asset_writer.h>
 #include <16nar/render/render_defs.h>
 
 #include <nlohmann/json.hpp>
@@ -258,6 +258,8 @@ TEST_CASE( "Packages reading and writing in JSON format", "[json_resources]" )
 
      REQUIRE( pkg.resources.size() == 2 );
 
+     REQUIRE( pkg.chunk_size == 10240 );
+
      const auto& data0 = pkg.resources.at( 0 );
      REQUIRE( data0.type == _16nar::ResourceType::Texture );
      REQUIRE( data0.name == "test_pkg_texture" );
@@ -303,6 +305,9 @@ TEST_CASE( "Packages reading and writing in JSON format", "[json_resources]" )
 
      std::ifstream ifs_written{ "data/out/test_package_out.json" };
      auto pkg_written = nlohmann::json::parse( ifs_written );
+
+     REQUIRE( pkg_written[ "chunk_size" ] == 10240 );
+
      auto written = pkg_written[ "resources" ][ 0 ];
      REQUIRE( written[ "type" ] == "texture" );
      REQUIRE( written[ "name" ] == "test_pkg_texture" );

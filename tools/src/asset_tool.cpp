@@ -5,12 +5,12 @@
 #include <16nar/tools/utils.h>
 #include <16nar/tools/assets/resource_package.h>
 #if defined( NARENGINE_TOOLS_JSON )
-#    include <16nar/tools/assets/json_asset_reader.h>
-#    include <16nar/tools/assets/json_asset_writer.h>
+#    include <16nar/tools/assets/json/json_asset_reader.h>
+#    include <16nar/tools/assets/json/json_asset_writer.h>
 #endif // NARENGINE_TOOLS_JSON
 #if defined( NARENGINE_TOOLS_FLATBUFFERS )
-#    include <16nar/tools/assets/flatbuffers_asset_reader.h>
-#    include <16nar/tools/assets/flatbuffers_asset_writer.h>
+#    include <16nar/tools/assets/flatbuffers/flatbuffers_asset_reader.h>
+#    include <16nar/tools/assets/flatbuffers/flatbuffers_asset_writer.h>
 #endif // NARENGINE_TOOLS_FLATBUFFERS
 
 #include <vector>

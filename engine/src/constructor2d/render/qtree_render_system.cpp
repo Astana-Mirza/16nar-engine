@@ -161,7 +161,7 @@ bool QTreeRenderSystem::check_quadrant( const Drawable2D *obj, const Quadrant *q
 {
      auto rect = obj->get_global_bounds();
      if ( quad->get_area().contains( rect.get_pos() ) &&
-          quad->get_area().contains( rect.get_pos() + Vec2f{ rect.get_width(), rect.get_height() } ) )
+          quad->get_area().contains( rect.get_end() ) )
      {
           return true;
      }

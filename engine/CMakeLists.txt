@@ -74,6 +74,7 @@ set(NARENGINE_BASE_SOURCES
     "${NARENGINE_SRC_DIR}/system/window.cpp"
     "${NARENGINE_SRC_DIR}/system/exceptions.cpp"
     "${NARENGINE_SRC_DIR}/system/package_manager.cpp"
+    "${NARENGINE_SRC_DIR}/signals/signallable.cpp"
     "${NARENGINE_SRC_DIR}/render/camera_2d.cpp"
     "${NARENGINE_SRC_DIR}/render/drawable.cpp"
 )
@@ -139,6 +140,7 @@ if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
         "${NARENGINE_SRC_DIR}/constructor2d/transformable_2d.cpp"
         "${NARENGINE_SRC_DIR}/constructor2d/node_2d.cpp"
         "${NARENGINE_SRC_DIR}/constructor2d/drawable_node_2d.cpp"
+        "${NARENGINE_SRC_DIR}/constructor2d/sprite_node.cpp"
     )
 
     add_library("${NAME}_constructor2d" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CONSTRUCTOR2D_SOURCES})
@@ -185,16 +187,25 @@ if ("${NARENGINE_BUILD_TESTS}")
         add_test(NAME "${NAME}_render_opengl_test" COMMAND "${NAME}_render_opengl_test")
      endif() # if ("${NARENGINE_RENDER_OPENGL}" OR "${NARENGINE_RENDER_OPENGL_ES}")
 
-     if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
-          add_executable("${NAME}_constructor2d_qtree_test"
-               "${NARENGINE_SRC_DIR}/constructor2d/render/test/qtree_test.cpp"
-          )
-          target_include_directories("${NAME}_constructor2d_qtree_test" PRIVATE
-               ${NARENGINE_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
-          target_link_directories("${NAME}_constructor2d_qtree_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
-          target_link_libraries("${NAME}_constructor2d_qtree_test" PRIVATE "${NAME}_constructor2d" "Catch2::Catch2WithMain")
-          add_test(NAME "${NAME}_constructor2d_qtree_test" COMMAND "${NAME}_constructor2d_qtree_test")
-     endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+    if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+        add_executable("${NAME}_constructor2d_qtree_test"
+            "${NARENGINE_SRC_DIR}/constructor2d/render/test/qtree_test.cpp"
+        )
+        target_include_directories("${NAME}_constructor2d_qtree_test" PRIVATE
+            ${NARENGINE_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
+        target_link_directories("${NAME}_constructor2d_qtree_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
+        target_link_libraries("${NAME}_constructor2d_qtree_test" PRIVATE "${NAME}_constructor2d" "Catch2::Catch2WithMain")
+        add_test(NAME "${NAME}_constructor2d_qtree_test" COMMAND "${NAME}_constructor2d_qtree_test")
+
+        add_executable("${NAME}_constructor2d_scene_test"
+            "${NARENGINE_SRC_DIR}/constructor2d/system/test/scene_test.cpp"
+        )
+        target_include_directories("${NAME}_constructor2d_scene_test" PRIVATE
+            ${NARENGINE_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
+        target_link_directories("${NAME}_constructor2d_scene_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
+        target_link_libraries("${NAME}_constructor2d_scene_test" PRIVATE "${NAME}_constructor2d" "Catch2::Catch2WithMain")
+        add_test(NAME "${NAME}_constructor2d_scene_test" COMMAND "${NAME}_constructor2d_scene_test")
+    endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 endif() # if ("${NARENGINE_BUILD_TESTS}")
 
 

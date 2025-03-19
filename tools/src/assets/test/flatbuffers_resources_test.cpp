@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <16nar/tools/assets/json_asset_reader.h>
-#include <16nar/tools/assets/flatbuffers_asset_reader.h>
-#include <16nar/tools/assets/flatbuffers_asset_writer.h>
+#include <16nar/tools/assets/json/json_asset_reader.h>
+#include <16nar/tools/assets/flatbuffers/flatbuffers_asset_reader.h>
+#include <16nar/tools/assets/flatbuffers/flatbuffers_asset_writer.h>
 #include <16nar/render/render_defs.h>
 
 #include <fstream>
@@ -210,6 +210,7 @@ TEST_CASE( "Packages reading and writing in flatbuffers format", "[flatbuffers_r
      _16nar::tools::PackageData read_pkg = reader.read_package( ifs );
      ifs.close();
 
+     REQUIRE( read_pkg.chunk_size == 10240 );
      REQUIRE( read_pkg.resources.size() == 2 );
 
      const auto& read_data0 = read_pkg.resources.at( 0 );

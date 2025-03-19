@@ -19,6 +19,7 @@ public:
      /// @copydoc Drawable2D::get_global_bounds() const
      FloatRect get_global_bounds() const override;
 
+protected:
      /// @copydoc Node2D::loop_call(SceneState&, float, bool)
      void loop_call( SceneState& state, float delta, bool updated ) override;
 };

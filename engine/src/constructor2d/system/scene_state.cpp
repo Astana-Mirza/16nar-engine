@@ -6,10 +6,16 @@
 namespace _16nar::constructor2d
 {
 
-SceneState::SceneState( std::unique_ptr< IRenderSystem2D >&& render_system,
+SceneState::SceneState( int order, std::unique_ptr< IRenderSystem2D >&& render_system,
                         bool updating, bool rendering ):
-     render_system_{ std::move( render_system ) }, nodes_{},
+     render_system_{ std::move( render_system ) }, nodes_{}, order_{ order },
      updating_{ updating }, rendering_{ rendering } {}
+
+
+int SceneState::get_order() const noexcept
+{
+     return order_;
+}
 
 
 void SceneState::set_rendering( bool rendering ) noexcept
@@ -61,23 +67,23 @@ void SceneState::loop( float delta )
 }
 
 
-void SceneState::add_node( std::unique_ptr< Node2D >&& node )
+void SceneState::add_child( std::unique_ptr< Node2D >&& node )
 {
-     auto pair = nodes_.insert( std::move( node ) );
-     if ( !pair.second )
-     {
-          throw std::runtime_error{ "unable to add node to children of scene state" };
-     }
+     auto& ptr = nodes_.emplace_back( std::move( node ) );
+     ptr->parent_ = nullptr;
+     ptr->set_state_order( order_ );
+     ptr->updated_ = true;
 }
 
 
-std::unique_ptr< Node2D > SceneState::remove_node( Node2D *node )
+std::unique_ptr< Node2D > SceneState::remove_child( const Node2D *node )
 {
-     auto iter = nodes_.find( node );
+     auto iter = std::find_if( nodes_.begin(), nodes_.end(),
+          [ node ]( const auto& ptr ){ return ptr.get() == node; } );
      if ( iter != nodes_.end() )
      {
-          auto handle = nodes_.extract( iter );
-          auto ptr{ std::move( handle.value() ) };
+          auto ptr{ std::move( *iter ) };
+          nodes_.erase( iter );
           return ptr;
      }
      return std::unique_ptr< Node2D >{};

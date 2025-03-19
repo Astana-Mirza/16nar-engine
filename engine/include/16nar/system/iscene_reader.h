@@ -3,7 +3,9 @@
 #ifndef _16NAR_ISCENE_READER_H
 #define _16NAR_ISCENE_READER_H
 
-#include <string_view>
+#include <16nar/16nardefs.h>
+
+#include <string>
 #include <memory>
 
 namespace _16nar
@@ -12,7 +14,7 @@ namespace _16nar
 class IRenderSystem;
 
 /// @brief Interface for reading scene from file.
-class ISceneReader
+class ENGINE_API ISceneReader
 {
 public:
      /// @brief Virtual default destructor.
@@ -20,7 +22,7 @@ public:
 
      /// @brief Set file for reading a scene.
      /// @param[in] filename path to file of the scene.
-     virtual void set_file( std::string_view filename ) = 0;
+     virtual void set_file( const std::string& filename ) = 0;
 
      /// @brief Create scene from file.
      virtual void create_scene() = 0;

@@ -21,7 +21,7 @@ class TestDrawable : public constructor2d::Drawable2D
 {
 public:
      TestDrawable( const VertexBuffer& vertices, const Shader& shader ):
-          Drawable2D( shader ), draw_info_{}, layer_{ 0 }
+          Drawable2D( shader ), draw_info_{}, model_matr_{}
      {
           draw_info_.render_params.primitive = PrimitiveType::Triangles;
           draw_info_.render_params.vertex_buffer = vertices;
@@ -56,7 +56,6 @@ public:
 private:
      mutable DrawInfo draw_info_;
      TransformMatrix model_matr_;
-     int layer_;
 };
 
 

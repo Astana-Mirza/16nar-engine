@@ -63,9 +63,9 @@ Vec2f TransformMatrix::operator*( const Vec2f& vector ) const noexcept
 FloatRect TransformMatrix::operator*( const FloatRect& rect ) const noexcept
 {
      Vec2f v1 = ( *this ) * rect.get_pos();
-     Vec2f v2 = ( *this ) * Vec2f{ rect.get_pos().x() + rect.get_width(), rect.get_pos().y() };
-     Vec2f v3 = ( *this ) * Vec2f{ rect.get_pos().x(), rect.get_pos().y() + rect.get_height() };
-     Vec2f v4 = ( *this ) * Vec2f{ rect.get_pos().x() + rect.get_width(), rect.get_pos().y() + rect.get_height() };
+     Vec2f v2 = ( *this ) * Vec2f{ rect.get_end().x(), rect.get_pos().y() };
+     Vec2f v3 = ( *this ) * Vec2f{ rect.get_pos().x(), rect.get_end().y() };
+     Vec2f v4 = ( *this ) * rect.get_end();
 
      std::array< float, 4 > x{ v1.x(), v2.x(), v3.x(), v4.x() };
      std::array< float, 4 > y{ v1.y(), v2.y(), v3.y(), v4.y() };
@@ -74,7 +74,7 @@ FloatRect TransformMatrix::operator*( const FloatRect& rect ) const noexcept
      float y_max = *std::max_element( y.cbegin(), y.cend() );
      float y_min = *std::min_element( y.cbegin(), y.cend() );
 
-     return FloatRect{ Vec2f{ x_min, y_min }, x_max - x_min, y_max - y_min };
+     return FloatRect{ Vec2f{ x_min, y_min }, Vec2f{ x_max, y_max } };
 }
 
 

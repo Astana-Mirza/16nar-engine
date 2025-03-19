@@ -37,11 +37,11 @@ public:
 
      /// @brief Get the scene layer of the object.
      /// @return scene layer of the object.
-     int get_layer() const noexcept;
+     uint8_t get_layer() const noexcept;
 
      /// @brief Set scene layer of this object.
      /// @param[in] layer scene layer.
-     void set_layer( int layer ) noexcept;
+     void set_layer( uint8_t layer ) noexcept;
 
      /// @brief Get local bounds of the object (in its own coordinates).
      /// @return local bounds of the object.
@@ -53,7 +53,7 @@ public:
 
 private:
      IRenderSystem2D *render_system_;   ///< render system which draws this object.
-     int layer_;                        ///< layer of this object which affects drawing order.
+     uint8_t layer_;                    ///< layer of this object which affects drawing order.
 };
 
 } // namespace _16nar::constructor2d

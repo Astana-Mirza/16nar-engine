@@ -45,12 +45,17 @@ enum class RenderApiType
 /// @brief Type of resource used for render.
 enum class ResourceType
 {
+     // render resources
      Texture,            ///< 2D texture.
      Shader,             ///< shader program.
      FrameBuffer,        ///< buffer for the frame.
      VertexBuffer,       ///< buffer or group of buffers for vertices.
      RenderBuffer,       ///< write-only render buffer.
      Cubemap,            ///< 3D texture.
+
+     // other resources
+     DataSchema,         ///< schema of binary serialized data.
+
      Unknown             ///< unknown resource type for default initialization.
 };
 
@@ -81,10 +86,14 @@ struct TypedResource : public Resource
 };
 
 
-using Shader       = TypedResource< ResourceType::Shader       >;
+// render resources
 using Texture      = TypedResource< ResourceType::Texture      >;
+using Shader       = TypedResource< ResourceType::Shader       >;
 using FrameBuffer  = TypedResource< ResourceType::FrameBuffer  >;
 using VertexBuffer = TypedResource< ResourceType::VertexBuffer >;
+using RenderBuffer = TypedResource< ResourceType::RenderBuffer >;
+using Cubemap      = TypedResource< ResourceType::Cubemap      >;
+// No need to make DataSchema, because it has no special manager
 
 } // namespace _16nar
 

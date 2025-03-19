@@ -27,7 +27,7 @@ public:
      constexpr static std::size_t quad_count = 4;
 
      using DrawableSet = std::unordered_set< Drawable2D * >;
-     using LayerMap = std::map< int, DrawableSet >;
+     using LayerMap = std::map< uint8_t, DrawableSet >;
      using QuadArray = std::array< std::unique_ptr< Quadrant >, quad_count >;
 
      /// @brief Constructor sets area of this quadrant.

@@ -4,35 +4,42 @@
 #define _16NAR_SLOT_H
 
 #include <16nar/signals/basic_slot.h>
+#include <16nar/signals/signal.h>
 #include <16nar/logger/logger.h>
 
-#include <stdexcept>
+#include <type_traits>
 
 namespace _16nar
 {
 
 /// @brief Class for signal accepting slot with custom handler.
+/// @tparam SignalType type of a signal.
+/// @tparam Handler type of signal handler, must be invocable with const SignalType&.
 template < typename SignalType, typename Handler >
 class Slot : public BasicSlot
 {
 public:
+     static_assert( std::is_base_of_v< Signal, std::decay_t< SignalType > >,
+          "SignalType must be derived from Signal" );
+     static_assert( std::is_invocable_v< Handler, const SignalType& >,
+          "Handler must be invocable with SignalType" );
+
      /// @brief Constructor, taking handler.
-     /// @param[in] handler Handler of a signal.
-     Slot( Handler&& handler ) : handler_{ handler } {}
+     /// @param[in] handler handler of a signal.
+     Slot( Handler&& handler ) : handler_{ std::forward< Handler >( handler ) } {}
 
 
      /// @brief Accept an emitted signal.
-     /// @param[in] sig Signal being accepted.
+     /// @param[in] sig signal being accepted.
      void accept_signal( const Signal& sig ) override
      {
-          try
+          auto *casted_sig = dynamic_cast< const SignalType * >( &sig );
+          if ( !casted_sig )
           {
-               handler_( dynamic_cast< const SignalType& >( sig ) );
+               LOG_16NAR_ERROR( "Cannot handle signal in slot, bad cast" );
+               return;
           }
-          catch ( const std::bad_cast& ex )
-          {
-               LOG_16NAR_ERROR( "Cannot handle signal in slot, bad cast: " << ex.what() );
-          }
+          handler_( *casted_sig );
      }
 
 private:

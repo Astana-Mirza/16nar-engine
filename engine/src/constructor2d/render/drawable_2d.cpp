@@ -48,13 +48,13 @@ IRenderSystem2D *Drawable2D::get_render_system() const noexcept
 }
 
 
-int Drawable2D::get_layer() const noexcept
+uint8_t Drawable2D::get_layer() const noexcept
 {
      return layer_;
 }
 
 
-void Drawable2D::set_layer( int layer ) noexcept
+void Drawable2D::set_layer( uint8_t layer ) noexcept
 {
      layer_ = layer;
 }

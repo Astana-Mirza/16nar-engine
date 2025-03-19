@@ -38,8 +38,8 @@ if ("${NARENGINE_TOOLS_JSON}")
     set(NARENGINE_ASSETS_JSON_LINK_LIBS PUBLIC "${NAME}_tools" PRIVATE "stb::stb" "nlohmann_json::nlohmann_json")
     set(NARENGINE_ASSETS_JSON_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
     set(NARENGINE_ASSETS_JSON_SOURCES
-        "${NARENGINE_TOOLS_SRC_DIR}/assets/json_asset_reader.cpp"
-        "${NARENGINE_TOOLS_SRC_DIR}/assets/json_asset_writer.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_asset_reader.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_asset_writer.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/stb_impl.cpp"
     )
     add_library("${NAME}_assets_json" "${NARENGINE_LIB_TYPE}" ${NARENGINE_ASSETS_JSON_SOURCES})
@@ -61,8 +61,8 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     set(NARENGINE_ASSETS_FB_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
     set(NARENGINE_ASSETS_FB_LINK_LIBS PUBLIC "glm::glm" "flatbuffers::libflatbuffers")
     set(NARENGINE_ASSETS_FB_SOURCES
-        "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers_asset_reader.cpp"
-        "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers_asset_writer.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_asset_reader.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_asset_writer.cpp"
     )
     add_library("${NAME}_assets_fb" "${NARENGINE_LIB_TYPE}" ${NARENGINE_ASSETS_FB_SOURCES})
     add_dependencies("${NAME}_assets_fb" "flatbuffers-gen-cpp" "GENERATE_flatbuffers-gen-cpp")

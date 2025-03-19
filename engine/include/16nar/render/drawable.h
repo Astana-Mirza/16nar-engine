@@ -20,7 +20,7 @@ public:
 
      /// @brief Get render data of the object.
      /// @return render data of the object.
-     virtual DrawInfo get_draw_info() const noexcept = 0;
+     virtual DrawInfo get_draw_info() const = 0;
 
      /// @brief Check if the object is visible.
      /// @return true if the object is visible, false otherwise.

@@ -18,19 +18,29 @@ public:
      /// @param[in] width witdh of the rectangle.
      /// @param[in] height height of the rectangle.
      Rectangle( const Vec< 2, T >& pos, T width, T height ) noexcept:
-          pos_{ pos }, width_{ width }, height_{ height } {}
+          pos_{ pos }, end_{ pos.x() + width, pos.y() + height } {}
 
-     /// @brief Get position of the rectangle.
+     /// @brief Constructor.
+     /// @param[in] pos position of the rectangle.
+     /// @param[in] end position of the end of the rectangle.
+     Rectangle( const Vec< 2, T >& pos, const Vec< 2, T >& end ) noexcept:
+          pos_{ pos }, end_{ end } {}
+
+     /// @brief Get position of the start of the rectangle.
      /// @return position of the rectangle.
      inline const Vec< 2, T >& get_pos() const noexcept { return pos_; }
 
+     /// @brief Get position of the end of the rectangle.
+     /// @return position of the end of the rectangle.
+     inline const Vec< 2, T >& get_end() const noexcept { return end_; }
+
      /// @brief Get width of the rectangle.
      /// @return width of the rectangle.
-     inline T get_width() const noexcept { return width_; }
+     inline T get_width() const noexcept { return end_.x() - pos_.x(); }
 
      /// @brief Get height of the rectangle.
      /// @return height of the rectangle.
-     inline T get_height() const noexcept { return height_; }
+     inline T get_height() const noexcept { return end_.y() - pos_.y(); }
 
      /// @brief Check if rectangle contains point.
      /// @param[in] point point in space.
@@ -43,9 +53,8 @@ public:
      bool intersects( const Rectangle& rect ) const noexcept;
 
 private:
-     Vec< 2, T > pos_;             ///< position of the rectangle.
-     T width_;                     ///< witdh of the rectangle.
-     T height_;                    ///< height of the rectangle.
+     Vec< 2, T > pos_;             ///< position of the starting corner of the rectangle.
+     Vec< 2, T > end_;             ///< position of the ending corner of the rectangle.
 };
 
 

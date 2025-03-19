@@ -2,6 +2,7 @@
 
 #include <16nar/constructor2d/system/scene_state.h>
 
+#include <algorithm>
 #include <stdexcept>
 
 namespace _16nar::constructor2d
@@ -42,42 +43,9 @@ TransformMatrix Node2D::get_global_transform_matr( bool include_self ) const noe
 }
 
 
-const NodesSet& Node2D::get_children() const noexcept
+const NodesList& Node2D::get_children() const noexcept
 {
      return children_;
-}
-
-
-// Member functions not for user to call
-
-void Node2D::set_name( const std::string& name )
-{
-     name_ = name;
-}
-
-
-void Node2D::set_state_order( int state_order ) noexcept
-{
-     state_order_ = state_order;
-}
-
-
-int Node2D::get_state_order() const noexcept
-{
-     return state_order_;
-}
-
-
-void Node2D::setup_call( SceneState& state )
-{
-     if ( setup_func_ )
-     {
-          setup_func_( this, state );
-     }
-     for ( auto& child : children_ )
-     {
-          child->setup_call( state );
-     }
 }
 
 
@@ -97,26 +65,54 @@ void Node2D::loop_call( SceneState& state, float delta, bool updated )
 }
 
 
-void Node2D::add_child( std::unique_ptr< Node2D >&& node )
+void Node2D::setup_call( SceneState& state )
 {
-     auto pair = children_.insert( std::move( node ) );
-     if ( !pair.second )
+     if ( setup_func_ )
      {
-          throw std::runtime_error{ "unable to add node to children of '" + name_ + "'" };
+          setup_func_( this, state );
      }
-     ( *pair.first )->parent_ = this;
-     ( *pair.first )->state_order_ = state_order_;
-     ( *pair.first )->updated_ = true;
+     for ( auto& child : children_ )
+     {
+          child->setup_call( state );
+     }
 }
 
 
-std::unique_ptr< Node2D > Node2D::remove_child( Node2D *node )
+void Node2D::set_name( const std::string& name )
 {
-     auto iter = children_.find( node );
+     name_ = name;
+}
+
+
+void Node2D::set_state_order( int state_order ) noexcept
+{
+     state_order_ = state_order;
+}
+
+
+int Node2D::get_state_order() const noexcept
+{
+     return state_order_;
+}
+
+
+void Node2D::add_child( std::unique_ptr< Node2D >&& node )
+{
+     auto& ptr = children_.emplace_back( std::move( node ) );
+     ptr->parent_ = this;
+     ptr->set_state_order( state_order_ );
+     ptr->updated_ = true;
+}
+
+
+std::unique_ptr< Node2D > Node2D::remove_child( const Node2D *node )
+{
+     auto iter = std::find_if( children_.begin(), children_.end(),
+          [ node ]( const auto& ptr ){ return ptr.get() == node; } );
      if ( iter != children_.end() )
      {
-          auto handle = children_.extract( iter );
-          auto ptr{ std::move( handle.value() ) };
+          auto ptr{ std::move( *iter ) };
+          children_.erase( iter );
           ptr->parent_ = nullptr;
           return ptr;
      }
