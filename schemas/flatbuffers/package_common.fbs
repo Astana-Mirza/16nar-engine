@@ -68,6 +68,47 @@ enum BufferType : uint8
 }
 
 
+/// @brief Type of stored data for type-safe key-value pair usage.
+enum StoredDataType : uint8
+{
+     Uint64,
+     Uint32,
+     Uint16,
+     Uint8,
+     Int64,
+     Int32,
+     Int16,
+     Int8,
+     Bool,
+     Float,
+     Double,
+     String,
+
+     Uint64Arr,
+     Uint32Arr,
+     Uint16Arr,
+     Uint8Arr,
+     Int64Arr,
+     Int32Arr,
+     Int16Arr,
+     Int8Arr,
+     BoolArr,
+     FloatArr,
+     DoubleArr,
+     StringArr,
+
+     Vec2f,
+     Vec3f,
+     Vec4f,
+     Vec2i,
+     Vec3i,
+     Vec4i,
+     FloatRect,
+     IntRect,
+     ResourceIndex
+}
+
+
 /// @brief Parameters of loading a texture.
 table TextureLoadParams
 {
@@ -133,13 +174,31 @@ table VertexBufferLoadParams
 }
 
 
+/// @brief One item of the data schema.
+table DataItem
+{
+     name:          string         (required);
+     type:          StoredDataType;
+     mandatory:     bool;
+}
+
+
+/// @brief Schema of binary data.
+table DataSchema
+{
+     items:         [DataItem]     (required);
+     default_vals:  [ubyte]        (flexbuffer);
+}
+
+
 /// @brief Representation of any load params.
 union AnyLoadParams
 {
      TextureLoadParams,
      CubemapLoadParams,
      ShaderLoadParams,
-     VertexBufferLoadParams
+     VertexBufferLoadParams,
+     DataSchema
 }
 
 

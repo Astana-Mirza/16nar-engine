@@ -2,19 +2,18 @@ include "constructor2d_nodes.fbs";
 
 namespace _16nar.data.constructor2d;
 
-/// @brief 2D render system which uses quadrants for binary space partition.
-table QTreeRenderSystem
+/// @brief Type of render system.
+enum RenderSystemType
 {
-     quad_start:    Vec2f;
-     quad_size:     Vec2f;
-     state_size:    Vec2i;
+     QTreeRenderSystem
 }
 
 
-/// @brief Union to store any 2D render system.
-union RenderSystem2D
+/// @brief Common render system information.
+table RenderSystemData
 {
-     QTreeRenderSystem
+     type:     RenderSystemType;
+     data:     [ubyte]   (flexbuffer, required);
 }
 
 
@@ -23,19 +22,21 @@ table SceneState2D
 {
      updating:      bool;
      rendering:     bool;
-     render_system: RenderSystem2D (required);
-     nodes:         [AnyNode2D]    (required);
+     render_system: RenderSystemData    (required);
+     nodes:         [NodeData]          (required);
 }
 
 
 /// @brief Scene executed by engine.
 table Scene2D
 {
-     main_lib:      string;
-     loop_func:     string;
-     setup_func:    string;
-     deps:          Dependencies   (required);
-     states:        [SceneState2D] (required);
+     version:            uint32;
+     deps:               Dependencies   (required);
+     states:             [SceneState2D] (required);
+     internal_pieces:    [ScenePiece2D] (optional);
+     schema:             ResourceId     (required);
+     loop_func:          ResourceId     (optional);
+     setup_func:         ResourceId     (optional);
 }
 
 root_type Scene2D;

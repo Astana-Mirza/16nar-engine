@@ -34,6 +34,7 @@ struct ResourceData
 struct PackageData
 {
      std::vector< ResourceData > resources;  ///< resources of the package.
+     uint32_t chunk_size{};                  ///< size of one chunk, used for partial package load.
 };
 
 } // namespace _16nar::tools

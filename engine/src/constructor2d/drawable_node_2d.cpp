@@ -24,12 +24,12 @@ void DrawableNode2D::loop_call( SceneState& state, float delta, bool updated )
      }
      bool transformed = calculate_matr();
      updated = updated || transformed || updated_;
-     updated_ = false;
      if ( updated )
      {
           set_render_system( &( state.get_render_system() ) ); // no effect if already set
           state.get_render_system().handle_change( this );
      }
+     updated_ = false;
      for ( auto& child : get_children() )
      {
           child->loop_call( state, delta, updated );

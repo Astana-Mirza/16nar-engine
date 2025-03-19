@@ -46,9 +46,8 @@ public:
      void loop( float delta );
 
      /// @brief Register new scene state.
-     /// @param[in] order order value which defines order of state updating.
      /// @param[in] state pointer to scene state.
-     void register_state( int order, SceneState&& state );
+     void register_state( SceneState&& state );
 
      /// @brief Get the scene state with given order, throws exception if no such state exists.
      /// @param[in] order order of the state.
@@ -83,6 +82,13 @@ public:
      /// @brief Delete node's name, the node will not be deleted.
      /// @param[in] name name of the node.
      void delete_node_name( const std::string& name );
+
+private:
+     /// @brief Extract node from current parent or state.
+     /// @param[in] states map of scene states.
+     /// @param[in] node pointer to node to be extracted.
+     /// @return pointer to extracted node.
+     std::unique_ptr< Node2D > extract_node( StatesMap& states, Node2D *node );
 
 private:
      StatesMap states_;            ///< states of this scene with their order.

@@ -1,7 +1,11 @@
-#include <16nar/tools/assets/flatbuffers_asset_reader.h>
+#include <16nar/tools/assets/flatbuffers/flatbuffers_asset_reader.h>
 #include <16nar/tools/convertor_utils.inl>
 
+#include <16nar/tools/scene_defs.h>
 #include <16nar/render/render_defs.h>
+
+#include <16nar/tools/flatbuffers/flatbuffers_props_reader.h>
+
 #include <16nar/gen/flatbuffers/package_generated.h>
 #include <16nar/gen/flatbuffers/resource_generated.h>
 
@@ -13,7 +17,7 @@ namespace
 
 constexpr std::size_t initial_buffer_size = 256;
 
-
+// boilerplate is a cost of independence from underlying format
 _16NAR_ENUM_CONVERTOR( _16nar::BufferDataFormat, _16nar::data::package::BufferDataFormat,
      { _16nar::data::package::BufferDataFormat::Rgb,             _16nar::BufferDataFormat::Rgb                 },
      { _16nar::data::package::BufferDataFormat::Rgba,            _16nar::BufferDataFormat::Rgba,               },
@@ -48,6 +52,40 @@ _16NAR_ENUM_CONVERTOR( _16nar::BufferType, _16nar::data::package::BufferType,
      { _16nar::data::package::BufferType::DynamicDraw,      _16nar::BufferType::DynamicDraw                    },
      { _16nar::data::package::BufferType::DynamicRead,      _16nar::BufferType::DynamicRead                    },
      { _16nar::data::package::BufferType::DynamicCopy,      _16nar::BufferType::DynamicCopy                    } )
+_16NAR_ENUM_CONVERTOR( _16nar::tools::StoredDataType, _16nar::data::package::StoredDataType,
+     { _16nar::data::package::StoredDataType::Uint64,       _16nar::StoredDataType::Uint64                     },
+     { _16nar::data::package::StoredDataType::Uint32,       _16nar::StoredDataType::Uint32                     },
+     { _16nar::data::package::StoredDataType::Uint16,       _16nar::StoredDataType::Uint16                     },
+     { _16nar::data::package::StoredDataType::Uint8,        _16nar::StoredDataType::Uint8                      },
+     { _16nar::data::package::StoredDataType::Int64,        _16nar::StoredDataType::Int64                      },
+     { _16nar::data::package::StoredDataType::Int32,        _16nar::StoredDataType::Int32                      },
+     { _16nar::data::package::StoredDataType::Int16,        _16nar::StoredDataType::Int16                      },
+     { _16nar::data::package::StoredDataType::Int8,         _16nar::StoredDataType::Int8                       },
+     { _16nar::data::package::StoredDataType::Bool,         _16nar::StoredDataType::Bool                       },
+     { _16nar::data::package::StoredDataType::Float,        _16nar::StoredDataType::Float                      },
+     { _16nar::data::package::StoredDataType::Double,       _16nar::StoredDataType::Double                     },
+     { _16nar::data::package::StoredDataType::String,       _16nar::StoredDataType::String                     },
+     { _16nar::data::package::StoredDataType::Uint64Arr,    _16nar::StoredDataType::Uint64Arr                  },
+     { _16nar::data::package::StoredDataType::Uint32Arr,    _16nar::StoredDataType::Uint32Arr                  },
+     { _16nar::data::package::StoredDataType::Uint16Arr,    _16nar::StoredDataType::Uint16Arr                  },
+     { _16nar::data::package::StoredDataType::Uint8Arr,     _16nar::StoredDataType::Uint8Arr                   },
+     { _16nar::data::package::StoredDataType::Int64Arr,     _16nar::StoredDataType::Int64Arr                   },
+     { _16nar::data::package::StoredDataType::Int32Arr,     _16nar::StoredDataType::Int32Arr                   },
+     { _16nar::data::package::StoredDataType::Int16Arr,     _16nar::StoredDataType::Int16Arr                   },
+     { _16nar::data::package::StoredDataType::Int8Arr,      _16nar::StoredDataType::Int8Arr                    },
+     { _16nar::data::package::StoredDataType::BoolArr,      _16nar::StoredDataType::BoolArr                    },
+     { _16nar::data::package::StoredDataType::FloatArr,     _16nar::StoredDataType::FloatArr                   },
+     { _16nar::data::package::StoredDataType::DoubleArr,    _16nar::StoredDataType::DoubleArr                  },
+     { _16nar::data::package::StoredDataType::StringArr,    _16nar::StoredDataType::StringArr                  },
+     { _16nar::data::package::StoredDataType::Vec2f,        _16nar::StoredDataType::Vec2f                      },
+     { _16nar::data::package::StoredDataType::Vec3f,        _16nar::StoredDataType::Vec3f                      },
+     { _16nar::data::package::StoredDataType::Vec4f,        _16nar::StoredDataType::Vec4f                      },
+     { _16nar::data::package::StoredDataType::Vec2i,        _16nar::StoredDataType::Vec2f                      },
+     { _16nar::data::package::StoredDataType::Vec3i,        _16nar::StoredDataType::Vec3i                      },
+     { _16nar::data::package::StoredDataType::Vec4i,        _16nar::StoredDataType::Vec4i                      },
+     { _16nar::data::package::StoredDataType::FloatRect,    _16nar::StoredDataType::FloatRect                  },
+     { _16nar::data::package::StoredDataType::IntRect,      _16nar::StoredDataType::IntRect                    },
+     { _16nar::data::package::StoredDataType::ResourceIndex,_16nar::StoredDataType::ResourceIndex              } )
 
 
 void read_texture( const _16nar::data::package::Resource *res_buffer,
@@ -171,6 +209,31 @@ void read_cubemap( const _16nar::data::package::Resource *res_buffer,
 }
 
 
+void read_data_schema( const _16nar::data::package::Resource *res_buffer,
+     const std::vector< _16nar::DataSharedPtr >& data, _16nar::tools::ResourceData& resource )
+{
+     auto params = res_buffer->params_as_DataSchema();
+     _16nar::tools::DataSchema schema;
+     resource.type = _16nar::ResourceType::DataSchema;
+
+     for ( const auto& item : *params->items() )
+     {
+          _16nar::tools::DataItem saved_item{};
+          saved_item.type = convert_enum( item->type() );
+          saved_item.mandatory = item->mandatory();
+          schema.emplace( item->name()->c_str(), saved_item );
+     }
+
+     if ( params->default_vals() )
+     {
+          schema.default_vals = std::make_shared< FlatBuffersPropsReader >(
+               params->default_vals().data(), params->default_vals().size(), true );
+     }
+
+     resource.params = std::any{ schema };
+}
+
+
 std::vector< uint8_t > read_header( std::istream& input, uint32_t& header_size )
 {
      input.read( reinterpret_cast< char * >( &header_size ), sizeof( header_size ) );
@@ -187,6 +250,10 @@ _16nar::tools::ResourceData read_resource( const _16nar::data::package::Resource
      std::vector< _16nar::DataSharedPtr > data;
      for ( uint32_t data_size : *res_buffer->data_sizes() )
      {
+          if ( 0 == data_size )
+          {
+               continue;
+          }
           data.emplace_back( _16nar::DataSharedPtr{
                     new std::byte[ data_size ], std::default_delete< std::byte[] >() } );
           input.read( reinterpret_cast< char * >( data.back().get() ), data_size );
@@ -208,6 +275,9 @@ _16nar::tools::ResourceData read_resource( const _16nar::data::package::Resource
                break;
           case _16nar::data::package::AnyLoadParams::CubemapLoadParams:
                read_cubemap( res_buffer, data, resource );
+               break;
+          case _16nar::data::package::AnyLoadParams::DataSchema:
+               read_data_schema( res_buffer, data, resource );
                break;
           default:
                throw std::runtime_error{ "wrong resource type: "
@@ -267,6 +337,7 @@ PackageData FlatBuffersAssetReader::read_package( std::istream& input )
      {
           package.resources.emplace_back( read_resource( resource, input ) );
      }
+     package.chunk_size = pkg_buffer->chunk_size();
      return package;
 }
 

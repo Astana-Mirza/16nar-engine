@@ -1,6 +1,6 @@
-#include <16nar/tools/assets/json_asset_writer.h>
+#include <16nar/tools/assets/json/json_asset_writer.h>
 
-#include <16nar/tools/assets/json_utils.inl>
+#include <16nar/tools/assets/json/json_utils.inl>
 #include <16nar/tools/utils.h>
 
 #include <string>
@@ -196,6 +196,7 @@ void JsonAssetWriter::write_package( std::ostream& output, const PackageData& pa
           resources.push_back( write_resource( resource, out_dir_ ) );
      }
      json[ "resources" ] = resources;
+     json[ "chunk_size" ] = package.chunk_size;
      output << json;
 }
 

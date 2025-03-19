@@ -5,7 +5,9 @@ namespace _16nar.data.package;
 /// @brief Collection of resources.
 table Package
 {
+     version:       uint32;
      resources:     [Resource]     (required);
+     chunk_size:    uint32;
 }
 
 root_type Package;

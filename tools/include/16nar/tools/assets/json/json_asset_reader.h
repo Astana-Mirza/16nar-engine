@@ -4,7 +4,7 @@
 #define _16NAR_TOOLS_JSON_ASSET_READER_H
 
 #include <16nar/tools/assets/iasset_reader.h>
-#include <16nar/tools/assets/json_file_operator.h>
+#include <16nar/tools/assets/json/json_file_operator.h>
 
 namespace _16nar::tools
 {

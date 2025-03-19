@@ -1,4 +1,4 @@
-#include <16nar/tools/assets/flatbuffers_asset_writer.h>
+#include <16nar/tools/assets/flatbuffers/flatbuffers_asset_writer.h>
 #include <16nar/tools/convertor_utils.inl>
 
 #include <16nar/render/render_defs.h>
@@ -285,6 +285,7 @@ void FlatBuffersAssetWriter::write_package( std::ostream& output, const PackageD
      auto resources_stored = builder.CreateVector( resources );
      _16nar::data::package::PackageBuilder pkg_builder{ builder };
      pkg_builder.add_resources( resources_stored );
+     pkg_builder.add_chunk_size( package.chunk_size );
 
      auto pkg_stored = pkg_builder.Finish();
      builder.Finish( pkg_stored, _16nar::data::package::PackageIdentifier() );

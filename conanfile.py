@@ -1,11 +1,12 @@
 from conan import ConanFile
 from conan.tools.cmake import CMake, cmake_layout
 from conan.tools.build import check_min_cppstd
+import re
 
 
 class NarengineRecipe(ConanFile):
     name = "16nar_engine"
-    version = "0.0.0-1"
+    version = "0.1.0-1"
 
     url = "https://github.com/Astana-Mirza/16nar-engine"
 
@@ -53,6 +54,7 @@ class NarengineRecipe(ConanFile):
         cmake_layout(self)
 
     def build(self):
+        version_items = re.split(r'\.|-|\+', self.version)
         cmake = CMake(self)
         cmake.configure({
             "NARENGINE_LOG_LEVEL": self.options.log_level,
@@ -60,7 +62,10 @@ class NarengineRecipe(ConanFile):
             "NARENGINE_TOOLS_JSON": "ON" if self.options.with_tools_json else "OFF",
             "NARENGINE_TOOLS_FLATBUFFERS": "ON" if self.options.with_tools_flatbuffers else "OFF",
             "NARENGINE_RENDER_OPENGL": "ON" if self.options.with_render_opengl else "OFF",
-            "NARENGINE_BUILD_CONSTRUCTOR2D": "ON" if self.options.with_arch_constructor2d else "OFF"
+            "NARENGINE_BUILD_CONSTRUCTOR2D": "ON" if self.options.with_arch_constructor2d else "OFF",
+            "NARENGINE_VERSION_MAJOR": version_items[ 0 ],
+            "NARENGINE_VERSION_MINOR": version_items[ 1 ],
+            "NARENGINE_VERSION_PATCH": version_items[ 2 ],
         })
         cmake.build()
         if self.settings.os != "Windows":

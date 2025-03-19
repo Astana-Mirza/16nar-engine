@@ -57,8 +57,8 @@ public:
      /// @brief Emits a signal, making all acceptors to handle it
      /// @tparam signalType type of a signal being emitted.
      /// @param[in] sig signal object.
-	template < typename SignalType >
-	void emit( const SignalType& sig );
+     template < typename SignalType >
+     void emit( const SignalType& sig );
 
      /// @brief Destructor, disconnects all slots.
      virtual ~Signallable();

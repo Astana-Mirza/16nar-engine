@@ -1,6 +1,6 @@
-#include <16nar/tools/assets/json_asset_reader.h>
+#include <16nar/tools/assets/json/json_asset_reader.h>
 
-#include <16nar/tools/assets/json_utils.inl>
+#include <16nar/tools/assets/json/json_utils.inl>
 #include <16nar/tools/utils.h>
 
 #include <stb_image.h>
@@ -257,6 +257,7 @@ PackageData JsonAssetReader::read_package( std::istream& input )
      {
           package.resources.emplace_back( read_resource( resource, in_dir_ ) );
      }
+     package.chunk_size = json[ "chunk_size" ];
      return package;
 }
 

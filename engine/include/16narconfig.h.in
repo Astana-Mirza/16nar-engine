@@ -3,4 +3,19 @@
 #cmakedefine NARENGINE_TOOLS_FLATBUFFERS
 #cmakedefine NARENGINE_TOOLS_JSON
 
+#cmakedefine NARENGINE_VERSION_MAJOR @NARENGINE_VERSION_MAJOR@
+#cmakedefine NARENGINE_VERSION_MINOR @NARENGINE_VERSION_MINOR@
+#cmakedefine NARENGINE_VERSION_PATCH @NARENGINE_VERSION_PATCH@
+
+// set default version values to 0 because CMake does not allow passing 0 in cmakedefine
+#ifndef NARENGINE_VERSION_MAJOR
+#    define NARENGINE_VERSION_MAJOR 0
+#endif
+#ifndef NARENGINE_VERSION_MINOR
+#    define NARENGINE_VERSION_MINOR 0
+#endif
+#ifndef NARENGINE_VERSION_PATCH
+#    define NARENGINE_VERSION_PATCH 0
+#endif
+
 #cmakedefine NARENGINE_WIN_EXPORT

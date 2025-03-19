@@ -3,10 +3,10 @@
 namespace std
 {
 
-     size_t hash< _16nar::Signallable::SlotId >::operator()( const _16nar::Signallable::SlotId& id ) const
-     {
-          return hash< type_index >{}( id.first ) + hash< _16nar::Signallable * >{}( id.second );
-	}
+size_t hash< _16nar::Signallable::SlotId >::operator()( const _16nar::Signallable::SlotId& id ) const
+{
+     return hash< type_index >{}( id.first ) + hash< _16nar::Signallable * >{}( id.second );
+}
 
 } // namespace std
 
