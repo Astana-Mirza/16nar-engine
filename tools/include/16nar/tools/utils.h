@@ -4,6 +4,8 @@
 #define _16NAR_TOOLS_UTILS_H
 
 #include <16nar/render/render_defs.h>
+#include <16nar/tools/assets/iprops_reader.h>
+#include <16nar/tools/assets/iprops_writer.h>
 
 #include <string>
 
@@ -41,6 +43,14 @@ ENGINE_API std::string correct_path( const std::string& base_dir, const std::str
 /// @return channel count used for the data format.
 ENGINE_API int get_channel_count( BufferDataFormat format );
 
+/// @brief Copy property from one property storage to another.
+/// @param[in] reader reader of source property storage.
+/// @param[in] name name of property.
+/// @param[in] item item which describes the property.
+/// @param[in] copy_optional true to copy optional fields, false otherwise.
+/// @param[out] writer writer of destination property storage.
+ENGINE_API void copy_property( IPropsReader& reader, const std::string& name,
+     const DataItem& item, bool copy_optional, IPropsWriter& writer );
 
 } // namespace _16nar::tools
 

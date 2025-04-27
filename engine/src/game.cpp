@@ -41,7 +41,7 @@ Game::Game():
      init();   // initialize with default config, if not initialized earlier.
 
      // call for correct initialization order
-     Logger::instance().log( ILogWriter::LogLevel::Info, "creating game object" );
+     Logger::instance().log( ILogWriter::LogLevel::Info, "Creating game object" );
 
      pkg_manager_ = std::make_unique< PackageManager >();
      pkg_manager_->set_package_dir( config_.app_dir );

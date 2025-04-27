@@ -5,6 +5,10 @@
 #include <16nar/gen/flatbuffers/package_generated.h>
 #include <16nar/gen/flatbuffers/resource_generated.h>
 
+#include <16nar/tools/utils.h>
+#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/assets/flatbuffers/flatbuffers_props_writer.h>
+
 #include <stdexcept>
 #include <ostream>
 
@@ -48,6 +52,40 @@ _16NAR_ENUM_CONVERTOR( _16nar::data::package::BufferType, _16nar::BufferType,
      { _16nar::BufferType::DynamicDraw,             _16nar::data::package::BufferType::DynamicDraw             },
      { _16nar::BufferType::DynamicRead,             _16nar::data::package::BufferType::DynamicRead             },
      { _16nar::BufferType::DynamicCopy,             _16nar::data::package::BufferType::DynamicCopy             } )
+_16NAR_ENUM_CONVERTOR( _16nar::data::package::StoredDataType, _16nar::tools::StoredDataType,
+     { _16nar::tools::StoredDataType::Uint64,       _16nar::data::package::StoredDataType::Uint64             },
+     { _16nar::tools::StoredDataType::Uint32,       _16nar::data::package::StoredDataType::Uint32             },
+     { _16nar::tools::StoredDataType::Uint16,       _16nar::data::package::StoredDataType::Uint16             },
+     { _16nar::tools::StoredDataType::Uint8,        _16nar::data::package::StoredDataType::Uint8              },
+     { _16nar::tools::StoredDataType::Int64,        _16nar::data::package::StoredDataType::Int64              },
+     { _16nar::tools::StoredDataType::Int32,        _16nar::data::package::StoredDataType::Int32              },
+     { _16nar::tools::StoredDataType::Int16,        _16nar::data::package::StoredDataType::Int16              },
+     { _16nar::tools::StoredDataType::Int8,         _16nar::data::package::StoredDataType::Int8               },
+     { _16nar::tools::StoredDataType::Bool,         _16nar::data::package::StoredDataType::Bool               },
+     { _16nar::tools::StoredDataType::Float,        _16nar::data::package::StoredDataType::Float              },
+     { _16nar::tools::StoredDataType::Double,       _16nar::data::package::StoredDataType::Double             },
+     { _16nar::tools::StoredDataType::String,       _16nar::data::package::StoredDataType::String             },
+     { _16nar::tools::StoredDataType::Uint64Arr,    _16nar::data::package::StoredDataType::Uint64Arr          },
+     { _16nar::tools::StoredDataType::Uint32Arr,    _16nar::data::package::StoredDataType::Uint32Arr          },
+     { _16nar::tools::StoredDataType::Uint16Arr,    _16nar::data::package::StoredDataType::Uint16Arr          },
+     { _16nar::tools::StoredDataType::Uint8Arr,     _16nar::data::package::StoredDataType::Uint8Arr           },
+     { _16nar::tools::StoredDataType::Int64Arr,     _16nar::data::package::StoredDataType::Int64Arr           },
+     { _16nar::tools::StoredDataType::Int32Arr,     _16nar::data::package::StoredDataType::Int32Arr           },
+     { _16nar::tools::StoredDataType::Int16Arr,     _16nar::data::package::StoredDataType::Int16Arr           },
+     { _16nar::tools::StoredDataType::Int8Arr,      _16nar::data::package::StoredDataType::Int8Arr            },
+     { _16nar::tools::StoredDataType::BoolArr,      _16nar::data::package::StoredDataType::BoolArr            },
+     { _16nar::tools::StoredDataType::FloatArr,     _16nar::data::package::StoredDataType::FloatArr           },
+     { _16nar::tools::StoredDataType::DoubleArr,    _16nar::data::package::StoredDataType::DoubleArr          },
+     { _16nar::tools::StoredDataType::StringArr,    _16nar::data::package::StoredDataType::StringArr          },
+     { _16nar::tools::StoredDataType::Vec2f,        _16nar::data::package::StoredDataType::Vec2f              },
+     { _16nar::tools::StoredDataType::Vec3f,        _16nar::data::package::StoredDataType::Vec3f              },
+     { _16nar::tools::StoredDataType::Vec4f,        _16nar::data::package::StoredDataType::Vec4f              },
+     { _16nar::tools::StoredDataType::Vec2i,        _16nar::data::package::StoredDataType::Vec2f              },
+     { _16nar::tools::StoredDataType::Vec3i,        _16nar::data::package::StoredDataType::Vec3i              },
+     { _16nar::tools::StoredDataType::Vec4i,        _16nar::data::package::StoredDataType::Vec4i              },
+     { _16nar::tools::StoredDataType::FloatRect,    _16nar::data::package::StoredDataType::FloatRect          },
+     { _16nar::tools::StoredDataType::IntRect,      _16nar::data::package::StoredDataType::IntRect            },
+     { _16nar::tools::StoredDataType::ResourceIndex,_16nar::data::package::StoredDataType::ResourceIndex      } )
 
 
 flatbuffers::Offset< _16nar::data::package::Resource > write_texture(
@@ -205,6 +243,52 @@ flatbuffers::Offset< _16nar::data::package::Resource > write_cubemap(
 }
 
 
+flatbuffers::Offset< _16nar::data::package::Resource > write_data_schema(
+     const _16nar::tools::ResourceData& resource,
+     flatbuffers::FlatBufferBuilder& builder,
+     std::vector< _16nar::DataSharedPtr >& )
+{
+     auto schema = std::any_cast< _16nar::tools::DataSchema >( resource.params );
+     auto name = builder.CreateString( resource.name );
+
+     _16nar::tools::FlatBuffersPropsWriter props{};
+     std::vector< flatbuffers::Offset< _16nar::data::package::DataItem > > items;
+     items.reserve( schema.items.size() );
+     for ( const auto& item : schema.items )
+     {
+          if ( schema.default_vals )
+          {
+               // optional fields cannot have default values
+               _16nar::tools::copy_property( *schema.default_vals,
+                    item.first, item.second, false, props );
+          }
+
+          auto name = builder.CreateString( item.first );
+          _16nar::data::package::DataItemBuilder item_builder{ builder };
+
+          item_builder.add_name( name );
+          item_builder.add_type( convert_enum( item.second.type ) );
+          item_builder.add_mandatory( item.second.mandatory );
+          items.emplace_back( item_builder.Finish() );
+     }
+     auto items_stored = builder.CreateVector( items );
+     const auto& props_buffer = props.finish_and_get_result();
+     auto props_stored = builder.CreateVector(
+          reinterpret_cast< const uint8_t * >( props_buffer.data() ), props_buffer.size() );
+
+     _16nar::data::package::DataSchemaBuilder schema_builder{ builder };
+     schema_builder.add_items( items_stored );
+     schema_builder.add_default_vals( props_stored );
+     auto schema_stored = schema_builder.Finish();
+
+     _16nar::data::package::ResourceBuilder res_builder{ builder };
+     res_builder.add_name( name );
+     res_builder.add_params_type( _16nar::data::package::AnyLoadParams::DataSchema );
+     res_builder.add_params( schema_stored.Union() );
+     return res_builder.Finish();
+}
+
+
 flatbuffers::Offset< _16nar::data::package::Resource > write_resource(
      const _16nar::tools::ResourceData& resource,
      flatbuffers::FlatBufferBuilder& builder,
@@ -224,6 +308,9 @@ flatbuffers::Offset< _16nar::data::package::Resource > write_resource(
                break;
           case _16nar::ResourceType::Cubemap:
                res_buffer = write_cubemap( resource, builder, data_units );
+               break;
+          case _16nar::ResourceType::DataSchema:
+               res_buffer = write_data_schema( resource, builder, data_units );
                break;
           default:
                throw std::runtime_error{ "wrong resource type: "

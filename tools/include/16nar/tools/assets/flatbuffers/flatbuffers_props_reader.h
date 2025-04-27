@@ -4,7 +4,7 @@
 #define _16NAR_TOOLS_FLATBUFFERS_PROPS_READER_H
 
 #include <16nar/16nardefs.h>
-#include <16nar/tools/iprops_reader.h>
+#include <16nar/tools/assets/iprops_reader.h>
 
 #include <flatbuffers/flexbuffers.h>
 
@@ -19,7 +19,10 @@ public:
      /// @param[in] buffer underlying buffer.
      /// @param[in] size size of the buffer.
      /// @param[in] own true if this object owns the buffer (the buffer will be copied then), false otherwise.
-     FlatBuffersPropsReader( std::byte *buffer, std::size_t size, bool own );
+     FlatBuffersPropsReader( const std::byte *buffer, std::size_t size, bool own );
+
+     /// @copydoc IPropsReader::is_owner() const noexcept
+     bool is_owner() const noexcept override;
 
      /// @copydoc IPropsReader::get_uint64(const std::string&)
      std::optional< uint64_t > get_uint64( const std::string& name ) override;
@@ -121,8 +124,8 @@ public:
      std::optional< ResourceIndex > get_resource_index( const std::string& name ) override;
 
 private:
-     std::vector< std::byte > buffer_;    ///< underlying buffer.
-     flexbuffers::Reference root_;        ///< reference to root flexbuffer.
+     std::vector< std::byte > buffer_;  ///< underlying buffer.
+     flexbuffers::Map root_;            ///< reference to root properties map.
 };
 
 } // namespace _16nar::tools

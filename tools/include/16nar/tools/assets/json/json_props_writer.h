@@ -4,7 +4,9 @@
 #define _16NAR_TOOLS_JSON_PROPS_WRITER_H
 
 #include <16nar/16nardefs.h>
-#include <16nar/tools/iprops_writer.h>
+#include <16nar/tools/assets/iprops_writer.h>
+
+#include <nlohmann/json.hpp>
 
 namespace _16nar::tools
 {
@@ -13,6 +15,10 @@ namespace _16nar::tools
 class ENGINE_API JsonPropsWriter : public IPropsWriter
 {
 public:
+     /// @brief Get object with stored properties.
+     /// @return object with stored properties.
+     const nlohmann::json& get_result() const;
+
      /// @copydoc IPropsWriter::set_uint64(const std::string&, uint64_t)
      void set_uint64( const std::string& name, uint64_t value ) override;
 
@@ -111,6 +117,9 @@ public:
 
      /// @copydoc IPropsWriter::set_uint64(const std::string&, uint64_t)
      void set_resource_index( const std::string& name, ResourceIndex value ) override;
+
+private:
+     nlohmann::json json_;    ///< object with stored properties.
 };
 
 } // namespace _16nar::tools

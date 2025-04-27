@@ -4,7 +4,7 @@
 #include <16nar/tools/scene_defs.h>
 #include <16nar/render/render_defs.h>
 
-#include <16nar/tools/flatbuffers/flatbuffers_props_reader.h>
+#include <16nar/tools/assets/flatbuffers/flatbuffers_props_reader.h>
 
 #include <16nar/gen/flatbuffers/package_generated.h>
 #include <16nar/gen/flatbuffers/resource_generated.h>
@@ -53,39 +53,39 @@ _16NAR_ENUM_CONVERTOR( _16nar::BufferType, _16nar::data::package::BufferType,
      { _16nar::data::package::BufferType::DynamicRead,      _16nar::BufferType::DynamicRead                    },
      { _16nar::data::package::BufferType::DynamicCopy,      _16nar::BufferType::DynamicCopy                    } )
 _16NAR_ENUM_CONVERTOR( _16nar::tools::StoredDataType, _16nar::data::package::StoredDataType,
-     { _16nar::data::package::StoredDataType::Uint64,       _16nar::StoredDataType::Uint64                     },
-     { _16nar::data::package::StoredDataType::Uint32,       _16nar::StoredDataType::Uint32                     },
-     { _16nar::data::package::StoredDataType::Uint16,       _16nar::StoredDataType::Uint16                     },
-     { _16nar::data::package::StoredDataType::Uint8,        _16nar::StoredDataType::Uint8                      },
-     { _16nar::data::package::StoredDataType::Int64,        _16nar::StoredDataType::Int64                      },
-     { _16nar::data::package::StoredDataType::Int32,        _16nar::StoredDataType::Int32                      },
-     { _16nar::data::package::StoredDataType::Int16,        _16nar::StoredDataType::Int16                      },
-     { _16nar::data::package::StoredDataType::Int8,         _16nar::StoredDataType::Int8                       },
-     { _16nar::data::package::StoredDataType::Bool,         _16nar::StoredDataType::Bool                       },
-     { _16nar::data::package::StoredDataType::Float,        _16nar::StoredDataType::Float                      },
-     { _16nar::data::package::StoredDataType::Double,       _16nar::StoredDataType::Double                     },
-     { _16nar::data::package::StoredDataType::String,       _16nar::StoredDataType::String                     },
-     { _16nar::data::package::StoredDataType::Uint64Arr,    _16nar::StoredDataType::Uint64Arr                  },
-     { _16nar::data::package::StoredDataType::Uint32Arr,    _16nar::StoredDataType::Uint32Arr                  },
-     { _16nar::data::package::StoredDataType::Uint16Arr,    _16nar::StoredDataType::Uint16Arr                  },
-     { _16nar::data::package::StoredDataType::Uint8Arr,     _16nar::StoredDataType::Uint8Arr                   },
-     { _16nar::data::package::StoredDataType::Int64Arr,     _16nar::StoredDataType::Int64Arr                   },
-     { _16nar::data::package::StoredDataType::Int32Arr,     _16nar::StoredDataType::Int32Arr                   },
-     { _16nar::data::package::StoredDataType::Int16Arr,     _16nar::StoredDataType::Int16Arr                   },
-     { _16nar::data::package::StoredDataType::Int8Arr,      _16nar::StoredDataType::Int8Arr                    },
-     { _16nar::data::package::StoredDataType::BoolArr,      _16nar::StoredDataType::BoolArr                    },
-     { _16nar::data::package::StoredDataType::FloatArr,     _16nar::StoredDataType::FloatArr                   },
-     { _16nar::data::package::StoredDataType::DoubleArr,    _16nar::StoredDataType::DoubleArr                  },
-     { _16nar::data::package::StoredDataType::StringArr,    _16nar::StoredDataType::StringArr                  },
-     { _16nar::data::package::StoredDataType::Vec2f,        _16nar::StoredDataType::Vec2f                      },
-     { _16nar::data::package::StoredDataType::Vec3f,        _16nar::StoredDataType::Vec3f                      },
-     { _16nar::data::package::StoredDataType::Vec4f,        _16nar::StoredDataType::Vec4f                      },
-     { _16nar::data::package::StoredDataType::Vec2i,        _16nar::StoredDataType::Vec2f                      },
-     { _16nar::data::package::StoredDataType::Vec3i,        _16nar::StoredDataType::Vec3i                      },
-     { _16nar::data::package::StoredDataType::Vec4i,        _16nar::StoredDataType::Vec4i                      },
-     { _16nar::data::package::StoredDataType::FloatRect,    _16nar::StoredDataType::FloatRect                  },
-     { _16nar::data::package::StoredDataType::IntRect,      _16nar::StoredDataType::IntRect                    },
-     { _16nar::data::package::StoredDataType::ResourceIndex,_16nar::StoredDataType::ResourceIndex              } )
+     { _16nar::data::package::StoredDataType::Uint64,       _16nar::tools::StoredDataType::Uint64             },
+     { _16nar::data::package::StoredDataType::Uint32,       _16nar::tools::StoredDataType::Uint32             },
+     { _16nar::data::package::StoredDataType::Uint16,       _16nar::tools::StoredDataType::Uint16             },
+     { _16nar::data::package::StoredDataType::Uint8,        _16nar::tools::StoredDataType::Uint8              },
+     { _16nar::data::package::StoredDataType::Int64,        _16nar::tools::StoredDataType::Int64              },
+     { _16nar::data::package::StoredDataType::Int32,        _16nar::tools::StoredDataType::Int32              },
+     { _16nar::data::package::StoredDataType::Int16,        _16nar::tools::StoredDataType::Int16              },
+     { _16nar::data::package::StoredDataType::Int8,         _16nar::tools::StoredDataType::Int8               },
+     { _16nar::data::package::StoredDataType::Bool,         _16nar::tools::StoredDataType::Bool               },
+     { _16nar::data::package::StoredDataType::Float,        _16nar::tools::StoredDataType::Float              },
+     { _16nar::data::package::StoredDataType::Double,       _16nar::tools::StoredDataType::Double             },
+     { _16nar::data::package::StoredDataType::String,       _16nar::tools::StoredDataType::String             },
+     { _16nar::data::package::StoredDataType::Uint64Arr,    _16nar::tools::StoredDataType::Uint64Arr          },
+     { _16nar::data::package::StoredDataType::Uint32Arr,    _16nar::tools::StoredDataType::Uint32Arr          },
+     { _16nar::data::package::StoredDataType::Uint16Arr,    _16nar::tools::StoredDataType::Uint16Arr          },
+     { _16nar::data::package::StoredDataType::Uint8Arr,     _16nar::tools::StoredDataType::Uint8Arr           },
+     { _16nar::data::package::StoredDataType::Int64Arr,     _16nar::tools::StoredDataType::Int64Arr           },
+     { _16nar::data::package::StoredDataType::Int32Arr,     _16nar::tools::StoredDataType::Int32Arr           },
+     { _16nar::data::package::StoredDataType::Int16Arr,     _16nar::tools::StoredDataType::Int16Arr           },
+     { _16nar::data::package::StoredDataType::Int8Arr,      _16nar::tools::StoredDataType::Int8Arr            },
+     { _16nar::data::package::StoredDataType::BoolArr,      _16nar::tools::StoredDataType::BoolArr            },
+     { _16nar::data::package::StoredDataType::FloatArr,     _16nar::tools::StoredDataType::FloatArr           },
+     { _16nar::data::package::StoredDataType::DoubleArr,    _16nar::tools::StoredDataType::DoubleArr          },
+     { _16nar::data::package::StoredDataType::StringArr,    _16nar::tools::StoredDataType::StringArr          },
+     { _16nar::data::package::StoredDataType::Vec2f,        _16nar::tools::StoredDataType::Vec2f              },
+     { _16nar::data::package::StoredDataType::Vec3f,        _16nar::tools::StoredDataType::Vec3f              },
+     { _16nar::data::package::StoredDataType::Vec4f,        _16nar::tools::StoredDataType::Vec4f              },
+     { _16nar::data::package::StoredDataType::Vec2i,        _16nar::tools::StoredDataType::Vec2f              },
+     { _16nar::data::package::StoredDataType::Vec3i,        _16nar::tools::StoredDataType::Vec3i              },
+     { _16nar::data::package::StoredDataType::Vec4i,        _16nar::tools::StoredDataType::Vec4i              },
+     { _16nar::data::package::StoredDataType::FloatRect,    _16nar::tools::StoredDataType::FloatRect          },
+     { _16nar::data::package::StoredDataType::IntRect,      _16nar::tools::StoredDataType::IntRect            },
+     { _16nar::data::package::StoredDataType::ResourceIndex,_16nar::tools::StoredDataType::ResourceIndex      } )
 
 
 void read_texture( const _16nar::data::package::Resource *res_buffer,
@@ -221,13 +221,14 @@ void read_data_schema( const _16nar::data::package::Resource *res_buffer,
           _16nar::tools::DataItem saved_item{};
           saved_item.type = convert_enum( item->type() );
           saved_item.mandatory = item->mandatory();
-          schema.emplace( item->name()->c_str(), saved_item );
+          schema.items.emplace( item->name()->c_str(), saved_item );
      }
 
      if ( params->default_vals() )
      {
-          schema.default_vals = std::make_shared< FlatBuffersPropsReader >(
-               params->default_vals().data(), params->default_vals().size(), true );
+          schema.default_vals = std::make_shared< _16nar::tools::FlatBuffersPropsReader >(
+               reinterpret_cast< const std::byte * >( params->default_vals()->data() ),
+               params->default_vals()->size(), true );
      }
 
      resource.params = std::any{ schema };

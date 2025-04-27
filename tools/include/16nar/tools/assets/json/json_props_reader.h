@@ -4,15 +4,25 @@
 #define _16NAR_TOOLS_JSON_PROPS_READER_H
 
 #include <16nar/16nardefs.h>
-#include <16nar/tools/iprops_reader.h>
+#include <16nar/tools/assets/iprops_reader.h>
+
+#include <nlohmann/json.hpp>
 
 namespace _16nar::tools
 {
 
-/// @brief Class for reading key-value properties in flatbuffers format.
+/// @brief Class for reading key-value properties in JSON format.
 class ENGINE_API JsonPropsReader : public IPropsReader
 {
 public:
+     /// @brief Constructor.
+     /// @param[in] json JSON object with properties.
+     /// @param[in] own true if this object owns the JSON  object (the object will be copied then), false otherwise.
+     JsonPropsReader( const nlohmann::json& json, bool own );
+
+     /// @copydoc IPropsReader::is_owner() const noexcept
+     bool is_owner() const noexcept override;
+
      /// @copydoc IPropsReader::get_uint64(const std::string&)
      std::optional< uint64_t > get_uint64( const std::string& name ) override;
 
@@ -111,6 +121,10 @@ public:
 
      /// @copydoc IPropsReader::get_uint64(const std::string&)
      std::optional< ResourceIndex > get_resource_index( const std::string& name ) override;
+
+private:
+     nlohmann::json own_json_;     ///< own JSON object, may be empty.
+     const nlohmann::json *json_;  ///< pointer to JSON object to read properties from.
 };
 
 } // namespace _16nar::tools
