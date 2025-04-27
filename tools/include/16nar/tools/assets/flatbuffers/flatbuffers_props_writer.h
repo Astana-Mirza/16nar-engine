@@ -4,7 +4,9 @@
 #define _16NAR_TOOLS_FLATBUFFERS_PROPS_WRITER_H
 
 #include <16nar/16nardefs.h>
-#include <16nar/tools/iprops_writer.h>
+#include <16nar/tools/assets/iprops_writer.h>
+
+#include <flatbuffers/flexbuffers.h>
 
 namespace _16nar::tools
 {
@@ -17,8 +19,9 @@ public:
      FlatBuffersPropsWriter();
 
      /// @brief Finish writing and return result buffer.
+     /// @details Must be called only once for an object. Further calls will raise flatbuffers error.
      /// @return written buffer.
-     const std::vector< uint8_t >& finish_and_get_buffer();
+     const std::vector< uint8_t >& finish_and_get_result();
 
      /// @copydoc IPropsWriter::set_uint64(const std::string&, uint64_t)
      void set_uint64( const std::string& name, uint64_t value ) override;

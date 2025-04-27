@@ -223,6 +223,9 @@ _16nar::tools::ResourceData read_resource( const nlohmann::json& json, const std
           case _16nar::ResourceType::Cubemap:
                read_cubemap( json, in_dir, resource );
                break;
+          case _16nar::ResourceType::DataSchema:
+               //read_data_schema( json, in_dir, resource );
+               break;
           default:
                throw std::runtime_error{ "wrong resource type: "
                     + std::to_string( static_cast< std::size_t >( type ) ) };

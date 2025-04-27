@@ -161,6 +161,9 @@ nlohmann::json write_resource( const _16nar::tools::ResourceData& resource, cons
           case _16nar::ResourceType::Cubemap:
                write_cubemap( resource, out_dir, json );
                break;
+          case _16nar::ResourceType::DataSchema:
+               //write_data_schema( resource, out_dir, json );
+               break;
           default:
                throw std::runtime_error{ "wrong resource type: "
                     + std::to_string( static_cast< std::size_t >( resource.type ) ) };

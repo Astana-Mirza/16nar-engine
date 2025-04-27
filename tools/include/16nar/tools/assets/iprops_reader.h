@@ -22,6 +22,10 @@ public:
      /// @brief Virtual default destructor.
      virtual ~IPropsReader() = default;
 
+     /// @brief Check if the reader owns the underlying buffer.
+     /// @return true if the reader owns the underlying buffer, false otherwise.
+     virtual bool is_owner() const noexcept = 0;
+
      // basic types
 
      /// @brief Get value with given name.

@@ -38,6 +38,8 @@ if ("${NARENGINE_TOOLS_JSON}")
     set(NARENGINE_ASSETS_JSON_LINK_LIBS PUBLIC "${NAME}_tools" PRIVATE "stb::stb" "nlohmann_json::nlohmann_json")
     set(NARENGINE_ASSETS_JSON_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
     set(NARENGINE_ASSETS_JSON_SOURCES
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_props_reader.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_props_writer.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_asset_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_asset_writer.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/stb_impl.cpp"
@@ -61,6 +63,8 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     set(NARENGINE_ASSETS_FB_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
     set(NARENGINE_ASSETS_FB_LINK_LIBS PUBLIC "glm::glm" "flatbuffers::libflatbuffers")
     set(NARENGINE_ASSETS_FB_SOURCES
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_reader.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_writer.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_asset_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_asset_writer.cpp"
     )
@@ -90,15 +94,21 @@ if ("${NARENGINE_BUILD_TESTS}")
     enable_testing()
     if ("${NARENGINE_TOOLS_JSON}")
         set(NARENGINE_RESOURCES_TEST_SOURCES ${NARENGINE_RESOURCES_TEST_SOURCES}
+            "${NARENGINE_TOOLS_SRC_DIR}/assets/test/json_props_test.cpp"
             "${NARENGINE_TOOLS_SRC_DIR}/assets/test/json_resources_test.cpp"
         )
-        # flatbuffers test depends on JSON
+        # flatbuffers resource test depends on JSON
         if ("${NARENGINE_TOOLS_FLATBUFFERS}")
             set(NARENGINE_RESOURCES_TEST_SOURCES ${NARENGINE_RESOURCES_TEST_SOURCES}
                 "${NARENGINE_TOOLS_SRC_DIR}/assets/test/flatbuffers_resources_test.cpp"
             )
         endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     endif() # if ("${NARENGINE_TOOLS_JSON}")
+    if ("${NARENGINE_TOOLS_FLATBUFFERS}")
+        set(NARENGINE_RESOURCES_TEST_SOURCES ${NARENGINE_RESOURCES_TEST_SOURCES}
+            "${NARENGINE_TOOLS_SRC_DIR}/assets/test/flatbuffers_props_test.cpp"
+        )
+    endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     add_executable("${NAME}_tools_assets_test" ${NARENGINE_RESOURCES_TEST_SOURCES})
     target_include_directories("${NAME}_tools_assets_test" PRIVATE
         "${NARENGINE_TOOLS_INCLUDE_DIR}" ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})

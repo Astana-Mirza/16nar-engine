@@ -9,10 +9,10 @@
 #include <unordered_map>
 #include <memory>
 
-#include <16nar/tools/iprops_reader.h>
-
 namespace _16nar::tools
 {
+
+class IPropsReader;
 
 /// @brief Type of stored data for type-safe key-value pair usage.
 enum class StoredDataType : uint8_t
