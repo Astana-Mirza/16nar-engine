@@ -3,6 +3,10 @@
 #include <16nar/tools/assets/json/json_utils.inl>
 #include <16nar/tools/utils.h>
 
+#include <16nar/tools/utils.h>
+#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/assets/json/json_props_writer.h>
+
 #include <string>
 #include <array>
 #include <stdexcept>
@@ -144,6 +148,33 @@ void write_cubemap( const _16nar::tools::ResourceData& resource,
 }
 
 
+void write_data_schema( const _16nar::tools::ResourceData& resource,
+     const std::string&, nlohmann::json& json )
+{
+     auto schema = std::any_cast< _16nar::tools::DataSchema >( resource.params );
+
+     _16nar::tools::JsonPropsWriter props{};
+     auto items = nlohmann::json::array();
+     for ( const auto& item : schema.items )
+     {
+          if ( schema.default_vals )
+          {
+               // optional fields cannot have default values
+               _16nar::tools::copy_property( *schema.default_vals,
+                    item.first, item.second, false, props );
+          }
+
+          nlohmann::json item_stored{};
+          item_stored[ "name" ] = item.first;
+          item_stored[ "type" ] = item.second.type;
+          item_stored[ "mandatory" ] = item.second.mandatory;
+          items.push_back( item_stored );
+     }
+     json[ "items" ] = items;
+     json[ "default_vals" ] = props.get_result();
+}
+
+
 nlohmann::json write_resource( const _16nar::tools::ResourceData& resource, const std::string& out_dir )
 {
      nlohmann::json json{};
@@ -162,7 +193,7 @@ nlohmann::json write_resource( const _16nar::tools::ResourceData& resource, cons
                write_cubemap( resource, out_dir, json );
                break;
           case _16nar::ResourceType::DataSchema:
-               //write_data_schema( resource, out_dir, json );
+               write_data_schema( resource, out_dir, json );
                break;
           default:
                throw std::runtime_error{ "wrong resource type: "

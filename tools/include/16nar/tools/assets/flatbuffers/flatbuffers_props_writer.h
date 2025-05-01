@@ -6,7 +6,14 @@
 #include <16nar/16nardefs.h>
 #include <16nar/tools/assets/iprops_writer.h>
 
-#include <flatbuffers/flexbuffers.h>
+namespace flexbuffers
+{
+
+class Builder;
+
+} // namespace flexbuffers
+
+
 
 namespace _16nar::tools
 {
@@ -17,6 +24,12 @@ class ENGINE_API FlatBuffersPropsWriter : public IPropsWriter
 public:
      /// @brief Constructor.
      FlatBuffersPropsWriter();
+
+     FlatBuffersPropsWriter( const FlatBuffersPropsWriter& ) = delete;
+     FlatBuffersPropsWriter& operator=( const FlatBuffersPropsWriter& ) = delete;
+
+     /// @brief Destructor.
+     ~FlatBuffersPropsWriter();
 
      /// @brief Finish writing and return result buffer.
      /// @details Must be called only once for an object. Further calls will raise flatbuffers error.
@@ -123,7 +136,7 @@ public:
      void set_resource_index( const std::string& name, ResourceIndex value ) override;
 
 private:
-     flexbuffers::Builder builder_;     ///< builder of the buffer.
+     flexbuffers::Builder *builder_;    ///< builder of the buffer.
      std::size_t map_key_;              ///< key of builded map.
 };
 

@@ -3,6 +3,8 @@
 #include <16nar/tools/assets/json/json_asset_reader.h>
 #include <16nar/tools/assets/flatbuffers/flatbuffers_asset_reader.h>
 #include <16nar/tools/assets/flatbuffers/flatbuffers_asset_writer.h>
+#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/assets/iprops_reader.h>
 #include <16nar/render/render_defs.h>
 
 #include <fstream>
@@ -185,6 +187,53 @@ TEST_CASE( "Cubemaps reading and writing in flatbuffers format", "[flatbuffers_r
      REQUIRE( cm_data.data_type == _16nar::DataType::Byte );
      REQUIRE( cm_data.size == _16nar::Vec2i{ 64, 64 } );
      REQUIRE( cm_data.border_color == _16nar::Vec4f{ 0.8f, 0.24f, 0.55f, 1.0f } );
+}
+
+
+TEST_CASE( "Data schemas reading and writing in flatbuffers format", "[flatbuffers_resources]" )
+{
+     if ( !fs::exists( "data/out" ) && !fs::create_directories( "data/out" ) )
+     {
+          throw std::runtime_error{ "cannot create output directory" };
+     }
+     _16nar::tools::JsonAssetReader json_reader{ "data" };
+     _16nar::tools::FlatBuffersAssetReader reader{};
+     _16nar::tools::FlatBuffersAssetWriter writer{};
+
+     std::ifstream json_ifs{ "data/test_data_schema.json" };
+     _16nar::tools::ResourceData data = json_reader.read_asset( json_ifs );
+     json_ifs.close();
+
+     std::ofstream ofs{ "data/out/test_data_schema.narasset", std::ios::out | std::ios::binary };
+     writer.write_asset( ofs, data );
+     ofs.close();
+
+     std::ifstream ifs{ "data/out/test_data_schema.narasset", std::ios::in | std::ios::binary };
+     _16nar::tools::ResourceData read_data = reader.read_asset( ifs );
+     ifs.close();
+
+     REQUIRE( read_data.type == _16nar::ResourceType::DataSchema );
+     REQUIRE( read_data.data_sizes.empty() );
+     REQUIRE( read_data.name == "test_data_schema" );
+
+     auto ds_data = std::any_cast< _16nar::tools::DataSchema >( read_data.params );
+     REQUIRE( ds_data.items.size() == 4 );
+     REQUIRE( ds_data.items.find( "test_string" ) != ds_data.items.cend() );
+     REQUIRE( ds_data.items[ "test_string" ].type == _16nar::tools::StoredDataType::String );
+     REQUIRE( ds_data.items[ "test_string" ].mandatory == true );
+     REQUIRE( ds_data.items.find( "test_int32" ) != ds_data.items.cend() );
+     REQUIRE( ds_data.items[ "test_int32" ].type == _16nar::tools::StoredDataType::Int32 );
+     REQUIRE( ds_data.items[ "test_int32" ].mandatory == true );
+     REQUIRE( ds_data.items.find( "test_vec2f" ) != ds_data.items.cend() );
+     REQUIRE( ds_data.items[ "test_vec2f" ].type == _16nar::tools::StoredDataType::Vec2f );
+     REQUIRE( ds_data.items[ "test_vec2f" ].mandatory == false );
+     REQUIRE( ds_data.items.find( "test_bool" ) != ds_data.items.cend() );
+     REQUIRE( ds_data.items[ "test_bool" ].type == _16nar::tools::StoredDataType::Bool );
+     REQUIRE( ds_data.items[ "test_bool" ].mandatory == true );
+
+     REQUIRE( ds_data.default_vals != nullptr );
+     REQUIRE( ds_data.default_vals->get_string( "test_string" ).value() == "some_value" );
+     REQUIRE( ds_data.default_vals->get_int32( "test_int32" ).value() == -678 );
 }
 
 

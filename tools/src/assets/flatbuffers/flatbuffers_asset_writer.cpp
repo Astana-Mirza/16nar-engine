@@ -249,6 +249,7 @@ flatbuffers::Offset< _16nar::data::package::Resource > write_data_schema(
      std::vector< _16nar::DataSharedPtr >& )
 {
      auto schema = std::any_cast< _16nar::tools::DataSchema >( resource.params );
+     auto data_sizes = builder.CreateVector( resource.data_sizes.data(), resource.data_sizes.size() );
      auto name = builder.CreateString( resource.name );
 
      _16nar::tools::FlatBuffersPropsWriter props{};
@@ -285,6 +286,7 @@ flatbuffers::Offset< _16nar::data::package::Resource > write_data_schema(
      res_builder.add_name( name );
      res_builder.add_params_type( _16nar::data::package::AnyLoadParams::DataSchema );
      res_builder.add_params( schema_stored.Union() );
+     res_builder.add_data_sizes( data_sizes );
      return res_builder.Finish();
 }
 

@@ -35,7 +35,7 @@ if ("${NARENGINE_TOOLS_JSON}")
     # Json assets library
     set(NARENGINE_ASSETS_JSON_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
     set(NARENGINE_ASSETS_JSON_INCLUDE_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS})
-    set(NARENGINE_ASSETS_JSON_LINK_LIBS PUBLIC "${NAME}_tools" PRIVATE "stb::stb" "nlohmann_json::nlohmann_json")
+    set(NARENGINE_ASSETS_JSON_LINK_LIBS PUBLIC "${NAME}_tools" "nlohmann_json::nlohmann_json" PRIVATE "stb::stb")
     set(NARENGINE_ASSETS_JSON_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
     set(NARENGINE_ASSETS_JSON_SOURCES
         "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_props_reader.cpp"
@@ -60,8 +60,9 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
         PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS}
         PRIVATE "${PROJECT_BINARY_DIR}/schemas/flatbuffers-gen-cpp"
     )
-    set(NARENGINE_ASSETS_FB_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
-    set(NARENGINE_ASSETS_FB_LINK_LIBS PUBLIC "glm::glm" "flatbuffers::libflatbuffers")
+    set(NARENGINE_ASSETS_FB_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS}
+        "FLATBUFFERS_LOCALE_INDEPENDENT=0")
+    set(NARENGINE_ASSETS_FB_LINK_LIBS PUBLIC "${NAME}_tools" PRIVATE "flatbuffers::libflatbuffers")
     set(NARENGINE_ASSETS_FB_SOURCES
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_writer.cpp"

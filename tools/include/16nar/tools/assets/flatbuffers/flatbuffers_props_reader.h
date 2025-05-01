@@ -6,7 +6,13 @@
 #include <16nar/16nardefs.h>
 #include <16nar/tools/assets/iprops_reader.h>
 
-#include <flatbuffers/flexbuffers.h>
+namespace flexbuffers
+{
+
+class Map;
+
+} // namespace flexbuffers
+
 
 namespace _16nar::tools
 {
@@ -20,6 +26,12 @@ public:
      /// @param[in] size size of the buffer.
      /// @param[in] own true if this object owns the buffer (the buffer will be copied then), false otherwise.
      FlatBuffersPropsReader( const std::byte *buffer, std::size_t size, bool own );
+
+     FlatBuffersPropsReader( const FlatBuffersPropsReader& ) = delete;
+     FlatBuffersPropsReader& operator=( const FlatBuffersPropsReader& ) = delete;
+
+     /// @brief Destructor.
+     ~FlatBuffersPropsReader();
 
      /// @copydoc IPropsReader::is_owner() const noexcept
      bool is_owner() const noexcept override;
@@ -125,7 +137,7 @@ public:
 
 private:
      std::vector< std::byte > buffer_;  ///< underlying buffer.
-     flexbuffers::Map root_;            ///< reference to root properties map.
+     flexbuffers::Map *root_;           ///< reference to root properties map.
 };
 
 } // namespace _16nar::tools
