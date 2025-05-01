@@ -4,7 +4,6 @@
 #include <filesystem>
 #include <stdexcept>
 
-
 #define _16NAR_COPY_PROP( TYPENAME )                        \
      {                                                      \
           auto prop = reader.get_##TYPENAME( name );        \

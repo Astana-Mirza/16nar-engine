@@ -12,7 +12,7 @@
 
 | Перечисление     | Значения                                                                                                                                 |
 |------------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| ResourceType     | `texture`, `shader`, `vertex_buffer`, `cubemap`                                                                                          |
+| ResourceType     | `texture`, `shader`, `vertex_buffer`, `cubemap`, `data_schema`                                                                                          |
 | TextureWrap      | `repeat`, `mirrored_repeat`, `clamp_to_edge`, `clamp_to_border`                                                                          |
 | TextureFilter    | `nearest`, `linear`, `nearest_mipmap_nearest`, `nearest_mipmap_linear`, `linear_mipmap_nearest`, `linear_mipmap_linear`                  |
 | BufferDataFormat | `rgb`, `rgba`, `srgb`, `srgba`                                                                                                           |
@@ -161,6 +161,52 @@
 
 Описание полей:
 - `files` - массив из 6 имён файлов с текстурами кубической карты.
+
+### DataSchema
+
+Схема данных содержит метаинформацию о свойствах, см. Обобщённый формат хранения свойств.
+
+Пример:
+
+```
+{
+     "type": "data_schema",
+     "name": "our_data_schema",
+     "items":[
+          {
+               "type": "string",
+               "name": "our_string",
+               "mandatory": true
+          },
+          {
+               "type": "int32",
+               "name": "our_int32",
+               "mandatory": true
+          },
+          {
+               "type": "vec2f",
+               "name": "our_vec2f",
+               "mandatory": false
+          },
+          {
+               "type": "bool",
+               "name": "our_bool",
+               "mandatory": true
+          }
+     ],
+     "default_vals":{
+          "our_string": "some_value",
+          "our_int32": 777
+     }
+}
+```
+
+Описание полей:
+- `items` - массив с объектами, каждый из которых представляет информацию об одном свойстве.
+В поле `type` каждого объекта содержится тип свойства в виде строки (типы см. Обобщённый формат хранения свойств),
+в поле `name` содержится имя свойства, а в поле `mandatory` - признак обязательности наличия этого свойства в хранилище.
+- `default_vals` - объект, представляющий хранилище свойств в виде пар "ключ-значение". Данное хранилище содержит
+значения полей по умолчанию, ассоциированные с именами полей.
 
 ## Представление пакета ресурсов
 

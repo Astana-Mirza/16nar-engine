@@ -14,6 +14,9 @@ size_t hash< _16nar::Signallable::SlotId >::operator()( const _16nar::Signallabl
 namespace _16nar
 {
 
+Signallable::Signallable() = default;
+
+
 Signallable::~Signallable()
 {
      for ( auto& sig_types : acceptors_ )

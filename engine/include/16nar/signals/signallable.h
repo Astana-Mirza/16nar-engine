@@ -40,6 +40,12 @@ class ENGINE_API Signallable
 public:
      using SlotId = std::pair< std::type_index, Signallable * >;
 
+     /// @brief Default constructor.
+     Signallable();
+
+     Signallable( const Signallable& ) = delete;
+     Signallable& operator=( const Signallable& ) = delete;
+
      /// @brief Sets a handler for a signal of given type from specified sender.
      /// @tparam SignalType type of a signal being handled.
      /// @tparam Handler type of a handler, must be callable.

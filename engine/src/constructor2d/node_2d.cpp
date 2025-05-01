@@ -9,6 +9,8 @@ namespace _16nar::constructor2d
 {
 
 Node2D::Node2D():
+     Transformable2D::Transformable2D(),
+     Signallable::Signallable(),
      children_{}, name_{}, parent_{ nullptr }, setup_func_{ nullptr },
      loop_func_{ nullptr }, state_order_{ -1 }
 {}

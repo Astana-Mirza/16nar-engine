@@ -2,6 +2,8 @@
 
 #include <16nar/tools/assets/json/json_utils.inl>
 #include <16nar/tools/utils.h>
+#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/assets/json/json_props_reader.h>
 
 #include <stb_image.h>
 
@@ -112,8 +114,8 @@ void read_vertex_buffer( const nlohmann::json& json, const std::string& in_dir,
           param.type = json.at( "type" ). template get< _16nar::BufferType >();
      };
 
-     read_buffer_param( json[ "buffer" ], params.buffer );
-     read_buffer_param( json[ "index_buffer" ], params.index_buffer );
+     read_buffer_param( json.at( "buffer" ), params.buffer );
+     read_buffer_param( json.at( "index_buffer" ), params.index_buffer );
      resource.data_sizes.emplace_back( static_cast< uint32_t >( params.buffer.size ) );
      resource.data_sizes.emplace_back( static_cast< uint32_t >( params.index_buffer.size ) );
 
@@ -204,6 +206,28 @@ void read_cubemap( const nlohmann::json& json, const std::string& in_dir,
 }
 
 
+void read_data_schema( const nlohmann::json& json, const std::string&,
+     _16nar::tools::ResourceData& resource )
+{
+     _16nar::tools::DataSchema schema{};
+
+     const auto& items = json.at( "items" );
+     for ( const auto& json_item : items )
+     {
+          _16nar::tools::DataItem item{};
+          item.type = json_item.at( "type" );
+          item.mandatory = json_item.at( "mandatory" );
+          schema.items[ json_item.at( "name" ) ] = item;
+     }
+
+     const nlohmann::json& default_vals = json.at( "default_vals" ); // it must be, but may be empty
+     schema.default_vals = std::make_shared< _16nar::tools::JsonPropsReader >( default_vals, true );
+
+     resource.params = std::any{ schema };
+     resource.type = _16nar::ResourceType::DataSchema;
+}
+
+
 _16nar::tools::ResourceData read_resource( const nlohmann::json& json, const std::string& in_dir )
 {
      _16nar::tools::ResourceData resource{};
@@ -224,7 +248,7 @@ _16nar::tools::ResourceData read_resource( const nlohmann::json& json, const std
                read_cubemap( json, in_dir, resource );
                break;
           case _16nar::ResourceType::DataSchema:
-               //read_data_schema( json, in_dir, resource );
+               read_data_schema( json, in_dir, resource );
                break;
           default:
                throw std::runtime_error{ "wrong resource type: "
@@ -255,12 +279,12 @@ PackageData JsonAssetReader::read_package( std::istream& input )
 {
      PackageData package{};
      auto json = nlohmann::json::parse( input );
-     const auto& resources = json[ "resources" ];
+     const auto& resources = json.at( "resources" );
      for ( const nlohmann::json& resource : resources )
      {
           package.resources.emplace_back( read_resource( resource, in_dir_ ) );
      }
-     package.chunk_size = json[ "chunk_size" ];
+     package.chunk_size = json.at( "chunk_size" );
      return package;
 }
 

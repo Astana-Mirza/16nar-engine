@@ -1,7 +1,9 @@
 #include <16nar/tools/assets/flatbuffers/flatbuffers_props_reader.h>
 
+#include <flatbuffers/flexbuffers.h>
+
 #define _16NAR_GET_FB_VAL( CHECK, GET ) \
-     auto ref = root_[ name ];          \
+     auto ref = ( *root_ )[ name ];     \
      if ( !ref.CHECK() )                \
      {                                  \
           return {};                    \
@@ -10,7 +12,7 @@
 
 
 #define _16NAR_GET_FB_TYPED_VECTOR( CPP_TYPE, TYPE, GET )   \
-     auto ref = root_[ name ];                              \
+     auto ref = ( *root_ )[ name ];                         \
      if ( !ref.IsTypedVector() )                            \
      {                                                      \
           return {};                                        \
@@ -30,7 +32,7 @@
 
 
 #define _16NAR_GET_FB_DECL_FIXED_TYPED_VECTOR( TYPE, SIZE ) \
-     auto ref = root_[ name ];                              \
+     auto ref = ( *root_ )[ name ];                         \
      if ( !ref.IsFixedTypedVector() )                       \
      {                                                      \
           return {};                                        \
@@ -47,17 +49,23 @@ namespace _16nar::tools
 {
 
 FlatBuffersPropsReader::FlatBuffersPropsReader( const std::byte *buffer, std::size_t size, bool own ):
-     buffer_{}, root_{ flexbuffers::Map::EmptyMap() }
+     buffer_{}, root_{ new flexbuffers::Map( flexbuffers::Map::EmptyMap() ) }
 {
      if ( own )
      {
           buffer_.assign( buffer, buffer + size );
-          root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer_.data() ), buffer_.size() ).AsMap();
+          *root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer_.data() ), buffer_.size() ).AsMap();
      }
      else
      {
-          root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsMap();
+          *root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsMap();
      }
+}
+
+
+FlatBuffersPropsReader::~FlatBuffersPropsReader()
+{
+     delete root_;
 }
 
 
