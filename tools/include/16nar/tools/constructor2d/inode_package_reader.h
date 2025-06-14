@@ -9,6 +9,8 @@
 namespace _16nar::tools::constructor2d
 {
 
+class IScenePieceReader;
+
 /// @brief Interface for reading node package from serialized image.
 class ENGINE_API INodePackageReader
 {
@@ -20,16 +22,14 @@ public:
      /// @return list of all dependencies of the node package.
      virtual Dependencies get_dependencies() = 0;
 
-     /// @brief Get current scene piece reader.
-     /// @details Initially reads first scene piece. To read next one, @b next_piece should be called.
-     /// @return current scene piece reader.
-     virtual ISceneStateReader& get_current_piece_reader() = 0;
+     /// @brief Get scene piece reader of scene piece with given name.
+     /// @param[in] name name of the scene piece.
+     /// @return scene piece reader.
+     virtual IScenePieceReader& get_scene_piece_reader( const std::string& name ) = 0;
 
-     /// @brief Switch to next scene piece.
-     /// @details Call of this function affects result of @b get_current_piece_reader.
-     /// If no next scene piece exists, the function returns false and does not make any changes.
-     /// @return true if successfully switched to next scene piece, false otherwise.
-     virtual bool next_piece() = 0;
+     /// @brief Get number of scene pieces in this package.
+     /// @return number of scene pieces in this package.
+     virtual std::size_t get_scene_piece_count() = 0;
 };
 
 } // namespace _16nar::tools::constructor2d

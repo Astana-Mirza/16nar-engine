@@ -17,6 +17,10 @@ public:
      /// @brief Virtual default destructor.
      virtual ~IScenePieceReader() = default;
 
+     /// @brief Check if there are no nodes to read.
+     /// @return true if there are no nodes to read, false otherwise. 
+     virtual bool is_empty() = 0;
+
      /// @brief Get current node's properties reader.
      /// @details Initially reads first node. To read next one, @b next_node should be called.
      /// @return current node's properties reader.

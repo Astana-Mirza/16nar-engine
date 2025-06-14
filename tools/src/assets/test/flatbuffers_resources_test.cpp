@@ -302,4 +302,4 @@ TEST_CASE( "Packages reading and writing in flatbuffers format", "[flatbuffers_r
      REQUIRE( fr_shader.from_source == true );
 }
 
-}
+} // anonymous namespace

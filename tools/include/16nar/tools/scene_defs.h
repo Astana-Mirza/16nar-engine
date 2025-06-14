@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <unordered_map>
 #include <memory>
+#include <limits>
 
 namespace _16nar::tools
 {
@@ -92,9 +93,13 @@ struct Dependencies
 /// @brief Index of resource in scene's dependencies.
 struct ResourceIndex
 {
-     uint16_t package{};      ///< index of package.
-     uint16_t resource{};     ///< index of resource within package.
+     std::uint16_t package{};      ///< index of package, must be in [0; 65534].
+     std::uint16_t resource{};     ///< index of resource within package.
 };
+
+
+/// @brief Special value of package indicating that it is embedded in current file.
+constexpr static std::uint16_t internal_package_num = std::numeric_limits< std::uint16_t >::max();
 
 } // namespace _16nar::tools
 

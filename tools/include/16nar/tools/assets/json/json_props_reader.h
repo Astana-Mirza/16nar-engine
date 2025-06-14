@@ -15,6 +15,9 @@ namespace _16nar::tools
 class ENGINE_API JsonPropsReader : public IPropsReader
 {
 public:
+     /// @brief Default constructor.
+     JsonPropsReader();
+
      /// @brief Constructor.
      /// @param[in] json JSON object with properties.
      /// @param[in] own true if this object owns the JSON  object (the object will be copied then), false otherwise.

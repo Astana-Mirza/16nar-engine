@@ -164,4 +164,4 @@ TEST_CASE( "Properties reading and writing in flatbuffers format", "[flatbuffers
      REQUIRE( reader.get_resource_index( "no_resource_index" ).has_value() == false );
 }
 
-}
+} // anonymous namespace

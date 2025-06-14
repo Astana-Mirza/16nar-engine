@@ -417,4 +417,4 @@ TEST_CASE( "Packages reading and writing in JSON format", "[json_resources]" )
      REQUIRE( fr_written[ "from_source" ] == true );
 }
 
-}
+} // anonymous namespace

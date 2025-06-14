@@ -10,7 +10,7 @@
 #include <string>
 #include <array>
 #include <stdexcept>
-
+#include <cassert>
 
 namespace
 {
@@ -279,6 +279,10 @@ PackageData JsonAssetReader::read_package( std::istream& input )
 {
      PackageData package{};
      auto json = nlohmann::json::parse( input );
+
+     std::uint32_t version = json.at( "version" );
+     assert( ( version & NARENGINE_VERSION_COMPATIBLE_MASK ) == NARENGINE_VERSION_NO_PATCH_UINT32 );
+
      const auto& resources = json.at( "resources" );
      for ( const nlohmann::json& resource : resources )
      {

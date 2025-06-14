@@ -8,7 +8,6 @@ table NodePackage2D
      version:       uint32;
      deps:          Dependencies   (required);
      pieces:        [ScenePiece2D] (required);
-     schema:        ResourceId     (required);
 }
 
 root_type NodePackage2D;

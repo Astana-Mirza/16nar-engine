@@ -16,7 +16,7 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
         set(NARENGINE_FLATBUFFERS_SCHEMAS ${NARENGINE_FLATBUFFERS_SCHEMAS}
             "flatbuffers/constructor2d_nodes.fbs"
             "flatbuffers/constructor2d_scene.fbs"
-            "flatbuffers/constructor2d_piece.fbs"
+            "flatbuffers/constructor2d_node_pkg.fbs"
         )
     endif() # if("${NARENGINE_BUILD_CONSTRUCTOR}")
 

@@ -35,6 +35,11 @@
 namespace _16nar::tools
 {
 
+JsonPropsReader::JsonPropsReader():
+     own_json_{}, json_{ &own_json_ }
+{}
+
+
 JsonPropsReader::JsonPropsReader( const nlohmann::json& json, bool own ):
      own_json_{}, json_{ own ? &own_json_ : &json }
 {

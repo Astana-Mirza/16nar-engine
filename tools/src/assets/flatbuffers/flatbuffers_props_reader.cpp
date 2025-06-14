@@ -48,6 +48,11 @@
 namespace _16nar::tools
 {
 
+FlatBuffersPropsReader::FlatBuffersPropsReader():
+     buffer_{}, root_{ new flexbuffers::Map( flexbuffers::Map::EmptyMap() ) }
+{}
+
+
 FlatBuffersPropsReader::FlatBuffersPropsReader( const std::byte *buffer, std::size_t size, bool own ):
      buffer_{}, root_{ new flexbuffers::Map( flexbuffers::Map::EmptyMap() ) }
 {
