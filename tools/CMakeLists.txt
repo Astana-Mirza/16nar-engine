@@ -50,6 +50,26 @@ if ("${NARENGINE_TOOLS_JSON}")
     target_compile_definitions("${NAME}_assets_json" ${NARENGINE_ASSETS_JSON_COMPILER_DEFS})
     target_link_libraries("${NAME}_assets_json" ${NARENGINE_ASSETS_JSON_LINK_LIBS})
     set(NARENGINE_TOOLS_ASSETS_LIBS ${NARENGINE_TOOLS_ASSETS_LIBS} "${NAME}_assets_json")
+
+    if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+        set(NARENGINE_CONSTRUCTOR2D_JSON_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
+        set(NARENGINE_CONSTRUCTOR2D_JSON_INCLUDE_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS})
+        set(NARENGINE_CONSTRUCTOR2D_JSON_LINK_LIBS PUBLIC "${NAME}_assets_json")
+        set(NARENGINE_CONSTRUCTOR2D_JSON_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
+        set(NARENGINE_CONSTRUCTOR2D_JSON_SOURCES
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_node_package_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_scene_piece_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_scene_state_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_scene_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_read_utils.cpp"
+        )
+        add_library("${NAME}_constructor2d_json" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CONSTRUCTOR2D_JSON_SOURCES})
+        target_include_directories("${NAME}_constructor2d_json" ${NARENGINE_CONSTRUCTOR2D_JSON_INCLUDE_DIRS})
+        target_link_directories("${NAME}_constructor2d_json" ${NARENGINE_CONSTRUCTOR2D_JSON_LINK_DIRS})
+        target_compile_definitions("${NAME}_constructor2d_json" ${NARENGINE_CONSTRUCTOR2D_JSON_COMPILER_DEFS})
+        target_link_libraries("${NAME}_constructor2d_json" ${NARENGINE_CONSTRUCTOR2D_JSON_LINK_LIBS})
+        set(NARENGINE_TOOLS_CONSTRUCTOR2D_LIBS ${NARENGINE_TOOLS_CONSTRUCTOR2D_LIBS} "${NAME}_constructor2d_json")
+    endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 endif() # if ("${NARENGINE_TOOLS_JSON}")
 
 
@@ -80,6 +100,9 @@ endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
 
 
 set(NARENGINE_TOOLS_ALL_TARGETS ${NARENGINE_TOOLS_ALL_TARGETS} ${NARENGINE_TOOLS_ASSETS_LIBS})
+if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+    set(NARENGINE_TOOLS_ALL_TARGETS ${NARENGINE_TOOLS_ALL_TARGETS} ${NARENGINE_TOOLS_CONSTRUCTOR2D_LIBS})
+endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 if ("${NARENGINE_BUILD_UTILS}")
     add_executable("${NAME}_asset_tool" "${NARENGINE_TOOLS_SRC_DIR}/asset_tool.cpp")
     target_include_directories("${NAME}_asset_tool" PRIVATE
@@ -118,6 +141,24 @@ if ("${NARENGINE_BUILD_TESTS}")
         "${NAME}_tools" ${NARENGINE_TOOLS_ASSETS_LIBS} "Catch2::Catch2WithMain" "nlohmann_json::nlohmann_json")
     file(COPY "${NARENGINE_TOOLS_SRC_DIR}/assets/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
     add_test(NAME "${NAME}_tools_assets_test" COMMAND "${NAME}_tools_assets_test")
+
+    if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+        if ("${NARENGINE_TOOLS_JSON}")
+            set(NARENGINE_CONSTRUCTOR2D_TEST_SOURCES ${NARENGINE_CONSTRUCTOR2D_TEST_SOURCES}
+                "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/test/json_scene_test.cpp"
+                "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/test/json_node_package_test.cpp"
+            )
+        endif() # if ("${NARENGINE_TOOLS_JSON}")
+        add_executable("${NAME}_tools_constructor2d_test" ${NARENGINE_CONSTRUCTOR2D_TEST_SOURCES})
+        target_include_directories("${NAME}_tools_constructor2d_test" PRIVATE
+            "${NARENGINE_TOOLS_INCLUDE_DIR}" ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
+        target_link_directories("${NAME}_tools_constructor2d_test" PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_link_libraries("${NAME}_tools_constructor2d_test" PRIVATE
+            "${NAME}_tools" ${NARENGINE_TOOLS_CONSTRUCTOR2D_LIBS}
+            "Catch2::Catch2WithMain" "nlohmann_json::nlohmann_json")
+        file(COPY "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+        add_test(NAME "${NAME}_tools_constructor2d_test" COMMAND "${NAME}_tools_constructor2d_test")
+    endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 endif() # if ("${NARENGINE_BUILD_TESTS}")
 
 

@@ -1,0 +1,38 @@
+{
+     "version": 65536,
+     "deps":
+     {
+          "resources": [
+               {
+                    "name": "test_package",
+                    "elements": [ "test_texture", "test_shader" ]
+               }
+          ],
+          "libs": [],
+          "pieces": [
+               {
+                    "name": "test_node_package2",
+                    "elements": [ "test_node_2d" ]
+               }
+          ]
+     },
+     "pieces":
+     {
+          "test_piece": [
+               {
+                    "type": "node_2d",
+                    "pos": [ 10.0, -50.0 ],
+                    "scale": [ 3.0, 3.0 ],
+                    "link": [ 0, 0 ]
+               },
+               {
+                    "type": "sprite_node",
+                    "parent": 0,
+                    "name": "test_sprite",
+                    "texture": [ 0, 0 ],
+                    "shader": [ 0, 1 ],
+                    "size": [ 10.0, 10.0 ]
+               }
+          ]
+     }
+}

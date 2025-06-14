@@ -21,6 +21,9 @@ namespace _16nar::tools
 class ENGINE_API FlatBuffersPropsReader : public IPropsReader
 {
 public:
+     /// @brief Default constructor.
+     FlatBuffersPropsReader();
+
      /// @brief Constructor.
      /// @param[in] buffer underlying buffer.
      /// @param[in] size size of the buffer.

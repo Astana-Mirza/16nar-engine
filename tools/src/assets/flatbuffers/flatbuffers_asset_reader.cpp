@@ -11,6 +11,7 @@
 
 #include <stdexcept>
 #include <istream>
+#include <cassert>
 
 namespace
 {
@@ -326,6 +327,10 @@ PackageData FlatBuffersAssetReader::read_package( std::istream& input )
      auto header_buffer = read_header( input, header_size );
 
      auto pkg_buffer = _16nar::data::package::GetPackage( header_buffer.data() );
+
+     std::uint32_t version = pkg_buffer->version();
+     assert( ( version & NARENGINE_VERSION_COMPATIBLE_MASK ) == NARENGINE_VERSION_NO_PATCH_UINT32 );
+
      flatbuffers::Verifier verifier{ header_buffer.data(), header_size };
      if ( !_16nar::data::package::VerifyPackageBuffer( verifier ) )
      {

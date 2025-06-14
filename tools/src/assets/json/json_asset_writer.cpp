@@ -231,6 +231,7 @@ void JsonAssetWriter::write_package( std::ostream& output, const PackageData& pa
      }
      json[ "resources" ] = resources;
      json[ "chunk_size" ] = package.chunk_size;
+     json[ "version" ] = NARENGINE_VERSION_UINT32;
      output << json;
 }
 

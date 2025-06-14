@@ -375,6 +375,7 @@ void FlatBuffersAssetWriter::write_package( std::ostream& output, const PackageD
      _16nar::data::package::PackageBuilder pkg_builder{ builder };
      pkg_builder.add_resources( resources_stored );
      pkg_builder.add_chunk_size( package.chunk_size );
+     pkg_builder.add_version( NARENGINE_VERSION_UINT32 );
 
      auto pkg_stored = pkg_builder.Finish();
      builder.Finish( pkg_stored, _16nar::data::package::PackageIdentifier() );
