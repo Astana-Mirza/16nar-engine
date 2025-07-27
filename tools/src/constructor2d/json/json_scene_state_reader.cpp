@@ -9,11 +9,12 @@ namespace _16nar::tools::constructor2d
 
 JsonSceneStateReader::JsonSceneStateReader( const nlohmann::json& json ):
      json_{ &json }, render_system_reader_{ json.at( "render_system" ), false },
-     node_reader_{}, end_{}, curr_node_{}
+     node_reader_{}, begin_{}, end_{}, curr_node_{}
 {
      const auto& nodes = json.at( "nodes" );
-     curr_node_ = nodes.cbegin();
+     begin_ = nodes.cbegin();
      end_ = nodes.cend();
+     curr_node_ = begin_;
      if ( curr_node_ != end_ )
      {
           node_reader_ = JsonPropsReader{ *curr_node_, false };
@@ -47,6 +48,12 @@ RenderSystemType JsonSceneStateReader::get_render_system_type()
           json_->at( "render_system" ).at( "type" );
      }
      return ret;
+}
+
+
+bool JsonSceneStateReader::is_empty()
+{
+     return begin_ == end_;
 }
 
 

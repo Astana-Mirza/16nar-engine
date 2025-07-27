@@ -137,4 +137,13 @@ void copy_property( IPropsReader& reader, const std::string& name,
      }
 }
 
+
+void copy_properties( const DataSchema& schema, IPropsReader& reader, IPropsWriter& writer )
+{
+     for ( const auto& [ name, item ] : schema.items )
+     {
+          copy_property( reader, name, item, true, writer );
+     }
+}
+
 } // namespace _16nar::tools

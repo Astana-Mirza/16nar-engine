@@ -21,8 +21,8 @@ public:
      /// @copydoc IAssetReader::read_asset(std::istream&)
      ResourceData read_asset( std::istream& input ) override;
 
-     /// @copydoc IAssetReader::read_package(std::istream&)
-     PackageData read_package( std::istream& input ) override;
+     /// @copydoc IAssetReader::read_package(std::istream&, const std::vector<std::string>&)
+     PackageData read_package( std::istream& input, const std::vector< std::string >& names = {} ) override;
 };
 
 } // namespace _16nar::tools

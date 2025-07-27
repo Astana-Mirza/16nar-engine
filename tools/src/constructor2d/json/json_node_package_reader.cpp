@@ -40,6 +40,18 @@ std::size_t JsonNodePackageReader::get_scene_piece_count()
 }
 
 
+std::vector< std::string > JsonNodePackageReader::get_scene_piece_names()
+{
+     std::vector< std::string > names;
+     names.reserve( pieces_.size() );
+     for ( const auto& iter : pieces_ )
+     {
+          names.emplace_back( iter.first );
+     }
+     return names;
+}
+
+
 void JsonNodePackageReader::read_json()
 {
      std::uint32_t version = json_.at( "version" );

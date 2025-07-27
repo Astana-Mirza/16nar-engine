@@ -82,22 +82,6 @@ class NarengineRecipe(ConanFile):
         self.cpp_info.set_property("cmake_file_name", "16nar")
         self.cpp_info.set_property("cmake_find_mode", "both")
 
-        # tools
-        self.cpp_info.components["16nar_tools"].libs = ["16nar_tools"]
-        self.cpp_info.components["16nar_tools"].system_libs = ["glm::glm"]
-        self.cpp_info.components["16nar_tools"].set_property("cmake_target_name",
-            nmspc_name + "::16nar_tools")
-        if self.options.with_tools_json:
-            self.cpp_info.components["16nar_assets_json"].libs = ["16nar_assets_json"]
-            self.cpp_info.components["16nar_assets_json"].requires = ["16nar_tools"]
-            self.cpp_info.components["16nar_assets_json"].set_property("cmake_target_name",
-                nmspc_name + "::16nar_assets_json")
-        if self.options.with_tools_flatbuffers:
-            self.cpp_info.components["16nar_assets_fb"].libs = ["16nar_assets_fb"]
-            self.cpp_info.components["16nar_assets_fb"].system_libs = ["flatbuffers::libflatbuffers"]
-            self.cpp_info.components["16nar_assets_fb"].set_property("cmake_target_name",
-                nmspc_name + "::16nar_assets_fb")
-
         # engine
         self.cpp_info.components["16nar_logger"].libs = ["16nar_logger"]
         self.cpp_info.components["16nar_logger"].set_property("cmake_target_name",
@@ -127,3 +111,40 @@ class NarengineRecipe(ConanFile):
             self.cpp_info.components["16nar_constructor2d"].requires = ["16nar_base"]
             self.cpp_info.components["16nar_constructor2d"].set_property("cmake_target_name",
                 nmspc_name + "::16nar_constructor2d")
+
+        # tools
+        self.cpp_info.components["16nar_tools"].libs = ["16nar_tools"]
+        self.cpp_info.components["16nar_tools"].requires = ["16nar_math"]
+        self.cpp_info.components["16nar_tools"].system_libs = ["glm::glm"]
+        self.cpp_info.components["16nar_tools"].set_property("cmake_target_name",
+            nmspc_name + "::16nar_tools")
+        if self.options.with_arch_constructor2d:
+            self.cpp_info.components["16nar_tools_constructor2d"].libs = ["16nar_tools_constructor2d"]
+            self.cpp_info.components["16nar_tools_constructor2d"].requires = ["16nar_math"]
+            self.cpp_info.components["16nar_tools_constructor2d"].system_libs = ["glm::glm"]
+            self.cpp_info.components["16nar_tools_constructor2d"].set_property("cmake_target_name",
+                nmspc_name + "::16nar_tools_constructor2d")
+
+        if self.options.with_tools_json:
+            self.cpp_info.components["16nar_assets_json"].libs = ["16nar_assets_json"]
+            self.cpp_info.components["16nar_assets_json"].requires = ["16nar_tools"]
+            self.cpp_info.components["16nar_assets_json"].set_property("cmake_target_name",
+                nmspc_name + "::16nar_assets_json")
+            if self.options.with_arch_constructor2d:
+                self.cpp_info.components["16nar_constructor2d_json"].libs = ["16nar_constructor2d_json"]
+                self.cpp_info.components["16nar_constructor2d_json"].requires = \
+                    ["16nar_tools_constructor2d", "16nar_assets_json"]
+                self.cpp_info.components["16nar_constructor2d_json"].set_property("cmake_target_name",
+                    nmspc_name + "::16nar_constructor2d_json")
+        if self.options.with_tools_flatbuffers:
+            self.cpp_info.components["16nar_assets_fb"].libs = ["16nar_assets_fb"]
+            self.cpp_info.components["16nar_assets_fb"].requires = ["16nar_tools"]
+            self.cpp_info.components["16nar_assets_fb"].system_libs = ["flatbuffers::libflatbuffers"]
+            self.cpp_info.components["16nar_assets_fb"].set_property("cmake_target_name",
+                nmspc_name + "::16nar_assets_fb")
+            #if self.options.with_arch_constructor2d:
+            #    self.cpp_info.components["16nar_constructor2d_fb"].libs = ["16nar_constructor2d_fb"]
+            #    self.cpp_info.components["16nar_constructor2d_fb"].requires = \
+            #        ["16nar_tools_constructor2d", "16nar_assets_fb"]
+            #    self.cpp_info.components["16nar_constructor2d_fb"].set_property("cmake_target_name",
+            #        nmspc_name + "::16nar_constructor2d_fb")

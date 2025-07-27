@@ -8,7 +8,7 @@ namespace _16nar::constructor2d
 {
 
 Transformable2D::Transformable2D() noexcept:
-     matr_{}, position_{}, origin_{}, scale_{ 1.0f, 1.0f },
+     matr_{}, position_{}, scale_{ 1.0f, 1.0f },
      rotation_{ 0.0f }, transformed_{ false }
 {}
 
@@ -41,12 +41,6 @@ float Transformable2D::get_rotation() const noexcept
 const Vec2f& Transformable2D::get_scale() const noexcept
 {
      return scale_;
-}
-
-
-const Vec2f& Transformable2D::get_origin() const noexcept
-{
-     return origin_;
 }
 
 
@@ -93,20 +87,6 @@ void Transformable2D::set_scale( float factor_x, float factor_y ) noexcept
 void Transformable2D::set_scale( const Vec2f& factors ) noexcept
 {
      scale_ = factors;
-     transformed_ = true;
-}
-
-
-void Transformable2D::set_origin( float x, float y ) noexcept
-{
-     origin_ = Vec2f{ x, y };
-     transformed_ = true;
-}
-
-
-void Transformable2D::set_origin( const Vec2f& origin ) noexcept
-{
-     origin_ = origin;
      transformed_ = true;
 }
 

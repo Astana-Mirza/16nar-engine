@@ -31,6 +31,23 @@ target_link_libraries("${NAME}_tools" ${NARENGINE_TOOLS_LINK_LIBS})
 set(NARENGINE_TOOLS_ALL_TARGETS ${NARENGINE_TOOLS_ALL_TARGETS} "${NAME}_tools")
 
 
+if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+    set(NARENGINE_TOOLS_CONSTRUCTOR2D_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
+    set(NARENGINE_TOOLS_CONSTRUCTOR2D_INCLUDE_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS})
+    set(NARENGINE_TOOLS_CONSTRUCTOR2D_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
+    set(NARENGINE_TOOLS_CONSTRUCTOR2D_LINK_LIBS PUBLIC "glm::glm")
+    set(NARENGINE_TOOLS_CONSTRUCTOR2D_SOURCES ${NARENGINE_TOOLS_CONSTRUCTOR2D_SOURCES}
+        "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/schemas.cpp"
+    )
+    add_library("${NAME}_tools_constructor2d" "${NARENGINE_LIB_TYPE}" ${NARENGINE_TOOLS_CONSTRUCTOR2D_SOURCES})
+    target_include_directories("${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CONSTRUCTOR2D_INCLUDE_DIRS})
+    target_link_directories("${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CONSTRUCTOR2D_LINK_DIRS})
+    target_compile_definitions("${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CONSTRUCTOR2D_COMPILER_DEFS})
+    target_link_libraries("${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CONSTRUCTOR2D_LINK_LIBS})
+    set(NARENGINE_TOOLS_ALL_TARGETS ${NARENGINE_TOOLS_ALL_TARGETS} "${NAME}_tools_constructor2d")
+endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+
+
 if ("${NARENGINE_TOOLS_JSON}")
     # Json assets library
     set(NARENGINE_ASSETS_JSON_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
@@ -54,13 +71,14 @@ if ("${NARENGINE_TOOLS_JSON}")
     if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
         set(NARENGINE_CONSTRUCTOR2D_JSON_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
         set(NARENGINE_CONSTRUCTOR2D_JSON_INCLUDE_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS})
-        set(NARENGINE_CONSTRUCTOR2D_JSON_LINK_LIBS PUBLIC "${NAME}_assets_json")
+        set(NARENGINE_CONSTRUCTOR2D_JSON_LINK_LIBS PUBLIC "${NAME}_tools_constructor2d" "${NAME}_assets_json")
         set(NARENGINE_CONSTRUCTOR2D_JSON_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
         set(NARENGINE_CONSTRUCTOR2D_JSON_SOURCES
             "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_node_package_reader.cpp"
             "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_scene_piece_reader.cpp"
             "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_scene_state_reader.cpp"
             "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_scene_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_scene_convertor.cpp"
             "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/json/json_read_utils.cpp"
         )
         add_library("${NAME}_constructor2d_json" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CONSTRUCTOR2D_JSON_SOURCES})
@@ -154,7 +172,7 @@ if ("${NARENGINE_BUILD_TESTS}")
             "${NARENGINE_TOOLS_INCLUDE_DIR}" ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
         target_link_directories("${NAME}_tools_constructor2d_test" PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
         target_link_libraries("${NAME}_tools_constructor2d_test" PRIVATE
-            "${NAME}_tools" ${NARENGINE_TOOLS_CONSTRUCTOR2D_LIBS}
+            "${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CONSTRUCTOR2D_LIBS}
             "Catch2::Catch2WithMain" "nlohmann_json::nlohmann_json")
         file(COPY "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
         add_test(NAME "${NAME}_tools_constructor2d_test" COMMAND "${NAME}_tools_constructor2d_test")

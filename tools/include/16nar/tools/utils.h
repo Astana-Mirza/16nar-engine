@@ -52,6 +52,12 @@ ENGINE_API int get_channel_count( BufferDataFormat format );
 ENGINE_API void copy_property( IPropsReader& reader, const std::string& name,
      const DataItem& item, bool copy_optional, IPropsWriter& writer );
 
+/// @brief Copy properties from one property storage to another using schema.
+/// @param[in] schema schema of properties storage.
+/// @param[in] reader reader of source property storage.
+/// @param[out] writer writer of destination property storage.
+ENGINE_API void copy_properties( const DataSchema& schema, IPropsReader& reader, IPropsWriter& writer );
+
 } // namespace _16nar::tools
 
 #endif // _16NAR_TOOLS_BINARY_UTILS_H

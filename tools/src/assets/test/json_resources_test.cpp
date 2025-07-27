@@ -415,6 +415,18 @@ TEST_CASE( "Packages reading and writing in JSON format", "[json_resources]" )
      REQUIRE( fr_written[ "type" ] == "fragment" );
      REQUIRE( fr_written[ "file" ] == "test_pkg_shader_shader1.bin" );
      REQUIRE( fr_written[ "from_source" ] == true );
+
+     std::ifstream ifs_partial{ "data/test_package.json" };
+     _16nar::tools::PackageData pkg_partial = reader.read_package( ifs_partial, { "test_pkg_texture" } );
+     ifs_partial.close();
+
+     REQUIRE( pkg_partial.resources.size() == 1 );
+
+     const auto& data_partial0 = pkg_partial.resources.at( 0 );
+     REQUIRE( data_partial0.type == _16nar::ResourceType::Texture );
+     REQUIRE( data_partial0.name == "test_pkg_texture" );
+     REQUIRE( data_partial0.data_sizes.size() == 1 );
+     REQUIRE( data_partial0.data_sizes.at( 0 ) == 64 * 64 * 4 * sizeof( std::byte ) );
 }
 
 } // anonymous namespace

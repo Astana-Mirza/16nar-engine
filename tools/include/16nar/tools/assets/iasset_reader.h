@@ -25,11 +25,13 @@ public:
      /// @throws std::exception and its derivatives.
      virtual ResourceData read_asset( std::istream& input ) = 0;
 
-     /// @brief Read package data with multiple assets.
+     /// @brief Read package data with selected assets.
      /// @param[in] input input data stream.
-     /// @return package read from data stream.
+     /// @param[in] names names of selected assets to be loaded from the package (load all if empty).
+     /// @return package read from data stream, the package contains only selected assets.
      /// @throws std::exception and its derivatives.
-     virtual PackageData read_package( std::istream& input ) = 0;
+     virtual PackageData read_package( std::istream& input,
+          const std::vector< std::string >& names = {} ) = 0;
 };
 
 } // namespace _16nar::tools

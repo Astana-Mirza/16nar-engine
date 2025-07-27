@@ -11,13 +11,14 @@ namespace _16nar::tools::constructor2d
 
 JsonSceneReader::JsonSceneReader( const nlohmann::json& json ):
      json_( json ), pieces_{}, state_reader_{},
-     end_{}, curr_state_{}
+     begin_{}, end_{}, curr_state_{}
 {
      read_json();
 
      const auto& states = json_.at( "states" );
-     curr_state_ = states.cbegin();
+     begin_ = states.cbegin();
      end_ = states.cend();
+     curr_state_ = begin_;
      if ( curr_state_ != end_ )
      {
           state_reader_ = JsonSceneStateReader{ *curr_state_ };
@@ -32,8 +33,9 @@ JsonSceneReader::JsonSceneReader( nlohmann::json&& json ):
      read_json();
 
      const auto& states = json_.at( "states" );
-     curr_state_ = states.cbegin();
+     begin_ = states.cbegin();
      end_ = states.cend();
+     curr_state_ = begin_;
      if ( curr_state_ != end_ )
      {
           state_reader_ = JsonSceneStateReader{ *curr_state_ };
@@ -47,13 +49,13 @@ Dependencies JsonSceneReader::get_dependencies()
 }
 
 
-ResourceIndex JsonSceneReader::get_setup_func()
+std::optional< ResourceIndex > JsonSceneReader::get_setup_func()
 {
      return read_resource_index( "setup_func", true );
 }
 
 
-ResourceIndex JsonSceneReader::get_loop_func()
+std::optional< ResourceIndex > JsonSceneReader::get_loop_func()
 {
      return read_resource_index( "loop_func", true );
 }
@@ -61,7 +63,13 @@ ResourceIndex JsonSceneReader::get_loop_func()
 
 ResourceIndex JsonSceneReader::get_schema()
 {
-     return read_resource_index( "schema", false );
+     return read_resource_index( "schema", false ).value();
+}
+
+
+bool JsonSceneReader::is_empty()
+{
+     return begin_ == end_;
 }
 
 
@@ -129,7 +137,7 @@ void JsonSceneReader::read_json()
 }
 
 
-ResourceIndex JsonSceneReader::read_resource_index( std::string_view name, bool optional ) const
+std::optional< ResourceIndex > JsonSceneReader::read_resource_index( std::string_view name, bool optional ) const
 {
      const auto iter = json_.find( name );
      if ( iter == json_.cend() )
@@ -138,7 +146,7 @@ ResourceIndex JsonSceneReader::read_resource_index( std::string_view name, bool 
           {
                throw std::runtime_error{ "mandatory field '" + std::string{ name } + "' is absent" };
           }
-          return ResourceIndex{};
+          return {};
      }
      std::array< std::uint16_t, 2 > val = *iter;
      ResourceIndex ret{};

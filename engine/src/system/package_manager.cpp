@@ -24,7 +24,7 @@ PackageManager::~PackageManager()
 }
 
 
-bool PackageManager::load_package( const std::string& name )
+bool PackageManager::load_package( const std::string& name, const std::vector< std::string >& resources )
 {
      if ( is_package_loaded( name ) )
      {
@@ -55,7 +55,7 @@ bool PackageManager::load_package( const std::string& name )
      tools::PackageData pkg{};
      try
      {
-          pkg = reader.read_package( ifs );
+          pkg = reader.read_package( ifs, resources );
      }
      catch ( const std::exception& ex )
      {
