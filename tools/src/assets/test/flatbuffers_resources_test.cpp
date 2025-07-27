@@ -300,6 +300,18 @@ TEST_CASE( "Packages reading and writing in flatbuffers format", "[flatbuffers_r
      REQUIRE( fr_shader.size == 102 * sizeof( std::byte ) );
      REQUIRE( fr_shader.type == _16nar::ShaderType::Fragment );
      REQUIRE( fr_shader.from_source == true );
+
+     std::ifstream ifs_partial{ "data/out/test_package.nrs", std::ios::in | std::ios::binary };
+     _16nar::tools::PackageData pkg_partial = reader.read_package( ifs_partial, { "test_pkg_texture" } );
+     ifs_partial.close();
+
+     REQUIRE( pkg_partial.resources.size() == 1 );
+
+     const auto& data_partial0 = pkg_partial.resources.at( 0 );
+     REQUIRE( data_partial0.type == _16nar::ResourceType::Texture );
+     REQUIRE( data_partial0.name == "test_pkg_texture" );
+     REQUIRE( data_partial0.data_sizes.size() == 1 );
+     REQUIRE( data_partial0.data_sizes.at( 0 ) == 64 * 64 * 4 * sizeof( std::byte ) );
 }
 
 } // anonymous namespace

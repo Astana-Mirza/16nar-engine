@@ -33,6 +33,9 @@ public:
      /// @copydoc INodePackageReader::get_scene_piece_count()
      std::size_t get_scene_piece_count() override;
 
+     /// @copydoc INodePackageReader::get_scene_piece_names()
+     std::vector< std::string > get_scene_piece_names() override;
+
 private:
      /// @brief Read JSON object to fill data fields.
      /// @throws std::runtime_error and implementation-defined exceptions if @b json_ is malformed.

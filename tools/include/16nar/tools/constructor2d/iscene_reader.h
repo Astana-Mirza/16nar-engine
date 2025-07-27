@@ -6,6 +6,8 @@
 #include <16nar/16nardefs.h>
 #include <16nar/tools/scene_defs.h>
 
+#include <optional>
+
 namespace _16nar::tools::constructor2d
 {
 
@@ -24,16 +26,20 @@ public:
      virtual Dependencies get_dependencies() = 0;
 
      /// @brief Get resource index of setup function.
-     /// @return resource index of setup function, will be zeroed if absent in scene.
-     virtual ResourceIndex get_setup_func() = 0;
+     /// @return resource index of setup function, optional.
+     virtual std::optional< ResourceIndex > get_setup_func() = 0;
 
      /// @brief Get resource index of loop function.
-     /// @return resource index of loop function, will be zeroed if absent in scene.
-     virtual ResourceIndex get_loop_func() = 0;
+     /// @return resource index of loop function, optional.
+     virtual std::optional< ResourceIndex > get_loop_func() = 0;
 
      /// @brief Get resource index of scene nodes' data schema.
      /// @return resource index of scene nodes' data schema.
      virtual ResourceIndex get_schema() = 0;
+
+     /// @brief Check if scene has no states.
+     /// @return true if scene has no states, false otherwise.
+     virtual bool is_empty() = 0;
 
      /// @brief Get current scene state reader.
      /// @details Initially reads first scene state. To read next one, @b next_state should be called.

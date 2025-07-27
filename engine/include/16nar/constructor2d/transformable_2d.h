@@ -29,10 +29,6 @@ public:
      /// @return current object's scale.
      const Vec2f& get_scale() const noexcept;
 
-     /// @brief Get current object's transform origin point.
-     /// @return current object's transform origin point.
-     const Vec2f& get_origin() const noexcept;
-
      /// @brief Get current object's transformation matrix.
      /// @return current object's transformation matrix.
      const TransformMatrix& get_transform_matr() const noexcept;
@@ -62,15 +58,6 @@ public:
      /// @brief Set current object scale.
      /// @param[in] factors object's scale factor vector.
      void set_scale( const Vec2f& factors ) noexcept;
-
-     /// @brief Set current object transform origin point.
-     /// @param[in] x object's origin x coordinate.
-     /// @param[in] y object's origin y coordinate.
-     void set_origin( float x, float y ) noexcept;
-
-     /// @brief Set current object transform origin point.
-     /// @param[in] origin object's origin coordinate vector.
-     void set_origin( const Vec2f& origin ) noexcept;
 
      /// @brief Move object by given offsets.
      /// @param[in] offset_x object's x moving offset.
@@ -104,7 +91,6 @@ protected:
 private:
      TransformMatrix matr_;        ///< matrix with transformation of this object.
      Vec2f position_;              ///< position of this object.
-     Vec2f origin_;                ///< transformation origin point of this object.
      Vec2f scale_;                 ///< scale of this object.
      float rotation_;              ///< clockwise rotation of this object, in degrees.
 	bool transformed_;            ///< indicator of object being transformed.

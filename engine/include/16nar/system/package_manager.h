@@ -5,12 +5,11 @@
 
 #include <16nar/16nardefs.h>
 
-#include <string_view>
+#include <vector>
 #include <string>
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
-#include <memory>
 
 namespace _16nar
 {
@@ -30,28 +29,29 @@ public:
      /// @brief Destructor, unloads all packages.
      ~PackageManager();
 
-     /// @brief Load resource package and create all its resources.
+     /// @brief Load resource package and create its selected resources.
      /// @details Package can be packed into single file.
-     /// If package is unpacked, then resources should be in directory with the name of package.
+     /// If package is unpacked, then resources must be in directory with the name of package.
      /// If load of a resource from a package fails, then all previously loaded resources
-     /// from this package should be unloaded. If this unload fails (exception is thrown
+     /// from this package will be unloaded. If this unload fails (exception is thrown
      /// by render API), it will not be caught here, because it means something bad happened.
-     /// @param[in] filename path to resource package file or directory.
+     /// @param[in] name name of resource package.
+     /// @param[in] resources names of selected resources to be loadded from the package (load all if empty).
      /// @return true if package is loaded successfully, false otherwise.
-     bool load_package( const std::string& name );
+     bool load_package( const std::string& name, const std::vector< std::string >& resources = {} );
 
      /// @brief Unload resource package and all its resources.
      /// @details Unload may throw, exception is not caught in this function.
-     /// @param[in] filename path to resource package file.
+     /// @param[in] name name of resource package.
      void unload_package( const std::string& name );
 
-     /// @brief Check if given package is loaded.
-     /// @param[in] name name of package file.
+     /// @brief Check if any resources from given package are loaded.
+     /// @param[in] name name of resource package.
      /// @return true if package is loaded, false otherwise.
      bool is_package_loaded( const std::string& name ) const;
 
      /// @brief Check if given resource is loaded.
-     /// @param[in] name name of resource.
+     /// @param[in] name name of resource in format "package_name/resource_name".
      /// @return true if resource is loaded, false otherwise.
      bool is_resource_loaded( const std::string& name ) const;
 
@@ -61,7 +61,6 @@ public:
 
      /// @brief Set directory containing resource packages.
      /// @param[in] dirname path to directory.
-     /// @throws std::bad_alloc.
      void set_package_dir( const std::string& dirname );
 
      /// @brief Get loaded resource.

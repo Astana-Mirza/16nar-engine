@@ -10,6 +10,7 @@
 #include <string>
 #include <array>
 #include <stdexcept>
+#include <algorithm>
 #include <cassert>
 
 namespace
@@ -228,11 +229,9 @@ void read_data_schema( const nlohmann::json& json, const std::string&,
 }
 
 
-_16nar::tools::ResourceData read_resource( const nlohmann::json& json, const std::string& in_dir )
+void fill_resource( const nlohmann::json& json, const std::string& in_dir, _16nar::tools::ResourceData& resource )
 {
-     _16nar::tools::ResourceData resource{};
      _16nar::ResourceType type = json.at( "type" ).template get< _16nar::ResourceType >();
-     resource.name = json.at( "name" );
      switch ( type )
      {
           case _16nar::ResourceType::Texture:
@@ -254,7 +253,6 @@ _16nar::tools::ResourceData read_resource( const nlohmann::json& json, const std
                throw std::runtime_error{ "wrong resource type: "
                     + std::to_string( static_cast< std::size_t >( type ) ) };
      }
-     return resource;
 }
 
 } // anonymous namespace
@@ -271,11 +269,14 @@ JsonAssetReader::JsonAssetReader( const std::string& in_dir ):
 ResourceData JsonAssetReader::read_asset( std::istream& input )
 {
      auto json = nlohmann::json::parse( input );
-     return read_resource( json, in_dir_ );
+     ResourceData resource{};
+     resource.name = json.at( "name" );
+     fill_resource( json, in_dir_, resource );
+     return resource;
 }
 
 
-PackageData JsonAssetReader::read_package( std::istream& input )
+PackageData JsonAssetReader::read_package( std::istream& input, const std::vector< std::string >& names )
 {
      PackageData package{};
      auto json = nlohmann::json::parse( input );
@@ -284,9 +285,17 @@ PackageData JsonAssetReader::read_package( std::istream& input )
      assert( ( version & NARENGINE_VERSION_COMPATIBLE_MASK ) == NARENGINE_VERSION_NO_PATCH_UINT32 );
 
      const auto& resources = json.at( "resources" );
-     for ( const nlohmann::json& resource : resources )
+     for ( const nlohmann::json& res_data : resources )
      {
-          package.resources.emplace_back( read_resource( resource, in_dir_ ) );
+          ResourceData resource{};
+          resource.name = res_data.at( "name" );
+          if ( !names.empty() && std::find( names.cbegin(), names.cend(), resource.name ) == names.cend() )
+          {
+               // we don't need this resource, so skip and adjust offset
+               continue;
+          }
+          fill_resource( res_data, in_dir_, resource );
+          package.resources.emplace_back( std::move( resource ) );
      }
      package.chunk_size = json.at( "chunk_size" );
      return package;

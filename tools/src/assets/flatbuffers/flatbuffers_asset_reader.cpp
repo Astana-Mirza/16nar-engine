@@ -10,6 +10,7 @@
 #include <16nar/gen/flatbuffers/resource_generated.h>
 
 #include <stdexcept>
+#include <algorithm>
 #include <istream>
 #include <cassert>
 
@@ -236,19 +237,18 @@ void read_data_schema( const _16nar::data::package::Resource *res_buffer,
 }
 
 
-std::vector< uint8_t > read_header( std::istream& input, uint32_t& header_size )
+std::vector< std::byte > read_header( std::istream& input, uint32_t& header_size )
 {
      input.read( reinterpret_cast< char * >( &header_size ), sizeof( header_size ) );
-     std::vector< uint8_t > header_buffer( header_size );
+     std::vector< std::byte > header_buffer( header_size );
      input.read( reinterpret_cast< char * >( header_buffer.data() ), header_size );
      return header_buffer;
 }
 
 
-_16nar::tools::ResourceData read_resource( const _16nar::data::package::Resource *res_buffer,
-     std::istream& input )
+void fill_resource( const _16nar::data::package::Resource *res_buffer,
+     std::istream& input, _16nar::tools::ResourceData& resource )
 {
-     _16nar::tools::ResourceData resource{};
      std::vector< _16nar::DataSharedPtr > data;
      for ( uint32_t data_size : *res_buffer->data_sizes() )
      {
@@ -263,7 +263,6 @@ _16nar::tools::ResourceData read_resource( const _16nar::data::package::Resource
      }
 
      auto type = res_buffer->params_type();
-     resource.name = res_buffer->name()->c_str();
      switch ( type )
      {
           case _16nar::data::package::AnyLoadParams::TextureLoadParams:
@@ -285,7 +284,6 @@ _16nar::tools::ResourceData read_resource( const _16nar::data::package::Resource
                throw std::runtime_error{ "wrong resource type: "
                     + std::to_string( static_cast< std::size_t >( type ) ) };
      }
-     return resource;
 }
 
 } // anonymous namespace
@@ -310,28 +308,33 @@ ResourceData FlatBuffersAssetReader::read_asset( std::istream& input )
 {
      uint32_t header_size = 0;
      auto header_buffer = read_header( input, header_size );
+     auto header_data = reinterpret_cast< const std::uint8_t * >( header_buffer.data() );
 
-     auto res_buffer = _16nar::data::package::GetResource( header_buffer.data() );
-     flatbuffers::Verifier verifier{ header_buffer.data(), header_size };
+     auto res_buffer = _16nar::data::package::GetResource( header_data );
+     flatbuffers::Verifier verifier{ header_data, header_size };
      if ( !_16nar::data::package::VerifyResourceBuffer( verifier ) )
      {
           throw std::runtime_error{ "asset is broken" };
      }
-     return read_resource( res_buffer, input );
+     ResourceData resource{};
+     resource.name = res_buffer->name()->c_str();
+     fill_resource( res_buffer, input, resource );
+     return resource;
 }
 
 
-PackageData FlatBuffersAssetReader::read_package( std::istream& input )
+PackageData FlatBuffersAssetReader::read_package( std::istream& input, const std::vector< std::string >& names )
 {
      uint32_t header_size = 0;
      auto header_buffer = read_header( input, header_size );
+     auto header_data = reinterpret_cast< const std::uint8_t * >( header_buffer.data() );
 
-     auto pkg_buffer = _16nar::data::package::GetPackage( header_buffer.data() );
+     auto pkg_buffer = _16nar::data::package::GetPackage( header_data );
 
      std::uint32_t version = pkg_buffer->version();
      assert( ( version & NARENGINE_VERSION_COMPATIBLE_MASK ) == NARENGINE_VERSION_NO_PATCH_UINT32 );
 
-     flatbuffers::Verifier verifier{ header_buffer.data(), header_size };
+     flatbuffers::Verifier verifier{ header_data, header_size };
      if ( !_16nar::data::package::VerifyPackageBuffer( verifier ) )
      {
           throw std::runtime_error{ "package is broken" };
@@ -339,9 +342,23 @@ PackageData FlatBuffersAssetReader::read_package( std::istream& input )
 
      PackageData package{};
      const auto& resources = *pkg_buffer->resources();
-     for ( const auto& resource : resources )
+     for ( const auto& res_buffer : resources )
      {
-          package.resources.emplace_back( read_resource( resource, input ) );
+          ResourceData resource{};
+          resource.name = res_buffer->name()->c_str();
+          if ( !names.empty() && std::find( names.cbegin(), names.cend(), resource.name ) == names.cend() )
+          {
+               // we don't need this resource, so skip and adjust offset
+               auto offset = input.tellg();
+               for ( uint32_t data_size : *res_buffer->data_sizes() )
+               {
+                    offset += data_size;
+               }
+               input.seekg( offset );
+               continue;
+          }
+          fill_resource( res_buffer, input, resource );
+          package.resources.emplace_back( std::move( resource ) );
      }
      package.chunk_size = pkg_buffer->chunk_size();
      return package;

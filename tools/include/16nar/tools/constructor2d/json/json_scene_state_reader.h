@@ -33,6 +33,9 @@ public:
      /// @copydoc ISceneStateReader::get_render_system_type()
      RenderSystemType get_render_system_type() override;
 
+     /// @copydoc ISceneStateReader::is_empty()
+     bool is_empty() override;
+
      /// @copydoc ISceneStateReader::get_current_node_reader()
      IPropsReader& get_current_node_reader() override;
 
@@ -49,6 +52,7 @@ private:
      const nlohmann::json *json_{};          ///< object of scene state.
      JsonPropsReader render_system_reader_;  ///< reader of render system's properties.
      JsonPropsReader node_reader_;           ///< reader of render system's properties.
+     NodeIter begin_;                        ///< begin iterator of nodes array.
      NodeIter end_;                          ///< end iterator of nodes array.
      NodeIter curr_node_;                    ///< current node.
 };

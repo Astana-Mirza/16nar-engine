@@ -30,6 +30,10 @@ public:
      /// @brief Get number of scene pieces in this package.
      /// @return number of scene pieces in this package.
      virtual std::size_t get_scene_piece_count() = 0;
+
+     /// @brief Get names of scene pieces in this package.
+     /// @return names of scene pieces in this package.
+     virtual std::vector< std::string > get_scene_piece_names() = 0;
 };
 
 } // namespace _16nar::tools::constructor2d

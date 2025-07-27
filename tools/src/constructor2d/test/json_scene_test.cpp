@@ -35,18 +35,21 @@ TEST_CASE( "Scene reading in json format", "[json_scene]" )
      REQUIRE( deps.pieces.size() == 0 );
 
      auto setup_func = scene_reader.get_setup_func();
-     REQUIRE( setup_func.package == 0 );
-     REQUIRE( setup_func.resource == 0 );
+     REQUIRE( setup_func.has_value() );
+     REQUIRE( setup_func.value().package == 0 );
+     REQUIRE( setup_func.value().resource == 0 );
 
      auto loop_func = scene_reader.get_loop_func();
-     REQUIRE( loop_func.package == 0 );
-     REQUIRE( loop_func.resource == 1 );
+     REQUIRE( loop_func.has_value() );
+     REQUIRE( loop_func.value().package == 0 );
+     REQUIRE( loop_func.value().resource == 1 );
 
      auto schema = scene_reader.get_schema();
      REQUIRE( schema.package == 1 );
      REQUIRE( schema.resource == 0 );
 
      REQUIRE( scene_reader.get_scene_piece_count() == 1 );
+     REQUIRE( !scene_reader.is_empty() );
 
      auto& piece_reader = scene_reader.get_scene_piece_reader( 0 );
      REQUIRE( piece_reader.is_empty() == false );
@@ -62,6 +65,7 @@ TEST_CASE( "Scene reading in json format", "[json_scene]" )
      REQUIRE( piece_reader.next_node() == false );
 
      auto& state_reader = scene_reader.get_current_state_reader();
+     REQUIRE( !state_reader.is_empty() );
      REQUIRE( state_reader.get_rendering() == true );
      REQUIRE( state_reader.get_updating() == false );
 

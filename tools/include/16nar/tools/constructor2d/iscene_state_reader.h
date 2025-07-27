@@ -34,6 +34,10 @@ public:
      /// @return type of render system.
      virtual RenderSystemType get_render_system_type() = 0;
 
+     /// @brief Check if scene state has no nodes.
+     /// @return true if scene state has no nodes, false otherwise.
+     virtual bool is_empty() = 0;
+
      /// @brief Get current node's properties reader.
      /// @details Initially reads first node. To read next one, @b next_node should be called.
      /// @return current node's properties reader.
