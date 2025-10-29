@@ -44,10 +44,6 @@ TEST_CASE( "Scene reading in json format", "[json_scene]" )
      REQUIRE( loop_func.value().package == 0 );
      REQUIRE( loop_func.value().resource == 1 );
 
-     auto schema = scene_reader.get_schema();
-     REQUIRE( schema.package == 1 );
-     REQUIRE( schema.resource == 0 );
-
      REQUIRE( scene_reader.get_scene_piece_count() == 1 );
      REQUIRE( !scene_reader.is_empty() );
 

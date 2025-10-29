@@ -10,7 +10,7 @@ JsonScenePieceReader::JsonScenePieceReader( const nlohmann::json& nodes ):
 {
      if ( !is_empty() )
      {
-          node_reader_ = JsonPropsReader{ *curr_node_, false };
+          node_reader_ = JsonPropsReader{ curr_node_->at( "props" ), false };
      }
 }
 
@@ -48,7 +48,7 @@ bool JsonScenePieceReader::next_node()
      {
           return false;
      }
-     node_reader_ = JsonPropsReader{ *curr_node_, false };
+     node_reader_ = JsonPropsReader{ curr_node_->at( "props" ), false };
      return true;
 }
 

@@ -140,9 +140,9 @@ void copy_property( IPropsReader& reader, const std::string& name,
 
 void copy_properties( const DataSchema& schema, IPropsReader& reader, IPropsWriter& writer )
 {
-     for ( const auto& [ name, item ] : schema.items )
+     for ( const auto& name : schema.ordered_items )
      {
-          copy_property( reader, name, item, true, writer );
+          copy_property( reader, name, schema.items.at( name ), true, writer );
      }
 }
 

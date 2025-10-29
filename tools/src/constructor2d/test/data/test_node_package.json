@@ -21,17 +21,23 @@
           "test_piece": [
                {
                     "type": "node_2d",
-                    "pos": [ 10.0, -50.0 ],
-                    "scale": [ 3.0, 3.0 ],
-                    "link": [ 0, 0 ]
+                    "props":
+                    {
+                         "pos": [ 10.0, -50.0 ],
+                         "scale": [ 3.0, 3.0 ],
+                         "link": [ 0, 0 ]
+                    }
                },
                {
                     "type": "sprite_node",
-                    "parent": 0,
-                    "name": "test_sprite",
-                    "texture": [ 0, 0 ],
-                    "shader": [ 0, 1 ],
-                    "size": [ 10.0, 10.0 ]
+                    "props":
+                    {
+                         "parent": 0,
+                         "name": "test_sprite",
+                         "texture": [ 0, 0 ],
+                         "shader": [ 0, 1 ],
+                         "size": [ 10.0, 10.0 ]
+                    }
                }
           ]
      }

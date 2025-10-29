@@ -56,6 +56,12 @@ bool JsonPropsReader::is_owner() const noexcept
 }
 
 
+void JsonPropsReader::set_data_schema( const DataSchema& ) noexcept
+{
+     // schema is not required for JSON format
+}
+
+
 std::optional< uint64_t > JsonPropsReader::get_uint64( const std::string& name )
 {
      _16NAR_JSON_GET( uint64_t );

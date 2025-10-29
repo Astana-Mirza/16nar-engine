@@ -61,12 +61,6 @@ std::optional< ResourceIndex > JsonSceneReader::get_loop_func()
 }
 
 
-ResourceIndex JsonSceneReader::get_schema()
-{
-     return read_resource_index( "schema", false ).value();
-}
-
-
 bool JsonSceneReader::is_empty()
 {
      return begin_ == end_;

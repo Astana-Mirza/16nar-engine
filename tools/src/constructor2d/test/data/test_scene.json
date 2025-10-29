@@ -24,8 +24,11 @@
           [
                {
                     "type": "node_2d",
-                    "pos": [ 10.0, -50.0 ],
-                    "scale": [ 1.0, 2.0 ]
+                    "props":
+                    {
+                         "pos": [ 10.0, -50.0 ],
+                         "scale": [ 1.0, 2.0 ]
+                    }
                }
           ]
      ],
@@ -34,23 +37,32 @@
                "render_system":
                {
                     "type": "qtree",
-                    "quad_start": [ 0.0, 0.0 ],
-                    "quad_size": [ 1000.0, 1000.0 ],
-                    "size": [ 5, 5 ]
+                    "props":
+                    {
+                         "quad_start": [ 0.0, 0.0 ],
+                         "quad_size": [ 1000.0, 1000.0 ],
+                         "size": [ 5, 5 ]
+                    }
                },
                "nodes": [
                     {
                          "type": "node_2d",
-                         "scale": [ 3.0, 3.0 ],
-                         "link": [ 65535, 0 ]
+                         "props":
+                         {
+                              "scale": [ 3.0, 3.0 ],
+                              "link": [ 65535, 0 ]
+                         }
                     },
                     {
                          "type": "sprite_node",
-                         "parent": 0,
-                         "name": "test_sprite",
-                         "texture": [ 0, 0 ],
-                         "shader": [ 0, 1 ],
-                         "size": [ 10.0, 10.0 ]
+                         "props":
+                         {
+                              "parent": 0,
+                              "name": "test_sprite",
+                              "texture": [ 0, 0 ],
+                              "shader": [ 0, 1 ],
+                              "size": [ 10.0, 10.0 ]
+                         }
                     }
                ],
                "rendering": true,
@@ -58,6 +70,5 @@
           }
      ],
      "setup_func": [ 0, 0 ],
-     "loop_func": [ 0, 1 ],
-     "schema": [ 1, 0 ]
+     "loop_func": [ 0, 1 ]
 }

@@ -9,6 +9,7 @@
 namespace flexbuffers
 {
 
+class Vector;
 class Map;
 
 } // namespace flexbuffers
@@ -25,9 +26,10 @@ public:
      FlatBuffersPropsReader();
 
      /// @brief Constructor.
-     /// @param[in] buffer underlying buffer.
-     /// @param[in] size size of the buffer.
+     /// @param[in] buffer underlying main buffer.
+     /// @param[in] size size of the main buffer.
      /// @param[in] own true if this object owns the buffer (the buffer will be copied then), false otherwise.
+     /// @throws std::runtime_error if main buffer does not contain items' indices.
      FlatBuffersPropsReader( const std::byte *buffer, std::size_t size, bool own );
 
      FlatBuffersPropsReader( const FlatBuffersPropsReader& ) = delete;
@@ -36,8 +38,21 @@ public:
      /// @brief Destructor.
      ~FlatBuffersPropsReader();
 
+     /// @brief Set unordered buffer.
+     /// @param[in] buffer underlying unordered buffer.
+     /// @param[in] size size of the unordered buffer.
+     /// @param[in] own true if this object owns the buffer (the buffer will be copied then), false otherwise.
+     void set_unordered_buffer( const std::byte *buffer, std::size_t size, bool own );
+
+     /// @brief Check if the reader owns the underlying unordered buffer.
+     /// @return true if the reader owns the underlying unordered buffer, false otherwise.
+     bool is_owner_unordered() const noexcept;
+
      /// @copydoc IPropsReader::is_owner() const noexcept
      bool is_owner() const noexcept override;
+
+     /// @copydoc IPropsReader::set_data_schema(const DataSchema&)
+     void set_data_schema( const DataSchema& schema ) noexcept override;
 
      /// @copydoc IPropsReader::get_uint64(const std::string&)
      std::optional< uint64_t > get_uint64( const std::string& name ) override;
@@ -139,8 +154,11 @@ public:
      std::optional< ResourceIndex > get_resource_index( const std::string& name ) override;
 
 private:
-     std::vector< std::byte > buffer_;  ///< underlying buffer.
-     flexbuffers::Map *root_;           ///< reference to root properties map.
+     std::vector< std::byte > buffer_;            ///< underlying main buffer.
+     std::vector< std::byte > unordered_buffer_;  ///< underlying unordered buffer.
+     const DataSchema *schema_;                   ///< schema of read data.
+     flexbuffers::Vector *root_;                  ///< reference to root properties vector.
+     flexbuffers::Map *unordered_root_;           ///< reference to root properties map (unordered).
 };
 
 } // namespace _16nar::tools

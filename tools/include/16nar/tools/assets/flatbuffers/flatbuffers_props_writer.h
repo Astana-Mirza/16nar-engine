@@ -19,11 +19,21 @@ namespace _16nar::tools
 {
 
 /// @brief Class for writing key-value properties in flatbuffers format.
+/// @details When properties are written in the same order as they are defined in data schema
+/// (optional fields may still be absent), then the storage optimizes the size of written buffer
+/// due to storing properties with their order index in schema, instead of using string names.
+/// Vector of items' indices is stored in the last element of main buffer's vector.
+/// If the order is violated, then properties will be written in so called "unordered" buffer and
+/// consume more memory, because they will be stored with their string names.
 class ENGINE_API FlatBuffersPropsWriter : public IPropsWriter
 {
 public:
+     /// @brief Underlying buffer of data.
+     using Buffer = std::vector< uint8_t >;
+
      /// @brief Constructor.
-     FlatBuffersPropsWriter();
+     /// @param[in] schema schema of written data.
+     FlatBuffersPropsWriter( const DataSchema& schema );
 
      FlatBuffersPropsWriter( const FlatBuffersPropsWriter& ) = delete;
      FlatBuffersPropsWriter& operator=( const FlatBuffersPropsWriter& ) = delete;
@@ -31,10 +41,18 @@ public:
      /// @brief Destructor.
      ~FlatBuffersPropsWriter();
 
-     /// @brief Finish writing and return result buffer.
+     /// @brief Finish writing of main buffer and return result.
      /// @details Must be called only once for an object. Further calls will raise flatbuffers error.
      /// @return written buffer.
-     const std::vector< uint8_t >& finish_and_get_result();
+     const Buffer& finish_and_get_result();
+
+     /// @brief Finish writing of unordered data buffer and return result.
+     /// @details Must be called only once for an object. Further calls will raise flatbuffers error.
+     /// @return written unordered buffer, if any, nullptr otherwise.
+     const Buffer *finish_and_get_result_unordered();
+
+     /// @copydoc IPropsWriter::conver_to_reader()
+     std::shared_ptr< IPropsReader > conver_to_reader() override;
 
      /// @copydoc IPropsWriter::set_uint64(const std::string&, uint64_t)
      void set_uint64( const std::string& name, uint64_t value ) override;
@@ -136,8 +154,12 @@ public:
      void set_resource_index( const std::string& name, ResourceIndex value ) override;
 
 private:
-     flexbuffers::Builder *builder_;    ///< builder of the buffer.
-     std::size_t map_key_;              ///< key of builded map.
+     std::vector< std::uint16_t > indices_;       ///< indices of stored elements.
+     const DataSchema& schema_;                   ///< schema of written data.
+     flexbuffers::Builder *builder_;              ///< builder of main buffer.
+     flexbuffers::Builder *unordered_builder_;    ///< builder of unordered data buffer.
+     std::size_t vector_key_;                     ///< key of built map for unordered buffer.
+     std::size_t map_key_;                        ///< key of built map for unordered buffer.
 };
 
 } // namespace _16nar::tools

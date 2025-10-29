@@ -8,7 +8,7 @@ namespace _16nar::tools::constructor2d
 {
 
 JsonSceneStateReader::JsonSceneStateReader( const nlohmann::json& json ):
-     json_{ &json }, render_system_reader_{ json.at( "render_system" ), false },
+     json_{ &json }, render_system_reader_{ json.at( "render_system" ).at( "props" ), false },
      node_reader_{}, begin_{}, end_{}, curr_node_{}
 {
      const auto& nodes = json.at( "nodes" );
@@ -17,7 +17,7 @@ JsonSceneStateReader::JsonSceneStateReader( const nlohmann::json& json ):
      curr_node_ = begin_;
      if ( curr_node_ != end_ )
      {
-          node_reader_ = JsonPropsReader{ *curr_node_, false };
+          node_reader_ = JsonPropsReader{ curr_node_->at( "props" ), false };
      }
 }
 
@@ -84,7 +84,7 @@ bool JsonSceneStateReader::next_node()
      {
           return false;
      }
-     node_reader_ = JsonPropsReader{ *curr_node_, false };
+     node_reader_ = JsonPropsReader{ curr_node_->at( "props" ), false };
      return true;
 }
 

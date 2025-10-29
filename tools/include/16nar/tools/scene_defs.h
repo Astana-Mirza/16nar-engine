@@ -13,8 +13,6 @@
 namespace _16nar::tools
 {
 
-class IPropsReader;
-
 /// @brief Type of stored data for type-safe key-value pair usage.
 enum class StoredDataType : uint8_t
 {
@@ -54,22 +52,6 @@ enum class StoredDataType : uint8_t
      FloatRect,
      IntRect,
      ResourceIndex
-};
-
-
-/// @brief Item of data schema.
-struct DataItem
-{
-     StoredDataType type = StoredDataType::Unknown;    ///< data type.
-     bool mandatory{};                                 ///< necessity of presense in stored data.
-};
-
-
-/// @brief Schema of stored binary data.
-struct DataSchema
-{
-     std::unordered_map< std::string, DataItem > items;     ///< data items.
-     std::shared_ptr< IPropsReader > default_vals;          ///< default values reader.
 };
 
 

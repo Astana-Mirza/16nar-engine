@@ -4,7 +4,7 @@
 #define _16NAR_TOOLS_IPROPS_WRITER_H
 
 #include <16nar/16nardefs.h>
-#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/data_schema.h>
 
 #include <16nar/math/vec.h>
 #include <16nar/math/rectangle.h>
@@ -20,6 +20,10 @@ class ENGINE_API IPropsWriter
 public:
      /// @brief Virtual default destructor.
      virtual ~IPropsWriter() = default;
+
+     /// @brief Create reader with all written data, reset current object state to default.
+     /// @return reader with all written data.
+     virtual std::shared_ptr< IPropsReader > conver_to_reader() = 0;
 
      // basic types
 

@@ -19,6 +19,9 @@ public:
      /// @return object with stored properties.
      const nlohmann::json& get_result() const;
 
+     /// @copydoc IPropsWriter::conver_to_reader()
+     std::shared_ptr< IPropsReader > conver_to_reader() override;
+
      /// @copydoc IPropsWriter::set_uint64(const std::string&, uint64_t)
      void set_uint64( const std::string& name, uint64_t value ) override;
 

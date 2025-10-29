@@ -1,9 +1,15 @@
 #include <16nar/tools/assets/flatbuffers/flatbuffers_props_reader.h>
 
+#include <16nar/tools/data_schema.h>
+
+#include <16nar/gen/flatbuffers/common_generated.h>
+
 #include <flatbuffers/flexbuffers.h>
 
+#include <stdexcept>
+
 #define _16NAR_GET_FB_VAL( CHECK, GET ) \
-     auto ref = ( *root_ )[ name ];     \
+     auto ref = get_ref( schema_, *root_, unordered_root_, name ); \
      if ( !ref.CHECK() )                \
      {                                  \
           return {};                    \
@@ -12,7 +18,7 @@
 
 
 #define _16NAR_GET_FB_TYPED_VECTOR( CPP_TYPE, TYPE, GET )   \
-     auto ref = ( *root_ )[ name ];                         \
+     auto ref = get_ref( schema_, *root_, unordered_root_, name ); \
      if ( !ref.IsTypedVector() )                            \
      {                                                      \
           return {};                                        \
@@ -31,39 +37,107 @@
      return result;
 
 
-#define _16NAR_GET_FB_DECL_FIXED_TYPED_VECTOR( TYPE, SIZE ) \
-     auto ref = ( *root_ )[ name ];                         \
-     if ( !ref.IsFixedTypedVector() )                       \
-     {                                                      \
-          return {};                                        \
-     }                                                      \
-     auto vec = ref.AsFixedTypedVector();                   \
-     if ( vec.ElementType() != flexbuffers::Type::TYPE      \
-          || vec.size() != SIZE )                           \
-     {                                                      \
-          return {};                                        \
+#define _16NAR_GET_FB_DECL_FIXED_TYPED_VECTOR( TYPE, SIZE )           \
+     auto ref = get_ref( schema_, *root_, unordered_root_, name );    \
+     if ( !ref.IsFixedTypedVector() )                                 \
+     {                                                                \
+          return {};                                                  \
+     }                                                                \
+     auto vec = ref.AsFixedTypedVector();                             \
+     if ( vec.ElementType() != flexbuffers::Type::TYPE                \
+          || vec.size() != SIZE )                                     \
+     {                                                                \
+          return {};                                                  \
      }
 
 
 namespace _16nar::tools
 {
+namespace
+{
+
+std::optional< std::size_t > binary_search( const flexbuffers::TypedVector& vector, std::size_t elem )
+{
+     if ( !vector.size() )
+     {
+          return {};
+     }
+     std::size_t base = std::min( elem, vector.size() - 1 );
+     std::size_t end = vector.size();
+     std::size_t start = 0;
+     do
+     {
+          const std::size_t val = vector[ base ].AsUInt16();
+          if ( val == elem )
+          {
+               return base;
+          }
+
+          if ( val > elem )
+          {
+               end = base;
+          }
+          else // if ( val < elem )
+          {
+               start = base + 1;
+          }
+          base = ( end + start ) / 2;
+     }
+     while ( start < end );
+     return {};
+}
+
+
+flexbuffers::Reference get_ref( const DataSchema *schema, flexbuffers::Vector& root,
+     flexbuffers::Map *unordered_root, const std::string& name )
+{
+     if ( !schema )
+     {
+          return {};
+     }
+     const auto iter = schema->items.find( name );
+     if ( iter == schema->items.cend() )
+     {
+          return {};
+     }
+     const auto indices = root[ root.size() - 1 ].AsTypedVector();
+     const auto index = binary_search( indices, iter->second.index );
+     if ( index.has_value() )
+     {
+          return root[ index.value() ];
+     }
+     else if ( unordered_root )
+     {
+          return ( *unordered_root )[ name ];
+     }
+     return {};
+}
+
+} // anonymous namespace
+
 
 FlatBuffersPropsReader::FlatBuffersPropsReader():
-     buffer_{}, root_{ new flexbuffers::Map( flexbuffers::Map::EmptyMap() ) }
+     buffer_{}, unordered_buffer_{}, schema_{},
+     root_{ new flexbuffers::Vector( flexbuffers::Vector::EmptyVector() ) }, unordered_root_{}
 {}
 
 
 FlatBuffersPropsReader::FlatBuffersPropsReader( const std::byte *buffer, std::size_t size, bool own ):
-     buffer_{}, root_{ new flexbuffers::Map( flexbuffers::Map::EmptyMap() ) }
+     buffer_{}, unordered_buffer_{}, schema_{},
+     root_{ new flexbuffers::Vector( flexbuffers::Vector::EmptyVector() ) }, unordered_root_{}
 {
      if ( own )
      {
           buffer_.assign( buffer, buffer + size );
-          *root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer_.data() ), buffer_.size() ).AsMap();
+          *root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer_.data() ), buffer_.size() ).AsVector();
      }
      else
      {
-          *root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsMap();
+          *root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsVector();
+     }
+     if ( root_->size() < 1 )
+     {
+          throw std::runtime_error{ "wrong flatbuffer properties vector" };
      }
 }
 
@@ -71,12 +145,44 @@ FlatBuffersPropsReader::FlatBuffersPropsReader( const std::byte *buffer, std::si
 FlatBuffersPropsReader::~FlatBuffersPropsReader()
 {
      delete root_;
+     if ( unordered_root_ )
+     {
+          delete unordered_root_;
+     }
+}
+
+
+void FlatBuffersPropsReader::set_unordered_buffer( const std::byte *buffer, std::size_t size, bool own )
+{
+     unordered_root_ = new flexbuffers::Map( flexbuffers::Map::EmptyMap() );
+     if ( own )
+     {
+          unordered_buffer_.assign( buffer, buffer + size );
+          *unordered_root_ = flexbuffers::GetRoot(
+               reinterpret_cast< const uint8_t * >( unordered_buffer_.data() ), unordered_buffer_.size() ).AsMap();
+     }
+     else
+     {
+          *unordered_root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsMap();
+     }
+}
+
+
+bool FlatBuffersPropsReader::is_owner_unordered() const noexcept
+{
+     return !unordered_buffer_.empty();
 }
 
 
 bool FlatBuffersPropsReader::is_owner() const noexcept
 {
      return !buffer_.empty();
+}
+
+
+void FlatBuffersPropsReader::set_data_schema( const DataSchema& schema ) noexcept
+{
+     schema_ = &schema;
 }
 
 

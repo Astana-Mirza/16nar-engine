@@ -10,10 +10,13 @@
 #include <16nar/math/rectangle.h>
 
 #include <optional>
+#include <vector>
 #include <string>
 
 namespace _16nar::tools
 {
+
+class DataSchema;
 
 /// @brief Interface for reading properties in form of key-value pairs.
 class ENGINE_API IPropsReader
@@ -25,6 +28,11 @@ public:
      /// @brief Check if the reader owns the underlying buffer.
      /// @return true if the reader owns the underlying buffer, false otherwise.
      virtual bool is_owner() const noexcept = 0;
+
+     /// @brief Set data schema for reading the data.
+     /// @details Setting of data schema may be required by certain data formats.
+     /// @param schema data schema of read data.
+     virtual void set_data_schema( const DataSchema& schema ) noexcept = 0;
 
      // basic types
 
