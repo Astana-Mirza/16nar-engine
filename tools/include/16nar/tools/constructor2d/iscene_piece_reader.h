@@ -4,7 +4,7 @@
 #define _16NAR_TOOLS_CONSTRUCTOR_2D_ISCENE_PIECE_READER_H
 
 #include <16nar/16nardefs.h>
-#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/assets/iprops_reader.h>
 #include <16nar/tools/constructor2d/constructor2d_defs.h>
 
 namespace _16nar::tools::constructor2d

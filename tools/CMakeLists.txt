@@ -57,6 +57,7 @@ if ("${NARENGINE_TOOLS_JSON}")
     set(NARENGINE_ASSETS_JSON_SOURCES
         "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_props_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_props_writer.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_props_writer_factory.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_asset_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/json/json_asset_writer.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/stb_impl.cpp"
@@ -104,6 +105,7 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     set(NARENGINE_ASSETS_FB_SOURCES
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_writer.cpp"
+        "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_writer_factory.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_asset_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_asset_writer.cpp"
     )

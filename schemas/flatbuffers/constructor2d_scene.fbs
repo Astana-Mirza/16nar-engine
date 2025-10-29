@@ -34,7 +34,6 @@ table Scene2D
      deps:               Dependencies   (required);
      states:             [SceneState2D] (required);
      internal_pieces:    [ScenePiece2D] (optional);
-     schema:             ResourceId     (required);
      loop_func:          ResourceId     (optional);
      setup_func:         ResourceId     (optional);
 }

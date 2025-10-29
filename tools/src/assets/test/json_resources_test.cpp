@@ -2,8 +2,7 @@
 
 #include <16nar/tools/assets/json/json_asset_reader.h>
 #include <16nar/tools/assets/json/json_asset_writer.h>
-#include <16nar/tools/scene_defs.h>
-#include <16nar/tools/assets/iprops_reader.h>
+#include <16nar/tools/data_schema.h>
 #include <16nar/render/render_defs.h>
 
 #include <nlohmann/json.hpp>
@@ -267,19 +266,24 @@ TEST_CASE( "Data schemas reading and writing in JSON format", "[json_resources]"
      REQUIRE( ds_data.items.find( "test_string" ) != ds_data.items.cend() );
      REQUIRE( ds_data.items[ "test_string" ].type == _16nar::tools::StoredDataType::String );
      REQUIRE( ds_data.items[ "test_string" ].mandatory == true );
+     REQUIRE( ds_data.items[ "test_string" ].index == 0 );
      REQUIRE( ds_data.items.find( "test_int32" ) != ds_data.items.cend() );
      REQUIRE( ds_data.items[ "test_int32" ].type == _16nar::tools::StoredDataType::Int32 );
      REQUIRE( ds_data.items[ "test_int32" ].mandatory == true );
+     REQUIRE( ds_data.items[ "test_int32" ].index == 1 );
      REQUIRE( ds_data.items.find( "test_vec2f" ) != ds_data.items.cend() );
      REQUIRE( ds_data.items[ "test_vec2f" ].type == _16nar::tools::StoredDataType::Vec2f );
      REQUIRE( ds_data.items[ "test_vec2f" ].mandatory == false );
+     REQUIRE( ds_data.items[ "test_vec2f" ].index == 2 );
      REQUIRE( ds_data.items.find( "test_bool" ) != ds_data.items.cend() );
      REQUIRE( ds_data.items[ "test_bool" ].type == _16nar::tools::StoredDataType::Bool );
      REQUIRE( ds_data.items[ "test_bool" ].mandatory == true );
+     REQUIRE( ds_data.items[ "test_bool" ].index == 3 );
 
-     REQUIRE( ds_data.default_vals != nullptr );
-     REQUIRE( ds_data.default_vals->get_string( "test_string" ).value() == "some_value" );
-     REQUIRE( ds_data.default_vals->get_int32( "test_int32" ).value() == -678 );
+     auto default_vals = ds_data.get_default_vals();
+     REQUIRE( default_vals != nullptr );
+     REQUIRE( default_vals->get_string( "test_string" ).value() == "some_value" );
+     REQUIRE( default_vals->get_int32( "test_int32" ).value() == -678 );
 
      std::ofstream ofs{ "data/out/" + data.name + "_out." + writer.get_file_ext() };
      writer.write_asset( ofs, data );
@@ -293,30 +297,18 @@ TEST_CASE( "Data schemas reading and writing in JSON format", "[json_resources]"
 
      std::vector< nlohmann::json > items = written[ "items" ];
      REQUIRE( items.size() == 4 );
-     auto it = std::find_if( items.cbegin(), items.cend(),
-          []( const auto& val ){ return val[ "name" ] == "test_string"; } );
-     REQUIRE( it != items.cend() );
-     REQUIRE( ( *it )[ "type" ] == "string" );
-     REQUIRE( ( *it )[ "mandatory" ] == true );
-     it = std::find_if( items.cbegin(), items.cend(),
-          []( const auto& val ){ return val[ "name" ] == "test_int32"; } );
-     REQUIRE( it != items.cend() );
-     REQUIRE( ( *it )[ "type" ] == "int32" );
-     REQUIRE( ( *it )[ "mandatory" ] == true );
-     it = std::find_if( items.cbegin(), items.cend(),
-          []( const auto& val ){ return val[ "name" ] == "test_vec2f"; } );
-     REQUIRE( it != items.cend() );
-     REQUIRE( ( *it )[ "type" ] == "vec2f" );
-     REQUIRE( ( *it )[ "mandatory" ] == false );
-     it = std::find_if( items.cbegin(), items.cend(),
-          []( const auto& val ){ return val[ "name" ] == "test_bool"; } );
-     REQUIRE( it != items.cend() );
-     REQUIRE( ( *it )[ "type" ] == "bool" );
-     REQUIRE( ( *it )[ "mandatory" ] == true );
+     REQUIRE( items[ 0 ][ "type" ] == "string" );
+     REQUIRE( items[ 0 ][ "mandatory" ] == true );
+     REQUIRE( items[ 1 ][ "type" ] == "int32" );
+     REQUIRE( items[ 1 ][ "mandatory" ] == true );
+     REQUIRE( items[ 2 ][ "type" ] == "vec2f" );
+     REQUIRE( items[ 2 ][ "mandatory" ] == false );
+     REQUIRE( items[ 3 ][ "type" ] == "bool" );
+     REQUIRE( items[ 3 ][ "mandatory" ] == true );
 
-     const nlohmann::json& default_vals = written[ "default_vals" ];
-     REQUIRE( default_vals[ "test_string" ] == "some_value" );
-     REQUIRE( default_vals[ "test_int32" ] == -678 );
+     const nlohmann::json& default_vals_json = written[ "default_vals" ];
+     REQUIRE( default_vals_json[ "test_string" ] == "some_value" );
+     REQUIRE( default_vals_json[ "test_int32" ] == -678 );
 }
 
 

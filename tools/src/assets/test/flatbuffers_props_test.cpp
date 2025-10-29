@@ -1,5 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include <16nar/tools/utils.h>
+#include <16nar/tools/data_schema.h>
 #include <16nar/tools/assets/flatbuffers/flatbuffers_props_reader.h>
 #include <16nar/tools/assets/flatbuffers/flatbuffers_props_writer.h>
 
@@ -14,9 +16,64 @@ namespace fs = std::filesystem;
 namespace
 {
 
+_16nar::tools::DataSchema make_test_schema()
+{
+     _16nar::tools::DataSchema schema{};
+     std::uint16_t index = 0;
+
+     auto add = [ &schema, &index ]( const std::string& name, _16nar::tools::StoredDataType type ) -> void
+     {
+          schema.items.emplace( name, _16nar::tools::DataItem{ index++, type, true } );
+          schema.ordered_items.emplace_back( name );
+     };
+
+     add( "uint64", _16nar::tools::StoredDataType::Uint64 );
+     add( "uint32", _16nar::tools::StoredDataType::Uint32 );
+     add( "uint16", _16nar::tools::StoredDataType::Uint16 );
+     add( "uint8", _16nar::tools::StoredDataType::Uint8 );
+     add( "int64", _16nar::tools::StoredDataType::Int64 );
+     add( "int32", _16nar::tools::StoredDataType::Int32 );
+     add( "int16", _16nar::tools::StoredDataType::Int16 );
+     add( "int8", _16nar::tools::StoredDataType::Int8 );
+     add( "bool", _16nar::tools::StoredDataType::Bool );
+     add( "float", _16nar::tools::StoredDataType::Float );
+     add( "double", _16nar::tools::StoredDataType::Double );
+     add( "string", _16nar::tools::StoredDataType::String );
+     add( "empty_string", _16nar::tools::StoredDataType::String );
+
+     add( "uint64_arr", _16nar::tools::StoredDataType::Uint64Arr );
+     add( "uint32_arr", _16nar::tools::StoredDataType::Uint32Arr );
+     add( "uint16_arr", _16nar::tools::StoredDataType::Uint16Arr );
+     add( "uint8_arr", _16nar::tools::StoredDataType::Uint8Arr );
+     add( "int64_arr", _16nar::tools::StoredDataType::Int64Arr );
+     add( "int32_arr", _16nar::tools::StoredDataType::Int32Arr );
+     add( "int16_arr", _16nar::tools::StoredDataType::Int16Arr );
+     add( "int8_arr", _16nar::tools::StoredDataType::Int8Arr );
+     add( "bool_arr", _16nar::tools::StoredDataType::BoolArr );
+     // will write in different order
+     add( "string_arr", _16nar::tools::StoredDataType::StringArr );
+     add( "float_arr", _16nar::tools::StoredDataType::FloatArr );
+     add( "double_arr", _16nar::tools::StoredDataType::DoubleArr );
+
+     add( "vec2f", _16nar::tools::StoredDataType::Vec2f );
+     add( "vec3f", _16nar::tools::StoredDataType::Vec3f );
+     add( "vec4f", _16nar::tools::StoredDataType::Vec4f );
+     add( "vec2i", _16nar::tools::StoredDataType::Vec2i );
+     add( "vec3i", _16nar::tools::StoredDataType::Vec3i );
+     add( "vec4i", _16nar::tools::StoredDataType::Vec4i );
+
+     add( "float_rect", _16nar::tools::StoredDataType::FloatRect );
+     add( "int_rect", _16nar::tools::StoredDataType::IntRect );
+     add( "resource_index", _16nar::tools::StoredDataType::ResourceIndex );
+
+     return schema;
+}
+
+
 TEST_CASE( "Properties reading and writing in flatbuffers format", "[flatbuffers_props]" )
 {
-     _16nar::tools::FlatBuffersPropsWriter writer{};
+     const auto schema = make_test_schema();
+     _16nar::tools::FlatBuffersPropsWriter writer{ schema };
      writer.set_uint64( "uint64", 1234 );
      writer.set_uint32( "uint32", 5678 );
      writer.set_uint16( "uint16", 65535 );
@@ -57,12 +114,18 @@ TEST_CASE( "Properties reading and writing in flatbuffers format", "[flatbuffers
           _16nar::Vec2i{ 2, -10 }, _16nar::Vec2i{ 100, 50 } } );
      writer.set_resource_index( "resource_index", _16nar::tools::ResourceIndex{ 4, 7 } );
 
-     auto result = writer.finish_and_get_result();
+     const auto& result = writer.finish_and_get_result();
+     const auto *unordered_result = writer.finish_and_get_result_unordered();
+     REQUIRE( unordered_result != nullptr );
 
      _16nar::tools::FlatBuffersPropsReader reader{
           reinterpret_cast< const std::byte* >( result.data() ), result.size(), false };
+     reader.set_unordered_buffer(
+          reinterpret_cast< const std::byte* >( unordered_result->data() ), unordered_result->size(), false );
+     reader.set_data_schema( schema );
 
      REQUIRE( !reader.is_owner() );
+     REQUIRE( !reader.is_owner_unordered() );
      REQUIRE( reader.get_uint64( "uint64" ).value() == 1234 );
      REQUIRE( reader.get_uint64( "no_uint64" ).has_value() == false );
      REQUIRE( reader.get_uint32( "uint32" ).value() == 5678 );

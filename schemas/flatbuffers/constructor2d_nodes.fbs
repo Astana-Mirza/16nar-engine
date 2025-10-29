@@ -14,7 +14,8 @@ enum NodeType
 table NodeData
 {
      type:     NodeType;
-     data:     [ubyte]   (flexbuffer, required);
+     props:    Properties     (required);
+     ext:      [DataObject]   (optional);
 }
 
 

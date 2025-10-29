@@ -73,6 +73,22 @@ struct ResourceId
 }
 
 
+/// @brief Key-value properties containing payload.
+table Properties
+{
+     data:               [ubyte]   (flexbuffer, required);
+     unordered_data:     [ubyte]   (flexbuffer);
+}
+
+
+/// @brief Data satisfying specified schema.
+table DataObject
+{
+     schema:   ResourceId     (required);
+     props:    Properties     (required);
+}
+
+
 /// @brief List of dependencies' names from a package with package name.
 table PackageDeps
 {

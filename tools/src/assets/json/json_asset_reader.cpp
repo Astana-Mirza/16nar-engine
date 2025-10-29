@@ -2,7 +2,7 @@
 
 #include <16nar/tools/assets/json/json_utils.inl>
 #include <16nar/tools/utils.h>
-#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/data_schema.h>
 #include <16nar/tools/assets/json/json_props_reader.h>
 
 #include <stb_image.h>
@@ -213,16 +213,27 @@ void read_data_schema( const nlohmann::json& json, const std::string&,
      _16nar::tools::DataSchema schema{};
 
      const auto& items = json.at( "items" );
+     std::uint16_t index = 0;
+
+     if ( items.size() > static_cast< std::size_t >( std::numeric_limits< std::uint16_t >::max() ) )
+     {
+          throw std::runtime_error{ "Too many items in data schema: " + std::to_string( items.size() ) };
+     }
+     schema.ordered_items.reserve( items.size() );
+
      for ( const auto& json_item : items )
      {
           _16nar::tools::DataItem item{};
+          item.index = index++;
           item.type = json_item.at( "type" );
           item.mandatory = json_item.at( "mandatory" );
-          schema.items[ json_item.at( "name" ) ] = item;
+          const auto& name = json_item.at( "name" );
+          schema.items[ name ] = item;
+          schema.ordered_items.emplace_back( name );
      }
 
      const nlohmann::json& default_vals = json.at( "default_vals" ); // it must be, but may be empty
-     schema.default_vals = std::make_shared< _16nar::tools::JsonPropsReader >( default_vals, true );
+     schema.set_default_vals( std::make_shared< _16nar::tools::JsonPropsReader >( default_vals, true ) );
 
      resource.params = std::any{ schema };
      resource.type = _16nar::ResourceType::DataSchema;

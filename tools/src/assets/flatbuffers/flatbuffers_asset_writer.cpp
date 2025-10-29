@@ -6,7 +6,7 @@
 #include <16nar/gen/flatbuffers/resource_generated.h>
 
 #include <16nar/tools/utils.h>
-#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/data_schema.h>
 #include <16nar/tools/assets/flatbuffers/flatbuffers_props_writer.h>
 
 #include <stdexcept>
@@ -252,24 +252,26 @@ flatbuffers::Offset< _16nar::data::package::Resource > write_data_schema(
      auto data_sizes = builder.CreateVector( resource.data_sizes.data(), resource.data_sizes.size() );
      auto name = builder.CreateString( resource.name );
 
-     _16nar::tools::FlatBuffersPropsWriter props{};
+     _16nar::tools::FlatBuffersPropsWriter props{ schema };
+     auto default_vals = schema.get_default_vals();
      std::vector< flatbuffers::Offset< _16nar::data::package::DataItem > > items;
      items.reserve( schema.items.size() );
-     for ( const auto& item : schema.items )
+     for ( const auto& name : schema.ordered_items )
      {
-          if ( schema.default_vals )
+          const auto& item = schema.items.at( name );
+          if ( default_vals )
           {
                // optional fields cannot have default values
-               _16nar::tools::copy_property( *schema.default_vals,
-                    item.first, item.second, false, props );
+               _16nar::tools::copy_property( *default_vals,
+                    name, item, false, props );
           }
 
-          auto name = builder.CreateString( item.first );
+          auto name_stored = builder.CreateString( name );
           _16nar::data::package::DataItemBuilder item_builder{ builder };
 
-          item_builder.add_name( name );
-          item_builder.add_type( convert_enum( item.second.type ) );
-          item_builder.add_mandatory( item.second.mandatory );
+          item_builder.add_name( name_stored );
+          item_builder.add_type( convert_enum( item.type ) );
+          item_builder.add_mandatory( item.mandatory );
           items.emplace_back( item_builder.Finish() );
      }
      auto items_stored = builder.CreateVector( items );

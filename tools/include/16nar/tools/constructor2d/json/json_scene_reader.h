@@ -39,9 +39,6 @@ public:
      /// @copydoc ISceneReader::get_loop_func()
      std::optional< ResourceIndex > get_loop_func() override;
 
-     /// @copydoc ISceneReader::get_schema()
-     ResourceIndex get_schema() override;
-
      /// @copydoc ISceneReder::is_empty()
      bool is_empty() override;
 

@@ -33,10 +33,6 @@ public:
      /// @return resource index of loop function, optional.
      virtual std::optional< ResourceIndex > get_loop_func() = 0;
 
-     /// @brief Get resource index of scene nodes' data schema.
-     /// @return resource index of scene nodes' data schema.
-     virtual ResourceIndex get_schema() = 0;
-
      /// @brief Check if scene has no states.
      /// @return true if scene has no states, false otherwise.
      virtual bool is_empty() = 0;

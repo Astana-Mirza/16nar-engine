@@ -1,5 +1,7 @@
 #include <16nar/tools/assets/json/json_props_writer.h>
 
+#include <16nar/tools/assets/json/json_props_reader.h>
+
 #include <array>
 
 namespace _16nar::tools
@@ -8,6 +10,14 @@ namespace _16nar::tools
 const nlohmann::json& JsonPropsWriter::get_result() const
 {
      return json_;
+}
+
+
+std::shared_ptr< IPropsReader > JsonPropsWriter::conver_to_reader()
+{
+     const auto json{ std::move( json_ ) };
+     json_ = nlohmann::json{};
+     return std::make_shared< JsonPropsReader >( json, true );
 }
 
 

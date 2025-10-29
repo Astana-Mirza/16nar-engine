@@ -4,7 +4,7 @@
 #include <16nar/tools/utils.h>
 
 #include <16nar/tools/utils.h>
-#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/data_schema.h>
 #include <16nar/tools/assets/json/json_props_writer.h>
 
 #include <string>
@@ -154,20 +154,22 @@ void write_data_schema( const _16nar::tools::ResourceData& resource,
      auto schema = std::any_cast< _16nar::tools::DataSchema >( resource.params );
 
      _16nar::tools::JsonPropsWriter props{};
+     auto default_vals = schema.get_default_vals();
      auto items = nlohmann::json::array();
-     for ( const auto& item : schema.items )
+     for ( const auto& name : schema.ordered_items )
      {
-          if ( schema.default_vals )
+          const auto& item = schema.items.at( name );
+          if ( default_vals )
           {
                // optional fields cannot have default values
-               _16nar::tools::copy_property( *schema.default_vals,
-                    item.first, item.second, false, props );
+               _16nar::tools::copy_property( *default_vals,
+                    name, item, false, props );
           }
 
           nlohmann::json item_stored{};
-          item_stored[ "name" ] = item.first;
-          item_stored[ "type" ] = item.second.type;
-          item_stored[ "mandatory" ] = item.second.mandatory;
+          item_stored[ "name" ] = name;
+          item_stored[ "type" ] = item.type;
+          item_stored[ "mandatory" ] = item.mandatory;
           items.push_back( item_stored );
      }
      json[ "items" ] = items;

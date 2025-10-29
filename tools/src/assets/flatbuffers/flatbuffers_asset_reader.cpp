@@ -1,7 +1,8 @@
 #include <16nar/tools/assets/flatbuffers/flatbuffers_asset_reader.h>
 #include <16nar/tools/convertor_utils.inl>
 
-#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/data_schema.h>
+#include <16nar/tools/utils.h>
 #include <16nar/render/render_defs.h>
 
 #include <16nar/tools/assets/flatbuffers/flatbuffers_props_reader.h>
@@ -10,7 +11,6 @@
 #include <16nar/gen/flatbuffers/resource_generated.h>
 
 #include <stdexcept>
-#include <algorithm>
 #include <istream>
 #include <cassert>
 
@@ -215,22 +215,31 @@ void read_data_schema( const _16nar::data::package::Resource *res_buffer,
      const std::vector< _16nar::DataSharedPtr >& data, _16nar::tools::ResourceData& resource )
 {
      auto params = res_buffer->params_as_DataSchema();
-     _16nar::tools::DataSchema schema;
+     _16nar::tools::DataSchema schema{};
      resource.type = _16nar::ResourceType::DataSchema;
 
+     if ( params->items()->size() > static_cast< std::size_t >( std::numeric_limits< std::uint16_t >::max() ) )
+     {
+          throw std::runtime_error{ "Too many items in data schema: " + std::to_string( params->items()->size() ) };
+     }
+     schema.ordered_items.reserve( params->items()->size() );
+
+     std::uint16_t index = 0;
      for ( const auto& item : *params->items() )
      {
           _16nar::tools::DataItem saved_item{};
+          saved_item.index = index++;
           saved_item.type = convert_enum( item->type() );
           saved_item.mandatory = item->mandatory();
           schema.items.emplace( item->name()->c_str(), saved_item );
+          schema.ordered_items.emplace_back( item->name()->c_str() );
      }
 
      if ( params->default_vals() )
      {
-          schema.default_vals = std::make_shared< _16nar::tools::FlatBuffersPropsReader >(
+          schema.set_default_vals( std::make_shared< _16nar::tools::FlatBuffersPropsReader >(
                reinterpret_cast< const std::byte * >( params->default_vals()->data() ),
-               params->default_vals()->size(), true );
+               params->default_vals()->size(), true ) );
      }
 
      resource.params = std::any{ schema };

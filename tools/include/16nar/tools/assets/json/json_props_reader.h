@@ -26,6 +26,9 @@ public:
      /// @copydoc IPropsReader::is_owner() const noexcept
      bool is_owner() const noexcept override;
 
+     /// @copydoc IPropsReader::set_data_schema(const DataSchema&)
+     void set_data_schema( const DataSchema& schema ) noexcept override;
+
      /// @copydoc IPropsReader::get_uint64(const std::string&)
      std::optional< uint64_t > get_uint64( const std::string& name ) override;
 

@@ -3,7 +3,7 @@
 #include <16nar/tools/assets/json/json_asset_reader.h>
 #include <16nar/tools/assets/flatbuffers/flatbuffers_asset_reader.h>
 #include <16nar/tools/assets/flatbuffers/flatbuffers_asset_writer.h>
-#include <16nar/tools/scene_defs.h>
+#include <16nar/tools/data_schema.h>
 #include <16nar/tools/assets/iprops_reader.h>
 #include <16nar/render/render_defs.h>
 
@@ -221,19 +221,24 @@ TEST_CASE( "Data schemas reading and writing in flatbuffers format", "[flatbuffe
      REQUIRE( ds_data.items.find( "test_string" ) != ds_data.items.cend() );
      REQUIRE( ds_data.items[ "test_string" ].type == _16nar::tools::StoredDataType::String );
      REQUIRE( ds_data.items[ "test_string" ].mandatory == true );
+     REQUIRE( ds_data.items[ "test_string" ].index == 0 );
      REQUIRE( ds_data.items.find( "test_int32" ) != ds_data.items.cend() );
      REQUIRE( ds_data.items[ "test_int32" ].type == _16nar::tools::StoredDataType::Int32 );
      REQUIRE( ds_data.items[ "test_int32" ].mandatory == true );
+     REQUIRE( ds_data.items[ "test_int32" ].index == 1 );
      REQUIRE( ds_data.items.find( "test_vec2f" ) != ds_data.items.cend() );
      REQUIRE( ds_data.items[ "test_vec2f" ].type == _16nar::tools::StoredDataType::Vec2f );
      REQUIRE( ds_data.items[ "test_vec2f" ].mandatory == false );
+     REQUIRE( ds_data.items[ "test_vec2f" ].index == 2 );
      REQUIRE( ds_data.items.find( "test_bool" ) != ds_data.items.cend() );
      REQUIRE( ds_data.items[ "test_bool" ].type == _16nar::tools::StoredDataType::Bool );
      REQUIRE( ds_data.items[ "test_bool" ].mandatory == true );
+     REQUIRE( ds_data.items[ "test_bool" ].index == 3 );
 
-     REQUIRE( ds_data.default_vals != nullptr );
-     REQUIRE( ds_data.default_vals->get_string( "test_string" ).value() == "some_value" );
-     REQUIRE( ds_data.default_vals->get_int32( "test_int32" ).value() == -678 );
+     auto default_vals = ds_data.get_default_vals();
+     REQUIRE( default_vals != nullptr );
+     REQUIRE( default_vals->get_string( "test_string" ).value() == "some_value" );
+     REQUIRE( default_vals->get_int32( "test_int32" ).value() == -678 );
 }
 
 
