@@ -101,7 +101,7 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     )
     set(NARENGINE_ASSETS_FB_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS}
         "FLATBUFFERS_LOCALE_INDEPENDENT=0")
-    set(NARENGINE_ASSETS_FB_LINK_LIBS PUBLIC "${NAME}_tools" PRIVATE "flatbuffers::libflatbuffers")
+    set(NARENGINE_ASSETS_FB_LINK_LIBS PUBLIC "${NAME}_tools" "flatbuffers::libflatbuffers")
     set(NARENGINE_ASSETS_FB_SOURCES
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/assets/flatbuffers/flatbuffers_props_writer.cpp"
@@ -116,6 +116,31 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     target_compile_definitions("${NAME}_assets_fb" ${NARENGINE_ASSETS_FB_COMPILER_DEFS})
     target_link_libraries("${NAME}_assets_fb" ${NARENGINE_ASSETS_FB_LINK_LIBS})
     set(NARENGINE_TOOLS_ASSETS_LIBS ${NARENGINE_TOOLS_ASSETS_LIBS} "${NAME}_assets_fb")
+
+    if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+        set(NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
+        set(NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_INCLUDE_DIRS
+            PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS}
+            PRIVATE "${PROJECT_BINARY_DIR}/schemas/flatbuffers-gen-cpp"
+        )
+        set(NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_LINK_LIBS
+            PUBLIC "${NAME}_tools_constructor2d" "${NAME}_assets_fb" PRIVATE "flatbuffers::libflatbuffers")
+        set(NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
+        set(NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_SOURCES
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/flatbuffers/flatbuffers_node_package_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/flatbuffers/flatbuffers_scene_piece_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/flatbuffers/flatbuffers_scene_state_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/flatbuffers/flatbuffers_scene_reader.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/flatbuffers/flatbuffers_scene_convertor.cpp"
+            "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/flatbuffers/flatbuffers_read_utils.cpp"
+        )
+        add_library("${NAME}_constructor2d_fb" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_SOURCES})
+        target_include_directories("${NAME}_constructor2d_fb" ${NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_INCLUDE_DIRS})
+        target_link_directories("${NAME}_constructor2d_fb" ${NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_LINK_DIRS})
+        target_compile_definitions("${NAME}_constructor2d_fb" ${NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_COMPILER_DEFS})
+        target_link_libraries("${NAME}_constructor2d_fb" ${NARENGINE_CONSTRUCTOR2D_FLATBUFFERS_LINK_LIBS})
+        set(NARENGINE_TOOLS_CONSTRUCTOR2D_LIBS ${NARENGINE_TOOLS_CONSTRUCTOR2D_LIBS} "${NAME}_constructor2d_fb")
+    endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
 
 

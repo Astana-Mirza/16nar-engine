@@ -15,9 +15,12 @@ namespace _16nar::tools::constructor2d
 class ENGINE_API JsonScenePieceReader : public IScenePieceReader
 {
 public:
+     /// @brief Default constructor.
+     JsonScenePieceReader();
+
      /// @brief Constructor.
      /// @param[in] nodes array of nodes of the scene piece.
-     JsonScenePieceReader( const nlohmann::json& nodes = {} );
+     explicit JsonScenePieceReader( const nlohmann::json& nodes );
 
      /// @copydoc IScenePieceReader::is_empty()
      bool is_empty() override;

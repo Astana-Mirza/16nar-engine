@@ -6,14 +6,7 @@
 #include <16nar/16nardefs.h>
 #include <16nar/tools/assets/iprops_writer.h>
 
-namespace flexbuffers
-{
-
-class Builder;
-
-} // namespace flexbuffers
-
-
+#include <flatbuffers/flexbuffers.h>
 
 namespace _16nar::tools
 {
@@ -37,9 +30,6 @@ public:
 
      FlatBuffersPropsWriter( const FlatBuffersPropsWriter& ) = delete;
      FlatBuffersPropsWriter& operator=( const FlatBuffersPropsWriter& ) = delete;
-
-     /// @brief Destructor.
-     ~FlatBuffersPropsWriter();
 
      /// @brief Finish writing of main buffer and return result.
      /// @details Must be called only once for an object. Further calls will raise flatbuffers error.
@@ -156,10 +146,11 @@ public:
 private:
      std::vector< std::uint16_t > indices_;       ///< indices of stored elements.
      const DataSchema& schema_;                   ///< schema of written data.
-     flexbuffers::Builder *builder_;              ///< builder of main buffer.
-     flexbuffers::Builder *unordered_builder_;    ///< builder of unordered data buffer.
-     std::size_t vector_key_;                     ///< key of built map for unordered buffer.
+     flexbuffers::Builder builder_;               ///< builder of main buffer.
+     flexbuffers::Builder unordered_builder_;     ///< builder of unordered data buffer.
+     std::size_t vector_key_;                     ///< key of built vector for main buffer.
      std::size_t map_key_;                        ///< key of built map for unordered buffer.
+     bool has_unordered_data_;                    ///< true if unordered buffer is not empty, false otherwise.
 };
 
 } // namespace _16nar::tools

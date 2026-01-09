@@ -4,12 +4,10 @@
 
 #include <16nar/gen/flatbuffers/common_generated.h>
 
-#include <flatbuffers/flexbuffers.h>
-
 #include <stdexcept>
 
 #define _16NAR_GET_FB_VAL( CHECK, GET ) \
-     auto ref = get_ref( schema_, *root_, unordered_root_, name ); \
+     auto ref = get_ref( schema_, root_, unordered_root_, name ); \
      if ( !ref.CHECK() )                \
      {                                  \
           return {};                    \
@@ -18,7 +16,7 @@
 
 
 #define _16NAR_GET_FB_TYPED_VECTOR( CPP_TYPE, TYPE, GET )   \
-     auto ref = get_ref( schema_, *root_, unordered_root_, name ); \
+     auto ref = get_ref( schema_, root_, unordered_root_, name ); \
      if ( !ref.IsTypedVector() )                            \
      {                                                      \
           return {};                                        \
@@ -38,7 +36,7 @@
 
 
 #define _16NAR_GET_FB_DECL_FIXED_TYPED_VECTOR( TYPE, SIZE )           \
-     auto ref = get_ref( schema_, *root_, unordered_root_, name );    \
+     auto ref = get_ref( schema_, root_, unordered_root_, name );     \
      if ( !ref.IsFixedTypedVector() )                                 \
      {                                                                \
           return {};                                                  \
@@ -88,8 +86,8 @@ std::optional< std::size_t > binary_search( const flexbuffers::TypedVector& vect
 }
 
 
-flexbuffers::Reference get_ref( const DataSchema *schema, flexbuffers::Vector& root,
-     flexbuffers::Map *unordered_root, const std::string& name )
+flexbuffers::Reference get_ref( const DataSchema *schema, const flexbuffers::Vector& root,
+     const flexbuffers::Map& unordered_root, const std::string& name )
 {
      if ( !schema )
      {
@@ -106,9 +104,9 @@ flexbuffers::Reference get_ref( const DataSchema *schema, flexbuffers::Vector& r
      {
           return root[ index.value() ];
      }
-     else if ( unordered_root )
+     else if ( !unordered_root.IsTheEmptyMap() )
      {
-          return ( *unordered_root )[ name ];
+          return unordered_root[ name ];
      }
      return {};
 }
@@ -117,53 +115,83 @@ flexbuffers::Reference get_ref( const DataSchema *schema, flexbuffers::Vector& r
 
 
 FlatBuffersPropsReader::FlatBuffersPropsReader():
-     buffer_{}, unordered_buffer_{}, schema_{},
-     root_{ new flexbuffers::Vector( flexbuffers::Vector::EmptyVector() ) }, unordered_root_{}
+     buffer_{},
+     unordered_buffer_{},
+     root_{ flexbuffers::Vector::EmptyVector() },
+     unordered_root_{ flexbuffers::Map::EmptyMap() },
+     schema_{}
 {}
 
 
 FlatBuffersPropsReader::FlatBuffersPropsReader( const std::byte *buffer, std::size_t size, bool own ):
-     buffer_{}, unordered_buffer_{}, schema_{},
-     root_{ new flexbuffers::Vector( flexbuffers::Vector::EmptyVector() ) }, unordered_root_{}
+     buffer_{},
+     unordered_buffer_{},
+     root_{ flexbuffers::Vector::EmptyVector() },
+     unordered_root_{ flexbuffers::Map::EmptyMap() },
+     schema_{}
 {
      if ( own )
      {
           buffer_.assign( buffer, buffer + size );
-          *root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer_.data() ), buffer_.size() ).AsVector();
+          root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >(
+               buffer_.data() ), buffer_.size() ).AsVector();
      }
      else
      {
-          *root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsVector();
+          root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsVector();
      }
-     if ( root_->size() < 1 )
+     if ( root_.IsTheEmptyVector() )
      {
           throw std::runtime_error{ "wrong flatbuffer properties vector" };
      }
 }
 
 
-FlatBuffersPropsReader::~FlatBuffersPropsReader()
+FlatBuffersPropsReader::FlatBuffersPropsReader( FlatBuffersPropsReader&& other ):
+     buffer_{ std::move( other.buffer_ ) },
+     unordered_buffer_{ std::move( other.unordered_buffer_ ) },
+     root_{ flexbuffers::Vector::EmptyVector() },
+     unordered_root_{ flexbuffers::Map::EmptyMap() },
+     schema_{}
 {
-     delete root_;
-     if ( unordered_root_ )
+     std::swap( root_, other.root_ );
+     std::swap( unordered_root_, other.unordered_root_ );
+     std::swap( schema_, other.schema_ );
+}
+
+
+FlatBuffersPropsReader& FlatBuffersPropsReader::operator=( FlatBuffersPropsReader&& rhs )
+{
+     if ( this == &rhs )
      {
-          delete unordered_root_;
+          return *this;
      }
+     buffer_ = std::move( rhs.buffer_ );
+     unordered_buffer_ = std::move( rhs.unordered_buffer_ );
+     root_ = rhs.root_;
+     unordered_root_ = rhs.unordered_root_;
+     schema_ = rhs.schema_;
+
+     rhs.root_ = flexbuffers::Vector::EmptyVector();
+     rhs.unordered_root_ = flexbuffers::Map::EmptyMap();
+     rhs.schema_ = nullptr;
+
+     return *this;
 }
 
 
 void FlatBuffersPropsReader::set_unordered_buffer( const std::byte *buffer, std::size_t size, bool own )
 {
-     unordered_root_ = new flexbuffers::Map( flexbuffers::Map::EmptyMap() );
+     unordered_root_ = flexbuffers::Map::EmptyMap();
      if ( own )
      {
           unordered_buffer_.assign( buffer, buffer + size );
-          *unordered_root_ = flexbuffers::GetRoot(
+          unordered_root_ = flexbuffers::GetRoot(
                reinterpret_cast< const uint8_t * >( unordered_buffer_.data() ), unordered_buffer_.size() ).AsMap();
      }
      else
      {
-          *unordered_root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsMap();
+          unordered_root_ = flexbuffers::GetRoot( reinterpret_cast< const uint8_t * >( buffer ), size ).AsMap();
      }
 }
 

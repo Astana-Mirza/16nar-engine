@@ -3,7 +3,7 @@ include "constructor2d_nodes.fbs";
 namespace _16nar.data.constructor2d;
 
 /// @brief Type of render system.
-enum RenderSystemType
+enum RenderSystemType : uint8
 {
      QTreeRenderSystem
 }
@@ -13,7 +13,7 @@ enum RenderSystemType
 table RenderSystemData
 {
      type:     RenderSystemType;
-     data:     [ubyte]   (flexbuffer, required);
+     props:    Properties     (required);
 }
 
 
@@ -33,9 +33,9 @@ table Scene2D
      version:            uint32;
      deps:               Dependencies   (required);
      states:             [SceneState2D] (required);
-     internal_pieces:    [ScenePiece2D] (optional);
-     loop_func:          ResourceId     (optional);
-     setup_func:         ResourceId     (optional);
+     internal_pieces:    [ScenePiece2D];
+     loop_func:          ResourceId;
+     setup_func:         ResourceId;
 }
 
 root_type Scene2D;

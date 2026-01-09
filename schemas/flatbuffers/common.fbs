@@ -69,7 +69,7 @@ struct TransformMatrix
 struct ResourceId
 {
      package:  uint16;
-     name:     uint16;
+     resource: uint16;
 }
 
 

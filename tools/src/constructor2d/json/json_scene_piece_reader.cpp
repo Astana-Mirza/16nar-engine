@@ -5,6 +5,9 @@
 namespace _16nar::tools::constructor2d
 {
 
+JsonScenePieceReader::JsonScenePieceReader() = default;
+
+
 JsonScenePieceReader::JsonScenePieceReader( const nlohmann::json& nodes ):
      node_reader_{}, begin_{ nodes.cbegin() }, end_{ nodes.cend() }, curr_node_{ nodes.cbegin() }
 {

@@ -18,11 +18,11 @@ public:
      /// @brief Constructor.
      /// @throws std::runtime_error and implementation-defined exceptions if @b json is malformed.
      /// @param[in] json object with node package.
-     JsonNodePackageReader( const nlohmann::json& json );
+     explicit JsonNodePackageReader( const nlohmann::json& json );
 
      /// @brief Constructor with object move.
      /// @param[in] json object with node package.
-     JsonNodePackageReader( nlohmann::json&& json );
+     explicit JsonNodePackageReader( nlohmann::json&& json );
 
      /// @copydoc INodePackageReader::get_dependencies()
      Dependencies get_dependencies() override;

@@ -4,84 +4,85 @@
 
 #include <flatbuffers/flexbuffers.h>
 
+namespace
+{
+
+constexpr static std::size_t builder_initial_size = 256;
 
 #define _16NAR_SET_FB_VAL( FUNC )                                \
      const auto& item = schema_.items.at( name );                \
      if ( !indices_.empty() && item.index < indices_.back() )    \
      {                                                           \
-          if ( !unordered_builder_ )                             \
+          if ( !has_unordered_data_ )                            \
           {                                                      \
-               unordered_builder_ = new flexbuffers::Builder();  \
-               map_key_ = unordered_builder_->StartMap();        \
+               map_key_ = unordered_builder_.StartMap();         \
+               has_unordered_data_ = true;                       \
           }                                                      \
-          unordered_builder_->FUNC( name.c_str(), value );       \
+          unordered_builder_.FUNC( name.c_str(), value );        \
           return;                                                \
      }                                                           \
      indices_.emplace_back( item.index );                        \
-     builder_->FUNC( value );
+     builder_.FUNC( value );
 
 
 #define _16NAR_SET_FB_FIXED_TYPED_VECTOR( VALUE, SIZE )          \
      const auto& item = schema_.items.at( name );                \
      if ( !indices_.empty() && item.index < indices_.back() )    \
      {                                                           \
-          if ( !unordered_builder_ )                             \
+          if ( !has_unordered_data_ )                            \
           {                                                      \
-               unordered_builder_ = new flexbuffers::Builder();  \
-               map_key_ = unordered_builder_->StartMap();        \
+               map_key_ = unordered_builder_.StartMap();         \
+               has_unordered_data_ = true;                       \
           }                                                      \
-          unordered_builder_->FixedTypedVector( name.c_str(), VALUE, SIZE ); \
+          unordered_builder_.FixedTypedVector( name.c_str(), VALUE, SIZE ); \
           return;                                                \
      }                                                           \
      indices_.emplace_back( item.index );                        \
-     builder_->FixedTypedVector( VALUE, SIZE );
+     builder_.FixedTypedVector( VALUE, SIZE );
 
 
 #define _16NAR_SET_FB_VECTOR( FUNC )                                       \
      const auto& item = schema_.items.at( name );                          \
      if ( !indices_.empty() && item.index < indices_.back() )              \
      {                                                                     \
-          if ( !unordered_builder_ )                                       \
+          if ( !has_unordered_data_ )                                      \
           {                                                                \
-               unordered_builder_ = new flexbuffers::Builder();            \
-               map_key_ = unordered_builder_->StartMap();                  \
+               map_key_ = unordered_builder_.StartMap();                   \
+               has_unordered_data_ = true;                                 \
           }                                                                \
-          auto start = unordered_builder_->StartVector( name.c_str() );    \
+          auto start = unordered_builder_.StartVector( name.c_str() );     \
           for ( const auto val : value )                                   \
           {                                                                \
-               unordered_builder_->FUNC( val );                            \
+               unordered_builder_.FUNC( val );                             \
           }                                                                \
-          unordered_builder_->EndVector( start, true, false );             \
+          unordered_builder_.EndVector( start, true, false );              \
           return;                                                          \
      }                                                                     \
      indices_.emplace_back( item.index );                                  \
-     auto start = builder_->StartVector();                                 \
+     auto start = builder_.StartVector();                                  \
      for ( const auto val : value )                                        \
      {                                                                     \
-          builder_->FUNC( val );                                           \
+          builder_.FUNC( val );                                            \
      }                                                                     \
-     builder_->EndVector( start, true, false );
+     builder_.EndVector( start, true, false );
+
+} // anonymous namespace
 
 
 namespace _16nar::tools
 {
 
 FlatBuffersPropsWriter::FlatBuffersPropsWriter( const DataSchema& schema ):
-     indices_{}, schema_{ schema }, builder_{ new flexbuffers::Builder() },
-     unordered_builder_{}, vector_key_{}, map_key_{}
+     indices_{},
+     schema_{ schema },
+     builder_{ builder_initial_size, flexbuffers::BuilderFlag::BUILDER_FLAG_NONE },
+     unordered_builder_{ builder_initial_size, flexbuffers::BuilderFlag::BUILDER_FLAG_NONE },
+     vector_key_{},
+     map_key_{},
+     has_unordered_data_{}
 {
-     vector_key_ = builder_->StartVector();
+     vector_key_ = builder_.StartVector();
      indices_.reserve( schema_.items.size() );
-}
-
-
-FlatBuffersPropsWriter::~FlatBuffersPropsWriter()
-{
-     if ( unordered_builder_ )
-     {
-          delete unordered_builder_;
-     }
-     delete builder_;
 }
 
 
@@ -93,10 +94,9 @@ std::shared_ptr< IPropsReader > FlatBuffersPropsWriter::conver_to_reader()
           reader = std::make_shared< FlatBuffersPropsReader >(
                reinterpret_cast< const std::byte * >( buffer.data() ), buffer.size(), true );
      }
-     delete builder_;
-     builder_ = new flexbuffers::Builder();
+     builder_ = flexbuffers::Builder( builder_initial_size, flexbuffers::BuilderFlag::BUILDER_FLAG_NONE );
 
-     vector_key_ = builder_->StartVector();
+     vector_key_ = builder_.StartVector();
      indices_.clear();
 
      const auto *buffer = finish_and_get_result_unordered();
@@ -104,9 +104,10 @@ std::shared_ptr< IPropsReader > FlatBuffersPropsWriter::conver_to_reader()
      {
           reader->set_unordered_buffer(
                reinterpret_cast< const std::byte * >( buffer->data() ), buffer->size(), true );
-          delete unordered_builder_;
-          unordered_builder_ = nullptr;
+          unordered_builder_ = flexbuffers::Builder(
+               builder_initial_size, flexbuffers::BuilderFlag::BUILDER_FLAG_NONE );
           map_key_ = 0;
+          has_unordered_data_ = false;
      }
      return reader;
 }
@@ -114,20 +115,20 @@ std::shared_ptr< IPropsReader > FlatBuffersPropsWriter::conver_to_reader()
 
 const FlatBuffersPropsWriter::Buffer& FlatBuffersPropsWriter::finish_and_get_result()
 {
-     builder_->Vector( indices_.data(), indices_.size() );
-     builder_->EndVector( vector_key_, false, false );
-     builder_->Finish();
-     return builder_->GetBuffer();
+     builder_.Vector( indices_.data(), indices_.size() );
+     builder_.EndVector( vector_key_, false, false );
+     builder_.Finish();
+     return builder_.GetBuffer();
 }
 
 
 const FlatBuffersPropsWriter::Buffer *FlatBuffersPropsWriter::finish_and_get_result_unordered()
 {
-     if ( unordered_builder_ )
+     if ( has_unordered_data_ )
      {
-          unordered_builder_->EndMap( map_key_ );
-          unordered_builder_->Finish();
-          return &unordered_builder_->GetBuffer();
+          unordered_builder_.EndMap( map_key_ );
+          unordered_builder_.Finish();
+          return &unordered_builder_.GetBuffer();
      }
      return nullptr;
 }

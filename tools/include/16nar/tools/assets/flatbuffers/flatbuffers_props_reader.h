@@ -6,14 +6,7 @@
 #include <16nar/16nardefs.h>
 #include <16nar/tools/assets/iprops_reader.h>
 
-namespace flexbuffers
-{
-
-class Vector;
-class Map;
-
-} // namespace flexbuffers
-
+#include <flatbuffers/flexbuffers.h>
 
 namespace _16nar::tools
 {
@@ -35,8 +28,14 @@ public:
      FlatBuffersPropsReader( const FlatBuffersPropsReader& ) = delete;
      FlatBuffersPropsReader& operator=( const FlatBuffersPropsReader& ) = delete;
 
-     /// @brief Destructor.
-     ~FlatBuffersPropsReader();
+     /// @brief Move constructor.
+     /// @param[in] other object to be moved.
+     FlatBuffersPropsReader( FlatBuffersPropsReader&& other );
+
+     /// @brief Move assignment.
+     /// @param[in] rhs right operand.
+     /// @return current object.
+     FlatBuffersPropsReader& operator=( FlatBuffersPropsReader&& rhs );
 
      /// @brief Set unordered buffer.
      /// @param[in] buffer underlying unordered buffer.
@@ -156,9 +155,9 @@ public:
 private:
      std::vector< std::byte > buffer_;            ///< underlying main buffer.
      std::vector< std::byte > unordered_buffer_;  ///< underlying unordered buffer.
+     flexbuffers::Vector root_;                   ///< reference to root properties vector.
+     flexbuffers::Map unordered_root_;            ///< reference to root properties map (unordered).
      const DataSchema *schema_;                   ///< schema of read data.
-     flexbuffers::Vector *root_;                  ///< reference to root properties vector.
-     flexbuffers::Map *unordered_root_;           ///< reference to root properties map (unordered).
 };
 
 } // namespace _16nar::tools
