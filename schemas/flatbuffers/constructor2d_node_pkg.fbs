@@ -2,12 +2,20 @@ include "constructor2d_nodes.fbs";
 
 namespace _16nar.data.constructor2d;
 
-/// @brief Package of scene pieces.
+/// @brief 2D scene piece with its name, which must be unique within its node package.
+table NamedScenePiece2D
+{
+     name:     string         (required);
+     piece:    ScenePiece2D   (required);
+}
+
+
+/// @brief Package of 2D scene pieces.
 table NodePackage2D
 {
      version:       uint32;
-     deps:          Dependencies   (required);
-     pieces:        [ScenePiece2D] (required);
+     deps:          Dependencies        (required);
+     pieces:        [NamedScenePiece2D] (required);
 }
 
 root_type NodePackage2D;

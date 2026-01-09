@@ -142,9 +142,9 @@ class NarengineRecipe(ConanFile):
             self.cpp_info.components["16nar_assets_fb"].system_libs = ["flatbuffers::libflatbuffers"]
             self.cpp_info.components["16nar_assets_fb"].set_property("cmake_target_name",
                 nmspc_name + "::16nar_assets_fb")
-            #if self.options.with_arch_constructor2d:
-            #    self.cpp_info.components["16nar_constructor2d_fb"].libs = ["16nar_constructor2d_fb"]
-            #    self.cpp_info.components["16nar_constructor2d_fb"].requires = \
-            #        ["16nar_tools_constructor2d", "16nar_assets_fb"]
-            #    self.cpp_info.components["16nar_constructor2d_fb"].set_property("cmake_target_name",
-            #        nmspc_name + "::16nar_constructor2d_fb")
+            if self.options.with_arch_constructor2d:
+                self.cpp_info.components["16nar_constructor2d_fb"].libs = ["16nar_constructor2d_fb"]
+                self.cpp_info.components["16nar_constructor2d_fb"].requires = \
+                    ["16nar_tools_constructor2d", "16nar_assets_fb"]
+                self.cpp_info.components["16nar_constructor2d_fb"].set_property("cmake_target_name",
+                    nmspc_name + "::16nar_constructor2d_fb")

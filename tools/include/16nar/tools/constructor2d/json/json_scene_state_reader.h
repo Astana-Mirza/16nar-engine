@@ -19,7 +19,7 @@ public:
 
      /// @brief Constructor.
      /// @param[in] json object of scene state.
-     JsonSceneStateReader( const nlohmann::json& json );
+     explicit JsonSceneStateReader( const nlohmann::json& json );
 
      /// @copydoc ISceneStateReader::get_rendering()
      bool get_rendering() override;
@@ -51,7 +51,7 @@ private:
 
      const nlohmann::json *json_{};          ///< object of scene state.
      JsonPropsReader render_system_reader_;  ///< reader of render system's properties.
-     JsonPropsReader node_reader_;           ///< reader of render system's properties.
+     JsonPropsReader node_reader_;           ///< reader of node's properties.
      NodeIter begin_;                        ///< begin iterator of nodes array.
      NodeIter end_;                          ///< end iterator of nodes array.
      NodeIter curr_node_;                    ///< current node.

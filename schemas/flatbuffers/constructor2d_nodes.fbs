@@ -3,7 +3,7 @@ include "common.fbs";
 namespace _16nar.data.constructor2d;
 
 /// @brief Type of node on the scene.
-enum NodeType
+enum NodeType : uint8
 {
      Node2D,
      SpriteNode
@@ -15,7 +15,7 @@ table NodeData
 {
      type:     NodeType;
      props:    Properties     (required);
-     ext:      [DataObject]   (optional);
+     ext:      [DataObject];
 }
 
 

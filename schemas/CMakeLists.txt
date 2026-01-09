@@ -12,13 +12,13 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
         "flatbuffers/package.fbs"
         "flatbuffers/resource.fbs"
     )
-    if("${NARENGINE_BUILD_CONSTRUCTOR}")
+    if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
         set(NARENGINE_FLATBUFFERS_SCHEMAS ${NARENGINE_FLATBUFFERS_SCHEMAS}
             "flatbuffers/constructor2d_nodes.fbs"
             "flatbuffers/constructor2d_scene.fbs"
             "flatbuffers/constructor2d_node_pkg.fbs"
         )
-    endif() # if("${NARENGINE_BUILD_CONSTRUCTOR}")
+    endif() # if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 
     flatbuffers_generate_headers(TARGET flatbuffers-gen-cpp
         INCLUDE "${NARENGINE_SCHEMAS_DIR}"
