@@ -1,0 +1,30 @@
+namespace _16nar.data;
+
+attribute "narengine_prop";
+
+/// @brief Header of the asset file.
+struct FileHeader
+{
+     version:  uint32;
+     size:     uint32;
+}
+
+
+/// @brief Data of the asset.
+table AssetData
+{
+     type_id:  uint32;
+     data:     [ubyte]   (required);
+}
+
+
+/// @brief Container with data and child containers.
+table Asset
+{
+     name:     string    (key);
+     is_array: bool = false;
+     content:  AssetData;
+     children: [Asset];
+}
+
+root_type Asset;

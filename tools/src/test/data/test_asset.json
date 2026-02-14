@@ -1,0 +1,34 @@
+{
+    "version": "1.0.0",
+    "name": "test_container",
+    "is_array": false,
+    "children": {
+        "test_child1": {
+            "name": "test_child1",
+            "content": {
+                "type_id": 123,
+                "data": "testdata1"
+            }
+        },
+        "test_child2": {
+            "name": "test_child2",
+            "is_array": true,
+            "content": {
+                "type_id": 456,
+                "data": "testdata2"
+            },
+            "children": [
+                {
+                    "name": "test_child3"
+                },
+                {
+                    "name": "test_child4",
+                    "content": {
+                        "type_id": 789,
+                        "data": "testdata3"
+                    }
+                }
+            ]
+        }
+    }
+}

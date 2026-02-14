@@ -32,13 +32,19 @@ narengine_set_option(NARENGINE_RENDER_OPENGL ON BOOL "Build with OpenGL support 
 #narengine_set_option(NARENGINE_RENDER_OPENGL_ES ON BOOL "Build with OpenGL ES support (uses GLM + GLFW + glad)") # not implemented
 
 narengine_set_option(NARENGINE_TOOLS_FLATBUFFERS ON BOOL "Build tools for using flatbuffers format")
-narengine_set_option(NARENGINE_TOOLS_JSON ON BOOL "Build tools for using flatbuffers format")
+narengine_set_option(NARENGINE_TOOLS_JSON ON BOOL "Build tools for using JSON format")
 
 narengine_set_option(NARENGINE_BUILD_UTILS ON BOOL "Build utilities for development with engine")
 narengine_set_option(NARENGINE_LOG_LEVEL "9" STRING "Maximum log level of engine logging library")
 narengine_set_option(NARENGINE_BUILD_TESTS "${BUILD_TESTING}" BOOL "Build tests for engine")
 
 narengine_set_option(NARENGINE_BUILD_CONSTRUCTOR2D ON BOOL "Build constructor2d architecture")
+
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(NARENGINE_DEBUG_BUILD ON)
+else()
+    set(NARENGINE_DEBUG_BUILD OFF)
+endif()
 
 # Dependencies
 # Visual Studio 17 2022 bug workaround
@@ -88,7 +94,7 @@ configure_file("${PROJECT_SOURCE_DIR}/engine/include/${NAME}config.h.in" "${NAME
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/schemas")
 add_subdirectory("${PROJECT_SOURCE_DIR}/tools")
-add_subdirectory("${PROJECT_SOURCE_DIR}/engine")
+#add_subdirectory("${PROJECT_SOURCE_DIR}/engine")
 
 install(FILES "${PROJECT_BINARY_DIR}/${NAME}/${NAME}config.h" DESTINATION "include/${NAME}")
 install(EXPORT "${NAME}" DESTINATION "lib/cmake" NAMESPACE "${NAME}::")

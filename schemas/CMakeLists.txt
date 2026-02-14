@@ -7,18 +7,13 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     set_source_files_properties("${NARENGINE_FB_GEN_INCLUDE_DIR}" PROPERTIES GENERATED TRUE)
 
     set(NARENGINE_FLATBUFFERS_SCHEMAS
-        "flatbuffers/common.fbs"
-        "flatbuffers/package_common.fbs"
-        "flatbuffers/package.fbs"
-        "flatbuffers/resource.fbs"
+        "flatbuffers/asset.fbs"
     )
-    if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
-        set(NARENGINE_FLATBUFFERS_SCHEMAS ${NARENGINE_FLATBUFFERS_SCHEMAS}
-            "flatbuffers/constructor2d_nodes.fbs"
-            "flatbuffers/constructor2d_scene.fbs"
-            "flatbuffers/constructor2d_node_pkg.fbs"
-        )
-    endif() # if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+    #if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+    #    set(NARENGINE_FLATBUFFERS_SCHEMAS ${NARENGINE_FLATBUFFERS_SCHEMAS}
+    #        "flatbuffers/constructor2d.fbs"
+    #    )
+    #endif() # if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 
     flatbuffers_generate_headers(TARGET flatbuffers-gen-cpp
         INCLUDE "${NARENGINE_SCHEMAS_DIR}"
