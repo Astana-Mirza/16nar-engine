@@ -25,7 +25,7 @@ SharedBufferPtr FlatBuffersAssetFileProcessor::read_asset_data( const File& file
           return SharedBufferPtr{};
      }
      auto ret = SharedBufferPtr::allocate( memory_resource_, header.size() );
-     if ( size != file.read( ret.get_view() ) )
+     if ( header.size() != file.read( ret.get_view() ) )
      {
           return SharedBufferPtr{};
      }

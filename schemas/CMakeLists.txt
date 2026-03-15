@@ -8,12 +8,13 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
 
     set(NARENGINE_FLATBUFFERS_SCHEMAS
         "flatbuffers/asset.fbs"
+        "flatbuffers/resource.fbs"
     )
-    #if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
-    #    set(NARENGINE_FLATBUFFERS_SCHEMAS ${NARENGINE_FLATBUFFERS_SCHEMAS}
-    #        "flatbuffers/constructor2d.fbs"
-    #    )
-    #endif() # if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+    if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+        set(NARENGINE_FLATBUFFERS_SCHEMAS ${NARENGINE_FLATBUFFERS_SCHEMAS}
+            "flatbuffers/constructor2d.fbs"
+        )
+    endif() # if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 
     flatbuffers_generate_headers(TARGET flatbuffers-gen-cpp
         INCLUDE "${NARENGINE_SCHEMAS_DIR}"

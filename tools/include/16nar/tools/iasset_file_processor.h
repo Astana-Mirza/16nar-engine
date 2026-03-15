@@ -34,7 +34,7 @@ public:
      /// @brief Make asset reader which reads data from given buffer.
      /// @details Asset reader usually does not copy memory, so memory
      /// of the @b buffer must not be released until the end of asset reader use.
-     /// @param buffer data of the asset.
+     /// @param[in] buffer data of the asset.
      /// @return asset reader.
      virtual IAssetReaderPtr make_asset_reader( ConstByteView buffer ) = 0;
 };

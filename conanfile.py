@@ -42,6 +42,8 @@ class NarengineRecipe(ConanFile):
         if self.options.with_tools_json:
             self.requires("nlohmann_json/3.11.3")
             self.requires("stb/cci.20240213")
+        if self.options.with_utils:
+            self.requires("cxxopts/3.3.1")
         if self.options.with_render_opengl:
             self.requires("opengl/system")
 
@@ -77,54 +79,37 @@ class NarengineRecipe(ConanFile):
         cmake = CMake(self)
         cmake.install()
 
-    def package_info(self):
+    def add_package_component(self, name, requires = [], system_libs = []):
         nmspc_name = "16nar"
+        self.cpp_info.components[name].libs = [name]
+        self.cpp_info.components[name].system_libs = system_libs
+        self.cpp_info.components[name].requires = requires
+        self.cpp_info.components[name].set_property("cmake_target_name", nmspc_name + "::" + name)
+
+
+    def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "16nar")
         self.cpp_info.set_property("cmake_find_mode", "both")
 
-        # engine
-        self.cpp_info.components["16nar_logger"].libs = ["16nar_logger"]
-        self.cpp_info.components["16nar_logger"].set_property("cmake_target_name",
-            nmspc_name + "::16nar_logger")
-
-        self.cpp_info.components["16nar_math"].libs = ["16nar_math"]
-        self.cpp_info.components["16nar_math"].system_libs = ["glm::glm"]
-        self.cpp_info.components["16nar_math"].requires = ["16nar_logger"]
-        self.cpp_info.components["16nar_math"].set_property("cmake_target_name",
-            nmspc_name + "::16nar_math")
-
-        self.cpp_info.components["16nar_base"].libs = ["16nar_base"]
-        self.cpp_info.components["16nar_base"].system_libs = ["glfw"]
-        self.cpp_info.components["16nar_base"].requires = ["16nar_math"]
-        self.cpp_info.components["16nar_base"].set_property("cmake_target_name",
-            nmspc_name + "::16nar_base")
-
-        if self.options.with_render_opengl:
-            self.cpp_info.components["16nar_render_gl"].libs = ["16nar_render_gl"]
-            self.cpp_info.components["16nar_render_gl"].system_libs = ["opengl::opengl"]
-            self.cpp_info.components["16nar_render_gl"].requires = ["16nar_base"]
-            self.cpp_info.components["16nar_render_gl"].set_property("cmake_target_name",
-                nmspc_name + "::16nar_render_gl")
-
-        if self.options.with_arch_constructor2d:
-            self.cpp_info.components["16nar_constructor2d"].libs = ["16nar_constructor2d"]
-            self.cpp_info.components["16nar_constructor2d"].requires = ["16nar_base"]
-            self.cpp_info.components["16nar_constructor2d"].set_property("cmake_target_name",
-                nmspc_name + "::16nar_constructor2d")
-
         # tools
-        self.cpp_info.components["16nar_tools"].libs = ["16nar_tools"]
-        self.cpp_info.components["16nar_tools"].set_property("cmake_target_name",
-            nmspc_name + "::16nar_tools")
+        self.add_package_component("16nar_tools")
 
         if self.options.with_tools_json:
-            self.cpp_info.components["16nar_tools_json"].libs = ["16nar_tools_json"]
-            self.cpp_info.components["16nar_tools_json"].requires = ["16nar_tools"]
-            self.cpp_info.components["16nar_tools_json"].set_property("cmake_target_name",
-                nmspc_name + "::16nar_tools_json")
+            self.add_package_component("16nar_tools_json", ["16nar_tools"])
         if self.options.with_tools_flatbuffers:
-            self.cpp_info.components["16nar_tools_fb"].libs = ["16nar_tools_fb"]
-            self.cpp_info.components["16nar_tools_fb"].requires = ["16nar_tools"]
-            self.cpp_info.components["16nar_tools_fb"].system_libs = ["flatbuffers::libflatbuffers"]
-            self.cpp_info.components["16nar_tools_fb"].set_property("cmake_target_name",
-                nmspc_name + "::16nar_tools_fb")
+            self.add_package_component("16nar_tools_fb", ["16nar_tools"], ["flatbuffers::libflatbuffers"])
+        if self.options.with_arch_constructor2d:
+            self.add_package_component("16nar_tools_constructor2d",
+                ["16nar_tools"], ["flatbuffers::libflatbuffers"])
+
+        # engine
+        self.add_package_component("16nar_logger")
+        self.add_package_component("16nar_math", ["16nar_logger"], ["glm::glm"])
+        self.add_package_component("16nar_base", ["16nar_math"], ["glfw"])
+
+        if self.options.with_render_opengl:
+            self.add_package_component("16nar_render_gl", ["16nar_base"], ["opengl::opengl"])
+
+        if self.options.with_arch_constructor2d:
+            self.add_package_component("16nar_constructor2d", ["16nar_base"])
+

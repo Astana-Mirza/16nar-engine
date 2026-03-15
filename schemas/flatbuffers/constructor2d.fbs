@@ -1,0 +1,41 @@
+include "asset.fbs";
+
+namespace _16nar.data.constructor2d;
+
+attribute "narengine_type";
+
+/// @brief Metadata of the scene.
+table Scene
+{
+     loop_func:     ResourceId;
+     setup_func:    ResourceId;
+}
+
+
+/// @brief Data of quadrant tree-based render system.
+struct QTreeRenderSystem
+{
+     quad_start:    [float:2]      (narengine_prop);
+     quad_size:     [float:2]      (narengine_prop);
+     size:          [uint16:2]     (narengine_prop);
+}
+
+
+/// @brief Metadata of scene state.
+table SceneState
+{
+     updating:      bool = true    (narengine_prop);
+     rendering:     bool = true    (narengine_prop);
+}
+
+
+/// @brief Context of node instancing.
+table NodeContext
+{
+     parent_ids:    [uint32];
+     pattern:       ResourceId;
+     is_overlay:    bool;
+}
+
+
+root_type Scene;

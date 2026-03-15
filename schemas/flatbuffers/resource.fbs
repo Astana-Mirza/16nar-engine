@@ -1,0 +1,25 @@
+include "asset.fbs";
+
+namespace _16nar.data;
+
+/// @brief Description of resource in the package.
+struct ResourceDesc
+{
+     hash:          Hash;
+     chunk_id:      uint32;
+     size:          uint32;
+     orig_size:     uint32;
+}
+
+
+/// @brief Description of resource package.
+table ResourcePackage
+{
+     /// @todo add compression information
+     chunk_size:    uint32;
+     database:      string;
+     resources:     [ResourceDesc];
+}
+
+
+root_type ResourcePackage;

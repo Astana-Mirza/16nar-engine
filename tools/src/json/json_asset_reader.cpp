@@ -42,7 +42,7 @@ JsonAssetReader::JsonAssetReader() noexcept:
 JsonAssetReader::JsonAssetReader( ConstByteView buffer ):
      json_{}, stack_{}, current_{}
 {
-     if ( !buffer)
+     if ( !buffer )
      {
           throw std::runtime_error{ "asset buffer is empty" };
      }
@@ -98,7 +98,7 @@ AssetData JsonAssetReader::get_content() const
      const auto& content_data = content_iter->second;
 
      AssetData result{};
-     result.type_id = content_data.at( type_id_label ).get< std::uint32_t >();
+     result.type_id = content_data.at( type_id_label ).get< ContentTypeId >();
      auto data = content_data.at( data_label ).get< std::string_view >();
      result.data = data.size() ?
           ConstByteView{ reinterpret_cast< const std::byte * >( data.data() ), data.size() } : ConstByteView{};

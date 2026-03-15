@@ -1,0 +1,17 @@
+{
+    "pos": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 3.0
+    },
+    "mana": 100,
+    "name": "Orc",
+    "inventory": [ 0, 1, 2, 3 ],
+    "color": "Red",
+    "equipped_type": "Weapon",
+    "equipped": {
+        "name": "Axe",
+        "damage": 10
+    }
+}
+  

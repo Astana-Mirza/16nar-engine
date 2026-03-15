@@ -13,6 +13,7 @@ namespace _16nar::tools
 {
 
 /// @brief Class for reading data asset in JSON format.
+/// @details Functions may throw implementation-defined exceptions.
 class ENGINE_API JsonAssetReader : public IAssetReader
 {
 public:
