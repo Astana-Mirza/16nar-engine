@@ -12,6 +12,7 @@ FlatBuffersPmrAllocator::FlatBuffersPmrAllocator() noexcept:
      assert( resource_ );
 }
 
+
 FlatBuffersPmrAllocator::FlatBuffersPmrAllocator( std::pmr::memory_resource& resource ) noexcept:
      resource_{ &resource }
 {}

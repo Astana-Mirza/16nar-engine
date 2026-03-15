@@ -1,0 +1,38 @@
+/// @see https://flatbuffers.dev/schema/
+// example IDL file
+
+namespace test_game;
+
+attribute "priority";
+
+enum Color : byte { Red = 1, Green, Blue }
+
+union Any { Weapon, Pickup }
+
+struct Vec3 {
+     x:   float;
+     y:   float;
+     z:   float;
+}
+
+table Monster {
+     pos:           Vec3;
+     mana:          short = 150;
+     hp:            short = 100;
+     name:          string;
+     friendly:      bool = false (deprecated, priority: 1);
+     inventory:     [ubyte];
+     color:         Color = Blue;
+     equipped:      Any;
+}
+
+table Weapon {
+     name:     string;
+     damage:   int;
+}
+
+table Pickup {
+     name:     string;
+}
+
+root_type Monster;

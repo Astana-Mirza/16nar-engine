@@ -27,4 +27,21 @@ table Asset
      children: [Asset];
 }
 
+
+/// @brief Hash of a resource.
+struct Hash
+{
+     data:     [ubyte:12];
+}
+
+
+/// @brief Identifier of resource.
+/// @details Usually, only one of the fields is set, either hash or name.
+table ResourceId
+{
+     hash:     Hash;
+     name:     string;
+}
+
+
 root_type Asset;

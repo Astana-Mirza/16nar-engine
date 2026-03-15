@@ -10,6 +10,12 @@
 namespace _16nar::tools
 {
 
+/// @brief Identifier of action of asset parsing.
+using AssetActionId = std::uint32_t;
+
+/// @brief Identifier of asset content type.
+using ContentTypeId = std::uint32_t;
+
 /// @brief View of buffer of bytes.
 struct ByteView
 {
@@ -41,7 +47,7 @@ struct ConstByteView
 /// @brief Data of the asset.
 struct AssetData
 {
-     std::uint32_t type_id{}; ///< identifier of asset data type.
+     ContentTypeId type_id{}; ///< identifier of asset data type.
      ConstByteView data{};    ///< binary buffer with asset data.
 };
 

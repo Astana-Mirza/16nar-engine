@@ -23,6 +23,8 @@ set(NARENGINE_TOOLS_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
 set(NARENGINE_TOOLS_SOURCES
     "${NARENGINE_TOOLS_SRC_DIR}/file.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/shared_buffer_ptr.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/asset_iterator.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/resource_pkg_visitor.cpp"
 )
 add_library("${NAME}_tools" "${NARENGINE_LIB_TYPE}" ${NARENGINE_TOOLS_SOURCES})
 target_include_directories("${NAME}_tools" ${NARENGINE_TOOLS_INCLUDE_DIRS})
@@ -43,6 +45,15 @@ if ("${NARENGINE_TOOLS_JSON}")
         "${NARENGINE_TOOLS_SRC_DIR}/json/json_asset_file_processor.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/stb_impl.cpp"
     )
+    if ("${NARENGINE_TOOLS_FLATBUFFERS}")
+        set(NARENGINE_TOOLS_JSON_LINK_LIBS ${NARENGINE_TOOLS_JSON_LINK_LIBS}
+            PUBLIC "flatbuffers::libflatbuffers"
+        )
+        set(NARENGINE_TOOLS_JSON_SOURCES ${NARENGINE_TOOLS_JSON_SOURCES}
+            "${NARENGINE_TOOLS_SRC_DIR}/json/json_to_flatbuffers_convertor.cpp"
+        )
+    endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
+
     add_library("${NAME}_tools_json" "${NARENGINE_LIB_TYPE}" ${NARENGINE_TOOLS_JSON_SOURCES})
     target_include_directories("${NAME}_tools_json" ${NARENGINE_TOOLS_JSON_INCLUDE_DIRS})
     target_link_directories("${NAME}_tools_json" ${NARENGINE_TOOLS_JSON_LINK_DIRS})
@@ -59,7 +70,7 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
         PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS}
         PRIVATE "${PROJECT_BINARY_DIR}/schemas/flatbuffers-gen-cpp"
     )
-    set(NARENGINE_TOOLS_FB_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS}
+    set(NARENGINE_TOOLS_FB_COMPILER_DEFS PUBLIC ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS}
         "FLATBUFFERS_LOCALE_INDEPENDENT=0")
     set(NARENGINE_TOOLS_FB_LINK_LIBS PUBLIC "${NAME}_tools" "flatbuffers::libflatbuffers")
     set(NARENGINE_TOOLS_FB_SOURCES
@@ -78,15 +89,33 @@ if ("${NARENGINE_TOOLS_FLATBUFFERS}")
 endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
 
 
+if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+    # constructor2d tools library
+    set(NARENGINE_TOOLS_CTR2D_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
+    set(NARENGINE_TOOLS_CTR2D_INCLUDE_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS})
+    set(NARENGINE_TOOLS_CTR2D_COMPILER_DEFS PUBLIC ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
+    set(NARENGINE_TOOLS_CTR2D_LINK_LIBS PUBLIC "${NAME}_tools")
+    set(NARENGINE_TOOLS_CTR2D_SOURCES
+        "${NARENGINE_TOOLS_SRC_DIR}/constructor2d/constructor2d_visitor.cpp"
+    )
+    add_library("${NAME}_tools_constructor2d" "${NARENGINE_LIB_TYPE}" ${NARENGINE_TOOLS_CTR2D_SOURCES})
+    target_include_directories("${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CTR2D_INCLUDE_DIRS})
+    target_link_directories("${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CTR2D_LINK_DIRS})
+    target_compile_definitions("${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CTR2D_COMPILER_DEFS})
+    target_link_libraries("${NAME}_tools_constructor2d" ${NARENGINE_TOOLS_CTR2D_LINK_LIBS})
+    set(NARENGINE_TOOLS_LIBS ${NARENGINE_TOOLS_LIBS} "${NAME}_tools_constructor2d")
+endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+
+
 set(NARENGINE_TOOLS_ALL_TARGETS ${NARENGINE_TOOLS_ALL_TARGETS} ${NARENGINE_TOOLS_LIBS})
-#if ("${NARENGINE_BUILD_UTILS}")
-#    add_executable("${NAME}_asset_tool" "${NARENGINE_TOOLS_SRC_DIR}/asset_tool.cpp")
-#    target_include_directories("${NAME}_asset_tool" PRIVATE
-#        ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS} "${NARENGINE_TOOLS_INCLUDE_DIR}")
-#    target_link_directories("${NAME}_asset_tool" PRIVATE ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
-#    target_link_libraries("${NAME}_asset_tool" PUBLIC ${NARENGINE_TOOLS_LIBS})
-#    set(NARENGINE_TOOLS_ALL_TARGETS ${NARENGINE_TOOLS_ALL_TARGETS} "${NAME}_asset_tool")
-#endif() # if ("${NARENGINE_BUILD_UTILS}")
+if ("${NARENGINE_BUILD_UTILS}")
+    add_executable("${NAME}_asset_tool" "${NARENGINE_TOOLS_SRC_DIR}/asset_tool.cpp")
+    target_include_directories("${NAME}_asset_tool" PRIVATE
+        ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS} "${NARENGINE_TOOLS_INCLUDE_DIR}")
+    target_link_directories("${NAME}_asset_tool" PRIVATE ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
+    target_link_libraries("${NAME}_asset_tool" PRIVATE "cxxopts::cxxopts" PUBLIC ${NARENGINE_TOOLS_LIBS})
+    set(NARENGINE_TOOLS_ALL_TARGETS ${NARENGINE_TOOLS_ALL_TARGETS} "${NAME}_asset_tool")
+endif() # if ("${NARENGINE_BUILD_UTILS}")
 
 
 # Testing
@@ -96,6 +125,11 @@ if ("${NARENGINE_BUILD_TESTS}")
         set(NARENGINE_TOOLS_TEST_SOURCES ${NARENGINE_TOOLS_TEST_SOURCES}
             "${NARENGINE_TOOLS_SRC_DIR}/test/json_tools_test.cpp"
         )
+        if ("${NARENGINE_TOOLS_FLATBUFFERS}")
+            set(NARENGINE_TOOLS_TEST_SOURCES ${NARENGINE_TOOLS_TEST_SOURCES}
+                "${NARENGINE_TOOLS_SRC_DIR}/test/json_to_flatbuffers_convertor_test.cpp"
+            )
+        endif() # if ("${NARENGINE_TOOLS_FLATBUFFERS}")
     endif() # if ("${NARENGINE_TOOLS_JSON}")
     if ("${NARENGINE_TOOLS_FLATBUFFERS}")
         set(NARENGINE_TOOLS_TEST_SOURCES ${NARENGINE_TOOLS_TEST_SOURCES}

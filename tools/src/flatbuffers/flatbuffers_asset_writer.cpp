@@ -77,6 +77,8 @@ std::uint32_t FlatBuffersAssetWriter::write_asset( std::string_view name, AssetD
 
      if ( content.data )
      {
+          builder_.ForceVectorAlignment( content.data.size,
+               sizeof( std::uint8_t ), alignof( std::max_align_t ) );
           const auto data_offset = builder_.CreateVector< std::uint8_t >(
                reinterpret_cast< const std::uint8_t * >( content.data.data ), content.data.size );
           content_offset = _16nar::data::CreateAssetData( builder_, content.type_id, data_offset );

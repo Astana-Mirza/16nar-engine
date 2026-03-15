@@ -1,480 +1,380 @@
 /// @file
 /// @brief Utility for engine resource management.
 
-#include <16nar/16nardefs.h>
-#include <16nar/tools/utils.h>
-#include <16nar/tools/assets/resource_package.h>
-#if defined( NARENGINE_TOOLS_JSON )
-#    include <16nar/tools/assets/json/json_asset_reader.h>
-#    include <16nar/tools/assets/json/json_asset_writer.h>
-#endif // NARENGINE_TOOLS_JSON
-#if defined( NARENGINE_TOOLS_FLATBUFFERS )
-#    include <16nar/tools/assets/flatbuffers/flatbuffers_asset_reader.h>
-#    include <16nar/tools/assets/flatbuffers/flatbuffers_asset_writer.h>
-#endif // NARENGINE_TOOLS_FLATBUFFERS
+#include <16nar/tools/defs.h>
 
-#include <vector>
+#include <16nar/tools/hash.h>
+#if defined( NARENGINE_TOOLS_JSON )
+#    include <16nar/tools/json/json_asset_file_processor.h>
+#    include <16nar/tools/json/json_asset_reader.h>
+#    include <16nar/tools/json/json_asset_writer.h>
+#    if defined( NARENGINE_TOOLS_FLATBUFFERS )
+#         include <16nar/tools/json/json_to_flatbuffers_convertor.h>
+#    endif // defined( NARENGINE_TOOLS_FLATBUFFERS )
+#endif // defined( NARENGINE_TOOLS_JSON )
+#if defined( NARENGINE_TOOLS_FLATBUFFERS )
+#    include <16nar/tools/flatbuffers/flatbuffers_asset_file_processor.h>
+#    include <16nar/tools/flatbuffers/flatbuffers_asset_reader.h>
+#    include <16nar/tools/flatbuffers/flatbuffers_asset_writer.h>
+#endif // defined( NARENGINE_TOOLS_FLATBUFFERS )
+
+#include <cxxopts.hpp>
+
 #include <string>
+#include <set>
+#include <unordered_map>
+#include <filesystem>
+#include <stdexcept>
+#include <memory_resource>
+#include <cassert>
 #include <fstream>
 #include <iostream>
-#include <filesystem>
-#include <unordered_map>
-#include <memory>
-#include <stdexcept>
-#include <cstdlib>
 
+namespace fs = std::filesystem;
+
+namespace _16nar::tools
+{
 namespace
 {
 
-constexpr char help_long[]        = "--help";
-constexpr char help_short[]       = "-h";
-constexpr char out_dir_long[]     = "--out-dir";
-constexpr char out_dir_short[]    = "-o";
-constexpr char base_dir_long[]    = "--base-dir";
-constexpr char base_dir_short[]   = "-b";
-constexpr char src_format_long[]  = "--src-format";
-constexpr char src_format_short[] = "-s";
-constexpr char dst_format_long[]  = "--dst-format";
-constexpr char dst_format_short[] = "-d";
-constexpr char pack_long[]        = "--pack";
-constexpr char pack_short[]       = "-p";
-constexpr char unpack_long[]      = "--unpack";
-constexpr char unpack_short[]     = "-u";
-constexpr char quiet_long[]       = "--quiet";
-constexpr char quiet_short[]      = "-q";
-
-
-std::vector< std::string > files;
-std::string out_dir = ".";
-std::string base_dir = ".";
-std::string package_name;
-bool quiet = false;
-
-
-
-std::unique_ptr< _16nar::tools::IAssetReader > create_asset_reader( const std::string& in_dir,
-     _16nar::tools::PackageFormat format )
+struct AssetToolParams
 {
-     switch ( format )
-     {
+     std::string output_dir{};
+     std::string src_format{};
+     std::string dst_format{};
+     std::vector< std::string > types{};
+     std::vector< std::string > schemas{};
+     std::vector< std::string > include_paths{};
+     bool quiet{};
+};
+
+
+void check_format( const std::string& format )
+{
 #if defined( NARENGINE_TOOLS_JSON )
-          case _16nar::tools::PackageFormat::Json:
-               return std::make_unique< _16nar::tools::JsonAssetReader >( in_dir );
-#endif // NARENGINE_TOOLS_JSON
-#if defined( NARENGINE_TOOLS_FLATBUFFERS )
-          case _16nar::tools::PackageFormat::FlatBuffers:
-               return std::make_unique< _16nar::tools::FlatBuffersAssetReader >();
-#endif // NARENGINE_TOOLS_FLATBUFFERS
-          default:
-               std::cerr << "Error: unknown input format." << std::endl;
+     if ( format == "json" )
+     {
+          return;
      }
-     return std::unique_ptr< _16nar::tools::IAssetReader >();
+#endif // defined( NARENGINE_TOOLS_JSON )
+#if defined( NARENGINE_TOOLS_FLATBUFFERS )
+     if ( format == "flatbuffers" )
+     {
+          return;
+     }
+#endif // defined( NARENGINE_TOOLS_FLATBUFFERS )
+     throw std::runtime_error{ "unknown format '" + format + "'" };
 }
 
 
-std::unique_ptr< _16nar::tools::IAssetWriter > create_asset_writer( const std::string& out_dir,
-     _16nar::tools::PackageFormat format )
+IAssetFileProcessorPtr make_file_processor( const std::string& format )
 {
-     switch ( format )
-     {
+     auto* resource = std::pmr::get_default_resource();
+     assert( resource );
 #if defined( NARENGINE_TOOLS_JSON )
-          case _16nar::tools::PackageFormat::Json:
-               return std::make_unique< _16nar::tools::JsonAssetWriter >( out_dir );
-#endif // NARENGINE_TOOLS_JSON
-#if defined( NARENGINE_TOOLS_FLATBUFFERS )
-          case _16nar::tools::PackageFormat::FlatBuffers:
-               return std::make_unique< _16nar::tools::FlatBuffersAssetWriter >();
-#endif // NARENGINE_TOOLS_FLATBUFFERS
-          default:
-               std::cerr << "Error: unknown output format." << std::endl;
+     if ( format == "json" )
+     {
+          return std::make_shared< JsonAssetFileProcessor >( *resource );
      }
-     return std::unique_ptr< _16nar::tools::IAssetWriter >();
+#endif // defined( NARENGINE_TOOLS_JSON )
+#if defined( NARENGINE_TOOLS_FLATBUFFERS )
+     if ( format == "flatbuffers" )
+     {
+          return std::make_shared< FlatBuffersAssetFileProcessor >( *resource );
+     }
+#endif // defined( NARENGINE_TOOLS_FLATBUFFERS )
+     throw std::runtime_error{ "unknown format '" + format + "'" };
 }
 
 
-bool str_to_format( const std::string& str, _16nar::tools::PackageFormat& format )
+IAssetWriterPtr make_writer( const std::string& format )
 {
-     static const std::unordered_map< std::string, _16nar::tools::PackageFormat > formats = {
 #if defined( NARENGINE_TOOLS_JSON )
-          { "json",        _16nar::tools::PackageFormat::Json },
-#endif // NARENGINE_TOOLS_JSON
+     if ( format == "json" )
+     {
+          return std::make_shared< JsonAssetWriter >();
+     }
+#endif // defined( NARENGINE_TOOLS_JSON )
 #if defined( NARENGINE_TOOLS_FLATBUFFERS )
-          { "flatbuffers", _16nar::tools::PackageFormat::FlatBuffers },
-#endif // NARENGINE_TOOLS_FLATBUFFERS
-     };
-     auto iter = formats.find( str );
-     if ( iter == formats.cend() )
+     if ( format == "flatbuffers" )
      {
-          return false;
+          return std::make_shared< FlatBuffersAssetWriter >();
      }
-     format = iter->second;
-     return true;
+#endif // defined( NARENGINE_TOOLS_FLATBUFFERS )
+     throw std::runtime_error{ "unknown format '" + format + "'" };
 }
 
 
-void print_usage( std::ostream& out )
+IAssetDataConvertorPtr make_convertor( const AssetToolParams& params, bool& backward )
 {
-     out << "Usage: 16nar_asset_tool OPTIONS... [ ARGS ] FILES...\n"
-          << "\nUtility for various resource format conversions and packing/unpacking.\n"
-          << "\tOPTIONS:\n"
-          << "\t\t--help, -h\n\t\tDisplay this message and exit.\n"
-          << "\n\t\t--base-dir DIR, -b DIR\n\t\tDirectory (it must exist) which will be used as base for input files, current directory is default.\n"
-          << "\n\t\t--out-dir DIR, -o DIR\n\t\tOutput directory of the utility, current directory is default.\n"
-          << "\n\t\t--src-format FORMAT, -s FORMAT\n\t\tFormat of input file(s), default is json, if supported.\n"
-          << "\n\t\t--dst-format FORMAT, -d FORMAT\n\t\tFormat of output file(s), default is flatbuffers, if supported.\n"
-          << "\n\t\t--pack PACKAGE_NAME, -p PACKAGE_NAME\n\t\tCreate a package with given name from input files."
-          << " File extension of the package will be set depending on output format. PACKAGE_NAME is treated relative to output directory.\n"
-          << "\n\t\t--unpack PACKAGE_NAME, -u PACKAGE_NAME\n\t\tUnpack package and place all resource files to output directory.\n"
-          << "\n\t\t--quiet, -q\n\t\tDisable text output to terminal.\n"
-          << "\n\tFORMATS:\n"
-#if defined( NARENGINE_TOOLS_JSON )
-          << "\t\tjson\n\t\tJSON format. When used as output format, will generate binary assets without converting"
-          << " to any specific format. For example, PNG file will not be created when unpacking texture asset from"
-          << " flatbuffers format. Instead, there will be JSON file with description and BIN file with raw texture data.\n"
-#endif // NARENGINE_TOOLS_JSON
-#if defined( NARENGINE_TOOLS_FLATBUFFERS )
-          << "\n\t\tflatbuffers\n\t\tFlatBuffers buffer format, but size of the buffer (uint32_t) will be prepended to buffer.\n"
-#endif // NARENGINE_TOOLS_FLATBUFFERS
-          ;
+#if defined( NARENGINE_TOOLS_JSON ) && defined( NARENGINE_TOOLS_FLATBUFFERS )
+     std::shared_ptr< JsonToFlatBuffersConvertor > json_to_fb{};
+     if ( params.src_format == "json" && params.dst_format == "flatbuffers" )
+     {
+          backward = false;
+          json_to_fb = std::make_shared< JsonToFlatBuffersConvertor >();
+     }
+     if ( params.src_format == "flatbuffers" && params.dst_format == "json" )
+     {
+          backward = true;
+          json_to_fb = std::make_shared< JsonToFlatBuffersConvertor >();
+     }
+     if ( json_to_fb )
+     {
+          for ( const auto& schema_path : params.schemas )
+          {
+               std::ifstream schema_input{ schema_path };
+               const std::string schema_data{
+                    std::istreambuf_iterator< char >( schema_input ),
+                    std::istreambuf_iterator< char >() };
+               if ( !json_to_fb->add_schema( schema_data, params.include_paths, schema_path ) )
+               {
+                    throw std::runtime_error{ "cannot register schema " + schema_path };
+               }
+          }
+          std::unordered_map< std::uint32_t, std::string > hashes{};
+          for ( const auto& type : params.types )
+          {
+               std::string_view type_sv{ type.c_str() };
+               const auto hash = str_hash32( type_sv );
+               if ( !hashes.insert( { hash, type } ).second )
+               {
+                    throw std::runtime_error{ "duplicate hashes found for types '"
+                         + hashes[ hash ] + "' and '" + type + "'" };
+               }
+               json_to_fb->set_type_name( hash, type_sv );
+          }
+          return json_to_fb;
+     }
+#endif // defined( NARENGINE_TOOLS_JSON ) && defined( NARENGINE_TOOLS_FLATBUFFERS )
+     throw std::runtime_error{ "cannot convert format '"
+          + params.src_format + "' to '" + params.dst_format + "'" };
 }
 
 
-int simple_convert( _16nar::tools::IAssetReader& reader, _16nar::tools::IAssetWriter& writer )
+std::uint32_t convert_recursive( IAssetReader& reader, IAssetWriter& writer,
+     IAssetDataConvertor& convertor, bool backward )
 {
-     for ( const auto& filename : files )
+     std::vector< std::uint32_t > children_ids{};
+     const bool is_array = reader.is_array();
+     if ( is_array )
      {
-          if ( filename.empty() )
+          const auto count = reader.get_children_count();
+          children_ids.reserve( count );
+          for ( std::size_t i = 0; i < count; ++i )
           {
-               continue;
-          }
-
-          _16nar::tools::ResourceData data{};
-          try
-          {
-               if ( !quiet )
+               if ( !reader.to_child_index( i ) )
                {
-                    std::cout << "Reading asset " << filename << "...";
+                    throw std::runtime_error{ "cannot go to asset child #" + std::to_string( i ) };
                }
-               std::ifstream ifs{ filename, std::ios::in | std::ios::binary };
-               data = reader.read_asset( ifs );
-          }
-          catch ( const std::exception& ex )
-          {
-               std::cerr << "error reading asset: " << ex.what() << "\n";
-               return EXIT_FAILURE;
-          }
-
-          try
-          {
-               std::string out_file = ( std::filesystem::path{ out_dir } /
-                    ( data.name + "." + writer.get_file_ext() ) ).string();
-               if ( !quiet )
+               children_ids.emplace_back( convert_recursive( reader, writer, convertor, backward ) );
+               if ( !reader.to_parent() )
                {
-                    std::cout << "done\n\tWriting converted asset " << out_file << "...";
-               }
-               std::ofstream ofs{ out_file, std::ios::out | std::ios::binary };
-               writer.write_asset( ofs, data );
-               if ( !quiet )
-               {
-                    std::cout << "done\n";
+                    throw std::runtime_error{ "cannot go to asset parent" };
                }
           }
-          catch ( const std::exception& ex )
-          {
-               std::cerr << "error writing asset: " << ex.what() << "\n";
-               return EXIT_FAILURE;
-          }
-     }
-     return EXIT_SUCCESS;
-}
-
-
-int pack_convert( _16nar::tools::IAssetReader& reader, _16nar::tools::IAssetWriter& writer )
-{
-     _16nar::tools::PackageData package{};
-     for ( const auto& filename : files )
-     {
-          if ( filename.empty() )
-          {
-               continue;
-          }
-
-          try
-          {
-               if ( !quiet )
-               {
-                    std::cout << "Reading asset " << filename << "...";
-               }
-               std::ifstream ifs{ filename, std::ios::in | std::ios::binary };
-               package.resources.emplace_back( reader.read_asset( ifs ) );
-               if ( !quiet )
-               {
-                    std::cout << "done\n";
-               }
-          }
-          catch ( const std::exception& ex )
-          {
-               std::cerr << "error reading asset: " << ex.what() << "\n";
-               return EXIT_FAILURE;
-          }
-     }
-
-     try
-     {
-          std::string file = ( std::filesystem::path{ out_dir } /
-                    ( package_name + "." + writer.get_pkg_ext() ) ).string();
-          if ( !quiet )
-          {
-               std::cout << "\tWriting package " << file << "...";
-          }
-          std::ofstream ofs{ file, std::ios::out | std::ios::binary };
-          writer.write_package( ofs, package );
-          if ( !quiet )
-          {
-               std::cout << "done\n";
-          }
-     }
-     catch ( const std::exception& ex )
-     {
-          std::cerr << "error writing package: " << ex.what() << "\n";
-          return EXIT_FAILURE;
-     }
-     return EXIT_SUCCESS;
-}
-
-
-int unpack_convert( _16nar::tools::IAssetReader& reader, _16nar::tools::IAssetWriter& writer )
-{
-     _16nar::tools::PackageData package{};
-     try
-     {
-          if ( !quiet )
-          {
-               std::cout << "Reading package " << package_name << "...";
-          }
-          std::ifstream ifs{ package_name, std::ios::in | std::ios::binary };
-          package = reader.read_package( ifs );
-          if ( !quiet )
-          {
-               std::cout << "done\n";
-          }
-     }
-     catch ( const std::exception& ex )
-     {
-          std::cerr << "error reading package: " << ex.what() << "\n";
-          return EXIT_FAILURE;
-     }
-
-     try
-     {
-          for ( const auto& resource : package.resources )
-          {
-               std::string file = ( std::filesystem::path{ out_dir } /
-                    ( resource.name + "." + writer.get_file_ext() ) ).string();
-               if ( !quiet )
-               {
-                    std::cout << "\tWriting asset " << file << "...";
-               }
-               std::ofstream ofs{ file, std::ios::out | std::ios::binary };
-               writer.write_asset( ofs, resource );
-               if ( !quiet )
-               {
-                    std::cout << "done\n";
-               }
-          }
-     }
-     catch ( const std::exception& ex )
-     {
-          std::cerr << "error writing asset: " << ex.what() << "\n";
-          return EXIT_FAILURE;
-     }
-     return EXIT_SUCCESS;
-}
-
-} // anonymous namespace
-
-int main( int argc, char *argv[] )
-{
-     bool pack = false;
-     bool unpack = false;
-     auto src_format = _16nar::tools::PackageFormat::Json;
-     auto dst_format = _16nar::tools::PackageFormat::FlatBuffers;
-
-     if ( argc < 2 )
-     {
-          std::cerr << "Too little arguments\n";
-          print_usage( std::cerr );
-          return EXIT_FAILURE;
-     }
-
-     // read arguments
-     for ( int i = 1; i < argc; i++ )
-     {
-          std::string arg{ argv[ i ] };
-          if ( arg == help_long || arg == help_short )
-          {
-               print_usage( std::cout );
-               return EXIT_SUCCESS;
-          }
-          else if ( arg == quiet_long || arg == quiet_short )
-          {
-               quiet = true;
-          }
-          else if ( arg == unpack_long || arg == unpack_short )
-          {
-               if ( i + 1 >= argc )
-               {
-                    std::cerr << "Error: option " << arg << " requires an argument\n";
-                    print_usage( std::cerr );
-                    return EXIT_FAILURE;
-               }
-               package_name = argv[ i + 1 ];
-               unpack = true;
-               i++;
-          }
-          else if ( arg == out_dir_long || arg == out_dir_short )
-          {
-               if( i + 1 >= argc )
-               {
-                    std::cerr << "Error: option " << arg << " requires an argument\n";
-                    print_usage( std::cerr );
-                    return EXIT_FAILURE;
-               }
-               out_dir = argv[ i + 1 ];
-               std::error_code ec;
-               if ( !std::filesystem::is_directory( out_dir, ec ) || ec )
-               {
-                    if ( !std::filesystem::create_directories( out_dir, ec ) || ec )
-                    {
-                         std::cerr << "Error: cannot create directory " << out_dir << "\n";
-                         return EXIT_FAILURE;
-                    }
-               }
-               i++;
-          }
-          else if ( arg == base_dir_long || arg == base_dir_short )
-          {
-               if( i + 1 >= argc )
-               {
-                    std::cerr << "Error: option " << arg << " requires an argument\n";
-                    print_usage( std::cerr );
-                    return EXIT_FAILURE;
-               }
-               base_dir = argv[ i + 1 ];
-               std::error_code ec;
-               if ( !std::filesystem::is_directory( base_dir, ec ) || ec )
-               {
-                    std::cerr << "Error: directory " << base_dir << " does not exist\n";
-                    return EXIT_FAILURE;
-               }
-               i++;
-          }
-          else if ( arg == src_format_long || arg == src_format_short )
-          {
-               if( i + 1 >= argc )
-               {
-                    std::cerr << "Error: option " << arg << " requires an argument\n";
-                    print_usage( std::cerr );
-                    return EXIT_FAILURE;
-               }
-               if ( !str_to_format( std::string{ argv[ i + 1 ] }, src_format ) )
-               {
-                    std::cerr << "Error: incorrect source format '" << argv[ i + 1 ] << "'\n";
-                    print_usage( std::cerr );
-                    return EXIT_FAILURE;
-               }
-               i++;
-          }
-          else if ( arg == dst_format_long || arg == dst_format_short )
-          {
-               if( i + 1 >= argc )
-               {
-                    std::cerr << "Error: option " << arg << " requires an argument\n";
-                    print_usage( std::cerr );
-                    return EXIT_FAILURE;
-               }
-               if ( !str_to_format( std::string{ argv[ i + 1 ] }, dst_format ) )
-               {
-                    std::cerr << "Error: incorrect destination format '" << argv[ i + 1 ] << "'\n";
-                    print_usage( std::cerr );
-                    return EXIT_FAILURE;
-               }
-               i++;
-          }
-          else if ( arg == pack_long || arg == pack_short )
-          {
-               if ( i + 1 >= argc )
-               {
-                    std::cerr << "Error: option " << arg << " requires an argument\n";
-                    print_usage( std::cerr );
-                    return EXIT_FAILURE;
-               }
-               package_name = argv[ i + 1 ];
-               pack = true;
-               i++;
-          }
-          else
-          {
-               files.push_back( arg );
-          }
-     }
-
-     bool error = false;
-     if ( pack && unpack )
-     {
-          std::cerr << "Error: cannot both pack and unpack simultaneously\n";
-          error = true;
-     }
-
-     if ( ( pack || unpack ) && package_name.empty() )
-     {
-          std::cerr << "Error: package name is empty\n";
-          error = true;
-     }
-
-     if ( out_dir.empty() || base_dir.empty() )
-     {
-          std::cerr << "Error: wrong directory specified\n";
-          error = true;
-     }
-
-     if ( files.empty() && !unpack )
-     {
-          std::cerr << "Error: no input files specified\n";
-          error = true;
-     }
-     else if ( unpack && !files.empty() )
-     {
-          std::cerr << "Error: excess input files specified when unpacking (only package name expected)\n";
-          error = true;
-     }
-
-     if ( error )
-     {
-          print_usage( std::cerr );
-          return EXIT_FAILURE;
-     }
-
-     // convert assets
-     auto reader = create_asset_reader( base_dir, src_format );
-     auto writer = create_asset_writer( out_dir, dst_format );
-     if ( !reader || !writer )
-     {
-          return EXIT_FAILURE;
-     }
-
-     int exit_code = EXIT_SUCCESS;
-     if ( pack )
-     {
-          exit_code = pack_convert( *reader, *writer );
-     }
-     else if ( unpack )
-     {
-          exit_code = unpack_convert( *reader, *writer );
      }
      else
      {
-          exit_code = simple_convert( *reader, *writer );
+          const auto names = reader.get_children_names();
+          children_ids.reserve( names.size() );
+          for ( const auto& name : names )
+          {
+               if ( !reader.to_child( name.c_str() ) )
+               {
+                    throw std::runtime_error{ "cannot go to asset child '" + name + "'" };
+               }
+               children_ids.emplace_back( convert_recursive( reader, writer, convertor, backward ) );
+               if ( !reader.to_parent() )
+               {
+                    throw std::runtime_error{ "cannot go to asset parent" };
+               }
+          }
      }
-     return exit_code;
+     const auto name = reader.get_name();
+     AssetData out_content{};
+     const auto in_content = reader.get_content();
+     if ( in_content.data )
+     {
+          out_content = backward ?
+               convertor.convert_backward( in_content ) : convertor.convert_forward( in_content );
+          if ( !out_content.data )
+          {
+               throw std::runtime_error{ convertor.get_error_description() };
+          }
+     }
+     const auto ret = writer.write_asset( name, out_content, children_ids, is_array );
+     if ( !ret )
+     {
+          throw std::runtime_error{ "cannot write asset " + std::string{ name.cbegin(), name.cend() } };
+     }
+     return ret;
+}
+
+
+void process( const std::vector< std::string >& paths, const AssetToolParams& params )
+{
+     bool backward{};
+     auto convertor = make_convertor( params, backward );
+     auto writer = make_writer( params.dst_format );
+     auto src_processor = make_file_processor( params.src_format );
+     auto dst_processor = make_file_processor( params.dst_format );
+
+     assert( convertor );
+     assert( writer );
+     assert( src_processor );
+     assert( dst_processor );
+
+     for ( const auto& path : paths )
+     {
+          if ( !params.quiet )
+          {
+               std::cout << "Processing file " << path << "..." << std::endl;
+          }
+          File file{};
+          if ( !file.open( path ) )
+          {
+               throw std::runtime_error{ "unable to open file '" + path + "'" };
+          }
+
+          const auto out_path = ( fs::path( params.output_dir ) / fs::path( path ).filename() ).string() + ".out";
+          File out_file{};
+          if ( !out_file.open( out_path, true ) )
+          {
+               throw std::runtime_error{ "unable to open file '" + out_path + "'" };
+          }
+          auto buffer_ptr = src_processor->read_asset_data( file );
+          if ( !buffer_ptr || !buffer_ptr.get_const_view() )
+          {
+               throw std::runtime_error{ "cannot read asset data from file '" + path + "'" };
+          }
+          auto reader = src_processor->make_asset_reader( buffer_ptr.get_const_view() );
+          assert( reader );
+
+          const auto root_id = convert_recursive( *reader, *writer, *convertor, backward );
+          const auto out_buffer = writer->finish( root_id );
+          if ( !params.quiet )
+          {
+               std::cout << "Writing output to file " << out_path << "...";
+          }
+          if ( !dst_processor->write_asset_data( out_buffer, out_file ) )
+          {
+               throw std::runtime_error{ "cannot write asset data to file '" + out_path + "'" };
+          }
+          if ( !params.quiet )
+          {
+               std::cout << " done" << std::endl;
+          }
+
+          writer->reset();
+     }
+}
+
+} // anonymous namespace
+} // namespace _16nar::tools
+
+
+int main( int argc, char *argv[] )
+{
+     try
+     {
+          cxxopts::Options options(
+               "16nar_asset_tool",
+               "Utility for asset format conversions."
+          );
+          options.allow_unrecognised_options();
+          options.add_options()
+               ( "h,help", "Print usage" )
+               ( "O,output-dir", "Output directory of the utility",
+                    cxxopts::value< std::string >()->default_value( fs::current_path().string() ) )
+               ( "s,src-format", "Source file format",
+                    cxxopts::value< std::string >() )
+               ( "d,dst-format", "Target file format",
+                    cxxopts::value< std::string >() )
+               ( "T,types", "Type names of processed assets",
+                    cxxopts::value< std::vector< std::string > >() )
+               ( "S,schemas", "Paths to schemas used in conversion",
+                    cxxopts::value< std::vector< std::string > >() )
+               ( "I,include-paths", "Include paths for resolving schemas",
+                    cxxopts::value< std::vector< std::string > >() )
+               ( "q,quiet", "Disable text output to terminal", cxxopts::value< bool >() )
+               ;
+          _16nar::tools::AssetToolParams params{};
+          auto args = options.parse( argc, argv );
+          if ( args.count( "help" ) )
+          {
+               std::cout << options.help() << std::endl;
+               return EXIT_SUCCESS;
+          }
+          params.output_dir = args[ "output-dir" ].as< std::string >();
+          params.src_format = args[ "src-format" ].as< std::string >();
+          params.dst_format = args[ "dst-format" ].as< std::string >();
+
+          _16nar::tools::check_format( params.src_format );
+          _16nar::tools::check_format( params.dst_format );
+
+          auto normalize_paths = []( const std::vector< std::string >& paths )
+               -> std::vector< std::string >
+          {
+               std::set< std::string > unique_paths{};
+               for ( const auto& path : paths )
+               {
+                    unique_paths.emplace( fs::canonical( path ).string() );
+               }
+               return std::vector< std::string >( unique_paths.cbegin(), unique_paths.cend() );
+          };
+
+          params.types = args[ "types" ].as< std::vector< std::string > >();
+          params.schemas = normalize_paths( args[ "schemas" ].as< std::vector< std::string > >() );
+          if ( args.count( "include-paths" ) )
+          {
+               params.include_paths = normalize_paths(
+                    args[ "include-paths" ].as< std::vector< std::string > >() );
+          }
+          if ( args.count( "quiet" ) )
+          {
+               params.quiet = args[ "quiet" ].as< bool >();
+          }
+
+          if ( params.src_format == params.dst_format )
+          {
+               throw std::logic_error{ "source and destinations are the same" };
+          }
+          if ( args.unmatched().empty() )
+          {
+               throw std::logic_error{ "no input files specified" };
+          }
+
+          for ( const auto& schema_file : params.schemas )
+          {
+               if ( !fs::exists( schema_file ) )
+               {
+                    throw std::runtime_error{ "schema file '" + schema_file + "' does not exist" };
+               }
+          }
+
+          const auto files = normalize_paths( args.unmatched() );
+          for ( const auto& file : files )
+          {
+               if ( !fs::exists( file ) )
+               {
+                    throw std::runtime_error{ "file '" + file + "' does not exist" };
+               }
+          }
+
+          fs::create_directories( params.output_dir );
+          _16nar::tools::process( files, params );
+     }
+     catch ( const std::exception& ex )
+     {
+          std::cerr << "Error: " << ex.what() << std::endl;
+          return EXIT_FAILURE;
+     }
+     catch ( ... )
+     {
+          std::cerr << "Unknown error" << std::endl;
+          return EXIT_FAILURE;
+     }
+
+     return EXIT_SUCCESS;
 }
