@@ -21,7 +21,6 @@ void ResourcePkgVisitor::process_resource_package( IAssetReader& reader )
      {
           // optionally, asset metadata may be stored directly in this array,
           // but it can also be a regular resource within the package
-          // also, some formats (JSON) are able to store it only here
           iter.call( Actions::ResourceEnter );
      } )
      .call( Actions::PackageEnd );

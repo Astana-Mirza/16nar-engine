@@ -17,17 +17,6 @@ void Constructor2DVisitor::process_scene( IAssetReader& reader )
      iter
      .check_array( false )
      .call( Actions::SceneBegin )
-     .go( "resources" )
-          .call( Actions::ResourcesBegin )
-          .for_each( [ &iter ]()
-          {
-               // optionally, asset metadata may be stored directly in this array,
-               // but it can also be a regular resource within the scene
-               // also, some formats (JSON) are able to store it only here
-               iter.call( Actions::ResourceEnter );
-          }, true )
-          .call( Actions::ResourcesEnd )
-     .up()
      .go( "states" )
           .call( Actions::StatesBegin )
           .for_each( [ &iter ]()

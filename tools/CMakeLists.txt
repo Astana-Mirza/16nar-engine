@@ -20,16 +20,23 @@ set(NARENGINE_TOOLS_COMMON_LINK_DIRS "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_D
 set(NARENGINE_TOOLS_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
 set(NARENGINE_TOOLS_INCLUDE_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS})
 set(NARENGINE_TOOLS_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
+set(NARENGINE_TOOLS_LINK_LIBS PRIVATE "stb::stb")
 set(NARENGINE_TOOLS_SOURCES
     "${NARENGINE_TOOLS_SRC_DIR}/file.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/shared_buffer_ptr.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/asset_iterator.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/resource_pkg_visitor.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/memory_domain.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/memory_manager.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/name_table.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/unified_storage.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/stb_impl.cpp"
 )
 add_library("${NAME}_tools" "${NARENGINE_LIB_TYPE}" ${NARENGINE_TOOLS_SOURCES})
 target_include_directories("${NAME}_tools" ${NARENGINE_TOOLS_INCLUDE_DIRS})
 target_link_directories("${NAME}_tools" ${NARENGINE_TOOLS_LINK_DIRS})
 target_compile_definitions("${NAME}_tools" ${NARENGINE_TOOLS_COMPILER_DEFS})
+target_link_libraries("${NAME}_tools" ${NARENGINE_TOOLS_LINK_LIBS})
 set(NARENGINE_TOOLS_LIBS ${NARENGINE_TOOLS_LIBS} "${NAME}_tools")
 
 
@@ -37,13 +44,12 @@ if ("${NARENGINE_TOOLS_JSON}")
     # JSON tools library
     set(NARENGINE_TOOLS_JSON_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
     set(NARENGINE_TOOLS_JSON_INCLUDE_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS})
-    set(NARENGINE_TOOLS_JSON_LINK_LIBS PUBLIC "${NAME}_tools" "nlohmann_json::nlohmann_json" PRIVATE "stb::stb")
+    set(NARENGINE_TOOLS_JSON_LINK_LIBS PUBLIC "${NAME}_tools" "nlohmann_json::nlohmann_json")
     set(NARENGINE_TOOLS_JSON_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
     set(NARENGINE_TOOLS_JSON_SOURCES
         "${NARENGINE_TOOLS_SRC_DIR}/json/json_asset_reader.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/json/json_asset_writer.cpp"
         "${NARENGINE_TOOLS_SRC_DIR}/json/json_asset_file_processor.cpp"
-        "${NARENGINE_TOOLS_SRC_DIR}/stb_impl.cpp"
     )
     if ("${NARENGINE_TOOLS_FLATBUFFERS}")
         set(NARENGINE_TOOLS_JSON_LINK_LIBS ${NARENGINE_TOOLS_JSON_LINK_LIBS}
@@ -109,7 +115,7 @@ endif() # if ("${NARENGINE_BUILD_CONSTRUCTOR2D}")
 
 set(NARENGINE_TOOLS_ALL_TARGETS ${NARENGINE_TOOLS_ALL_TARGETS} ${NARENGINE_TOOLS_LIBS})
 if ("${NARENGINE_BUILD_UTILS}")
-    add_executable("${NAME}_asset_tool" "${NARENGINE_TOOLS_SRC_DIR}/asset_tool.cpp")
+    add_executable("${NAME}_asset_tool" "${NARENGINE_TOOLS_SRC_DIR}/utils/asset_tool.cpp")
     target_include_directories("${NAME}_asset_tool" PRIVATE
         ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS} "${NARENGINE_TOOLS_INCLUDE_DIR}")
     target_link_directories("${NAME}_asset_tool" PRIVATE ${NARENGINE_TOOLS_COMMON_LINK_DIRS})

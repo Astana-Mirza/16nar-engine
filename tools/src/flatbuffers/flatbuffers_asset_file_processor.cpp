@@ -1,14 +1,18 @@
 #include <16nar/tools/flatbuffers/flatbuffers_asset_file_processor.h>
 
 #include <16nar/tools/flatbuffers/flatbuffers_asset_reader.h>
+#include <16nar/tools/flatbuffers/flatbuffers_asset_writer.h>
 
 #include <16nar/gen/flatbuffers/asset_generated.h>
 
 namespace _16nar::tools
 {
 
-FlatBuffersAssetFileProcessor::FlatBuffersAssetFileProcessor( std::pmr::memory_resource& memory_resource ) noexcept:
-     memory_resource_{ memory_resource }
+FlatBuffersAssetFileProcessor::FlatBuffersAssetFileProcessor(
+     std::pmr::memory_resource& memory_resource, std::size_t initial_size, bool check_names ) noexcept:
+     memory_resource_{ memory_resource },
+     initial_size_{ initial_size },
+     check_names_{ check_names }
 {}
 
 
@@ -59,6 +63,12 @@ bool FlatBuffersAssetFileProcessor::write_asset_data( ConstByteView buffer, File
 IAssetReaderPtr FlatBuffersAssetFileProcessor::make_asset_reader( ConstByteView buffer )
 {
      return std::make_shared< FlatBuffersAssetReader >( buffer );
+}
+
+
+IAssetWriterPtr FlatBuffersAssetFileProcessor::make_asset_writer()
+{
+     return std::make_shared< FlatBuffersAssetWriter >( memory_resource_, initial_size_, check_names_ );
 }
 
 } // namespace _16nar::tools

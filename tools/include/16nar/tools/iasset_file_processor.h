@@ -4,7 +4,6 @@
 #define _16NAR_TOOLS_IASSET_FILE_PROCESSOR_H
 
 #include <16nar/tools/defs.h>
-#include <16nar/tools/iasset_reader.h>
 #include <16nar/tools/file.h>
 #include <16nar/tools/shared_buffer_ptr.h>
 
@@ -37,9 +36,11 @@ public:
      /// @param[in] buffer data of the asset.
      /// @return asset reader.
      virtual IAssetReaderPtr make_asset_reader( ConstByteView buffer ) = 0;
-};
 
-using IAssetFileProcessorPtr = std::shared_ptr< IAssetFileProcessor >;
+     /// @brief Make asset writer.
+     /// @return asset writer.
+     virtual IAssetWriterPtr make_asset_writer() = 0;
+};
 
 } // namespace _16nar::tools
 
