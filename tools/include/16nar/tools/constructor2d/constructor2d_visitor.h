@@ -17,14 +17,11 @@ public:
      enum Actions : AssetActionId
      {
           SceneBegin        = 1,   ///< start parsing of the scene.
-          ResourcesBegin    = 2,   ///< start parsing embedded resources.
-          ResourceEnter     = 3,   ///< parse new embedded resource (optional).
-          ResourcesEnd      = 4,   ///< finish parsing embedded resources.
-          StatesBegin       = 5,   ///< start parsing scene states.
-          StateEnter        = 6,   ///< parse new scene state.
-          RenderSystemEnter = 7,   ///< parse render system of scene state.
-          StatesEnd         = 8,   ///< finish parsing scene states.
-          SceneEnd          = 9,   ///< finish parsing of the scene.
+          StatesBegin       = 2,   ///< start parsing scene states.
+          StateEnter        = 3,   ///< parse new scene state.
+          RenderSystemEnter = 4,   ///< parse render system of scene state.
+          StatesEnd         = 5,   ///< finish parsing scene states.
+          SceneEnd          = 6,   ///< finish parsing of the scene.
      };
 
      /// @copydoc IAssetVisitor::visit(AssetActionId, const IAssetReader&)

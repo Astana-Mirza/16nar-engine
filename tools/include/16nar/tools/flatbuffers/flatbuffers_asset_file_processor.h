@@ -14,7 +14,12 @@ class ENGINE_API FlatBuffersAssetFileProcessor : public IAssetFileProcessor
 public:
      /// @brief Constructor.
      /// @param[in] memory_resource memory resource for data allocations.
-     explicit FlatBuffersAssetFileProcessor( std::pmr::memory_resource& memory_resource ) noexcept;
+     /// @param[in] initial_size initial size of builder buffer for asset writer.
+     /// @param[in] check_names true if, for asset writer, name uniqueness needs to be
+     /// checked while saving children sets (has performance and memory costs), false otherwise.
+     FlatBuffersAssetFileProcessor(
+          std::pmr::memory_resource& memory_resource,
+          std::size_t initial_size = 1024, bool check_names = false ) noexcept;
 
      /// @copydoc IAssetFileProcessor::read_asset_data(const File&)
      SharedBufferPtr read_asset_data( const File& file ) override;
@@ -25,8 +30,13 @@ public:
      /// @copydoc IAssetFileProcessor::make_asset_reader(ConstByteView)
      IAssetReaderPtr make_asset_reader( ConstByteView buffer ) override;
 
+     /// @copydoc IAssetFileProcessor::make_asset_writer()
+     IAssetWriterPtr make_asset_writer() override;
+
 private:
      std::pmr::memory_resource& memory_resource_; ///< memory resource for data allocations.
+     std::size_t initial_size_;                   ///< initial size of builder buffer for asset writer.
+     bool check_names_;                           ///< check names of children in sets for asset writer.
 };
 
 } // namespace _16nar::tools

@@ -7,7 +7,6 @@
 
 #include <vector>
 #include <string_view>
-#include <memory>
 
 namespace _16nar::tools
 {
@@ -42,8 +41,6 @@ public:
      /// @brief Reset current state to default.
      virtual void reset() = 0;
 };
-
-using IAssetWriterPtr = std::shared_ptr< IAssetWriter >;
 
 } // namespace _16nar::tools
 

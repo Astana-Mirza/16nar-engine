@@ -25,6 +25,9 @@ public:
      /// @copydoc IAssetFileProcessor::make_asset_reader(ConstByteView)
      IAssetReaderPtr make_asset_reader( ConstByteView buffer ) override;
 
+     /// @copydoc IAssetFileProcessor::make_asset_writer()
+     IAssetWriterPtr make_asset_writer() override;
+
 private:
      std::pmr::memory_resource& memory_resource_; ///< memory resource for data allocations.
 };

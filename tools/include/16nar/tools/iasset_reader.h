@@ -8,7 +8,6 @@
 #include <vector>
 #include <string>
 #include <string_view>
-#include <memory>
 
 namespace _16nar::tools
 {
@@ -74,8 +73,6 @@ public:
      /// @return true if context was switched to parent asset, false otherwise (e.g. the parent does not exist).
      virtual bool to_parent() = 0;
 };
-
-using IAssetReaderPtr = std::shared_ptr< IAssetReader >;
 
 } // namespace _16nar::tools
 

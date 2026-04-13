@@ -1,6 +1,7 @@
 #include <16nar/tools/json/json_asset_file_processor.h>
 
 #include <16nar/tools/json/json_asset_reader.h>
+#include <16nar/tools/json/json_asset_writer.h>
 #include <16nar/tools/json/literals.h>
 
 #include <cstdio> // sscanf
@@ -87,6 +88,12 @@ bool JsonAssetFileProcessor::write_asset_data( ConstByteView buffer, File& file 
 IAssetReaderPtr JsonAssetFileProcessor::make_asset_reader( ConstByteView buffer )
 {
      return std::make_shared< JsonAssetReader >( buffer );
+}
+
+
+IAssetWriterPtr JsonAssetFileProcessor::make_asset_writer()
+{
+     return std::make_shared< JsonAssetWriter >();
 }
 
 } // namespace _16nar::tools

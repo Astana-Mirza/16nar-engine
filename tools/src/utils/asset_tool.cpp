@@ -87,24 +87,6 @@ IAssetFileProcessorPtr make_file_processor( const std::string& format )
 }
 
 
-IAssetWriterPtr make_writer( const std::string& format )
-{
-#if defined( NARENGINE_TOOLS_JSON )
-     if ( format == "json" )
-     {
-          return std::make_shared< JsonAssetWriter >();
-     }
-#endif // defined( NARENGINE_TOOLS_JSON )
-#if defined( NARENGINE_TOOLS_FLATBUFFERS )
-     if ( format == "flatbuffers" )
-     {
-          return std::make_shared< FlatBuffersAssetWriter >();
-     }
-#endif // defined( NARENGINE_TOOLS_FLATBUFFERS )
-     throw std::runtime_error{ "unknown format '" + format + "'" };
-}
-
-
 IAssetDataConvertorPtr make_convertor( const AssetToolParams& params, bool& backward )
 {
 #if defined( NARENGINE_TOOLS_JSON ) && defined( NARENGINE_TOOLS_FLATBUFFERS )
@@ -216,14 +198,15 @@ void process( const std::vector< std::string >& paths, const AssetToolParams& pa
 {
      bool backward{};
      auto convertor = make_convertor( params, backward );
-     auto writer = make_writer( params.dst_format );
      auto src_processor = make_file_processor( params.src_format );
      auto dst_processor = make_file_processor( params.dst_format );
 
      assert( convertor );
-     assert( writer );
      assert( src_processor );
      assert( dst_processor );
+
+     auto writer = dst_processor->make_asset_writer();
+     assert( writer );
 
      for ( const auto& path : paths )
      {

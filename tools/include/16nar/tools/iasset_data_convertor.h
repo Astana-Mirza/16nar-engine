@@ -5,7 +5,6 @@
 
 #include <16nar/tools/defs.h>
 
-#include <memory>
 #include <string>
 
 namespace _16nar::tools
@@ -34,8 +33,6 @@ public:
      /// @return Description of latest error, empty string if there was no error.
      virtual std::string get_error_description() const = 0;
 };
-
-using IAssetDataConvertorPtr = std::shared_ptr< IAssetDataConvertor >;
 
 } // namespace _16nar::tools
 

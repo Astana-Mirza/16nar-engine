@@ -51,6 +51,22 @@ struct AssetData
      ConstByteView data{};    ///< binary buffer with asset data.
 };
 
+
+class IAssetReader;
+class IAssetWriter;
+class IAssetFileProcessor;
+class IAssetDataConvertor;
+class NameTable;
+class MemoryManager;
+class MemoryDomain;
+using IAssetReaderPtr = std::shared_ptr< IAssetReader >;
+using IAssetWriterPtr = std::shared_ptr< IAssetWriter >;
+using IAssetFileProcessorPtr = std::shared_ptr< IAssetFileProcessor >;
+using IAssetDataConvertorPtr = std::shared_ptr< IAssetDataConvertor >;
+using NameTablePtr = std::shared_ptr< NameTable >;
+using MemoryManagerPtr = std::shared_ptr< MemoryManager >;
+using MemoryDomainUniquePtr = std::unique_ptr< MemoryDomain >;
+
 } // namespace _16nar::tools
 
 #endif // #ifndef _16NAR_TOOLS_DEFS_H

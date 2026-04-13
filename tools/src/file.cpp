@@ -113,7 +113,7 @@ std::filesystem::path correct_path(
      {
           result = std::filesystem::path{ base_dir } / result;
      }
-     return result.string();
+     return result;
 }
 
 } // namespace _16nar::tools
