@@ -3,7 +3,7 @@
 
 #include <16nar/tools/defs.h>
 
-#include <16nar/tools/hash.h>
+#include <16nar/tools/misc/hash.h>
 #if defined( NARENGINE_TOOLS_JSON )
 #    include <16nar/tools/json/json_asset_file_processor.h>
 #    include <16nar/tools/json/json_asset_reader.h>

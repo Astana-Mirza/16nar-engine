@@ -4,8 +4,8 @@
 #define _16NAR_TOOLS_IASSET_FILE_PROCESSOR_H
 
 #include <16nar/tools/defs.h>
-#include <16nar/tools/file.h>
-#include <16nar/tools/shared_buffer_ptr.h>
+#include <16nar/tools/misc/file.h>
+#include <16nar/tools/misc/shared_buffer_ptr.h>
 
 namespace _16nar::tools
 {

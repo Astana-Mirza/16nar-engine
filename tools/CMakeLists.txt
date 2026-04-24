@@ -18,21 +18,25 @@ set(NARENGINE_TOOLS_COMMON_LINK_DIRS "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_D
 
 # Base tools library
 set(NARENGINE_TOOLS_COMPILER_DEFS PRIVATE ${NARENGINE_TOOLS_COMMON_COMPILER_DEFS})
-set(NARENGINE_TOOLS_INCLUDE_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS})
+set(NARENGINE_TOOLS_INCLUDE_DIRS
+    PUBLIC ${NARENGINE_TOOLS_COMMON_INCLUDE_DIRS}
+    PRIVATE "${PROJECT_BINARY_DIR}/schemas/flatbuffers-gen-cpp"
+)
 set(NARENGINE_TOOLS_LINK_DIRS PUBLIC ${NARENGINE_TOOLS_COMMON_LINK_DIRS})
-set(NARENGINE_TOOLS_LINK_LIBS PRIVATE "stb::stb")
+set(NARENGINE_TOOLS_LINK_LIBS PRIVATE "stb::stb" "flatbuffers::libflatbuffers")
 set(NARENGINE_TOOLS_SOURCES
-    "${NARENGINE_TOOLS_SRC_DIR}/file.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/shared_buffer_ptr.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/asset_iterator.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/resource_pkg_visitor.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/misc/file.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/misc/shared_buffer_ptr.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/misc/asset_iterator.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/misc/name_table.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/misc/stb_impl.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/resources/resource_pkg_visitor.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/memory_domain.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/memory_manager.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/name_table.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/unified_storage.cpp"
-    "${NARENGINE_TOOLS_SRC_DIR}/stb_impl.cpp"
 )
 add_library("${NAME}_tools" "${NARENGINE_LIB_TYPE}" ${NARENGINE_TOOLS_SOURCES})
+add_dependencies("${NAME}_tools" "flatbuffers-gen-cpp" "GENERATE_flatbuffers-gen-cpp")
 target_include_directories("${NAME}_tools" ${NARENGINE_TOOLS_INCLUDE_DIRS})
 target_link_directories("${NAME}_tools" ${NARENGINE_TOOLS_LINK_DIRS})
 target_compile_definitions("${NAME}_tools" ${NARENGINE_TOOLS_COMPILER_DEFS})

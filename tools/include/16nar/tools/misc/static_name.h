@@ -4,7 +4,7 @@
 #define _16NAR_TOOLS_STATIC_NAME_H
 
 #include <16nar/tools/defs.h>
-#include <16nar/tools/hash.h>
+#include <16nar/tools/misc/hash.h>
 
 namespace _16nar::tools
 {

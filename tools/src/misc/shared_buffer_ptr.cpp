@@ -1,4 +1,4 @@
-#include <16nar/tools/shared_buffer_ptr.h>
+#include <16nar/tools/misc/shared_buffer_ptr.h>
 
 namespace _16nar::tools
 {
