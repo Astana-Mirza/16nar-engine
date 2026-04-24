@@ -4,7 +4,7 @@
 #define _16NAR_TOOLS_NAME_TABLE_H
 
 #include <16nar/tools/defs.h>
-#include <16nar/tools/static_name.h>
+#include <16nar/tools/misc/static_name.h>
 
 #include <unordered_map>
 #include <string>
@@ -18,9 +18,11 @@ class ENGINE_API NameTable
 {
 public:
      /// @brief Get full string by static name.
+     /// @details Pretty printed name is allocated in thread-local static buffer.
      /// @param[in] name name object.
+     /// @param[in] pretty get pretty printed name in case of unknonwn hash.
      /// @return string with the name data, empty string if data does not exist.
-     std::string_view get_name( StaticName name ) const noexcept;
+     std::string_view get_name( StaticName name, bool pretty = false ) const noexcept;
 
      /// @brief Add name to the table.
      /// @param[in] name name to be added.

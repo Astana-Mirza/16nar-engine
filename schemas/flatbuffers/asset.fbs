@@ -31,7 +31,8 @@ table Asset
 /// @brief Hash of a resource.
 struct Hash
 {
-     data:     [ubyte:12];
+     name:     uint64;
+     type_id:  uint32;
 }
 
 

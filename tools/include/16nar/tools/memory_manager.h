@@ -5,7 +5,7 @@
 
 #include <16nar/tools/defs.h>
 
-#include <16nar/tools/static_name.h>
+#include <16nar/tools/misc/static_name.h>
 
 #include <vector>
 #include <unordered_map>

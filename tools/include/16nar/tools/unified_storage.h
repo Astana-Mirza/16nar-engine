@@ -5,9 +5,9 @@
 
 #include <16nar/tools/defs.h>
 
-#include <16nar/tools/file.h>
-#include <16nar/tools/static_name.h>
-#include <16nar/tools/shared_buffer_ptr.h>
+#include <16nar/tools/misc/file.h>
+#include <16nar/tools/misc/static_name.h>
+#include <16nar/tools/misc/shared_buffer_ptr.h>
 
 #include <unordered_map>
 #include <filesystem>
@@ -54,7 +54,7 @@ public:
      /// @brief Load the resource data by name.
      /// @param[in] name name of the resource.
      /// @return Data of the resource, nullptr if resource with given @b name does not exist.
-     SharedBufferPtr load( StaticName name ) const;
+     SharedBufferPtr load( StaticName name );
 
      /// @brief Mount the package.
      /// @details If there are resources with the same name in differrent packages, then
@@ -80,6 +80,7 @@ private:
      /// @brief Description of resource in the package.
      struct ResourceDesc
      {
+          ContentTypeId type_id{};      ///< type of the resource.
           std::uint32_t chunk_id{};     ///< id of starting chunk of the resource.
           std::uint32_t size{};         ///< size of the resource in the package, in bytes.
           std::uint32_t orig_size{};    ///< original size of the resource data, in bytes.
@@ -104,7 +105,7 @@ private:
      NameTablePtr name_table_;               ///< name table.
      IAssetFileProcessorPtr file_processor_; ///< asset file processor.
      IAssetDataConvertorPtr convertor_;      ///< asset data convertor.
-     MemoryDomain *memory_;                  ///< memory domain for asset reading allocations.
+     std::pmr::memory_resource *memory_;     ///< memory domain for asset reading allocations.
      bool unpacked_;                         ///< read unpacked resources insted of packages.
 };
 

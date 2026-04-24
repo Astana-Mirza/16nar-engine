@@ -1,14 +1,29 @@
-#include <16nar/tools/name_table.h>
+#include <16nar/tools/misc/name_table.h>
+
+#include <cstdio>
+#include <cinttypes>
 
 namespace _16nar::tools
 {
-
-std::string_view NameTable::get_name( StaticName name ) const noexcept
+namespace
 {
-     const StaticName key{ name };
-     const auto iter = table_.find( key );
+
+static thread_local char pretty_print_buffer[21]{};
+
+} // anonymous namespace
+
+
+std::string_view NameTable::get_name( StaticName name, bool pretty ) const noexcept
+{
+     const auto iter = table_.find( name );
      if ( iter == table_.cend() )
      {
+          if ( pretty )
+          {
+               std::snprintf( pretty_print_buffer, sizeof( pretty_print_buffer ),
+                    "[0x%016" PRIx64 "]", name.hash );
+               return pretty_print_buffer;
+          }
           return std::string_view{};
      }
      return std::string_view{ iter->second.data(), iter->second.size() };
