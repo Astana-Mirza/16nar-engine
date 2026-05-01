@@ -90,16 +90,6 @@ private:
      FILE *handle_;     ///< file handle.
 };
 
-
-/// @brief Get correct filename.
-/// @details If base directory is not empty and path is relative, then prepend base directory to path. 
-/// @param[in] base_dir base directory to be prepended to file path.
-/// @param[in] path path to the file.
-/// @return final filename to be used for file operations.
-ENGINE_API std::filesystem::path correct_path(
-     const std::filesystem::path& base_dir,
-     const std::filesystem::path& path );
-
 } // namespace _16nar::tools
 
 #endif // #ifndef _16NAR_TOOLS_FILE_H

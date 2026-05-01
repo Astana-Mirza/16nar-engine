@@ -15,10 +15,19 @@
 namespace _16nar::tools
 {
 
-/// @brief Storage of all application files and data.
+/// @brief Storage of all application files and resource data.
 class ENGINE_API UnifiedStorage
 {
 public:
+     /// @brief Get corrected path.
+     /// @details If path is relative, then prepend base directory to it. 
+     /// @param[in] base_dir base directory to be prepended to file path.
+     /// @param[in] path path to the file.
+     /// @return final path to be used for file operations.
+     static std::filesystem::path correct_path(
+          const std::filesystem::path& base_dir,
+          const std::filesystem::path& path );
+
      /// @brief Constructor.
      /// @throws std::runtime_error if @b name_table or @b file_processor is null
      /// or no suitable allocator present in @b memory_manager.

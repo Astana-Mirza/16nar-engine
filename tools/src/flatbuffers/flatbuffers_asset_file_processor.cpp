@@ -1,5 +1,6 @@
 #include <16nar/tools/flatbuffers/flatbuffers_asset_file_processor.h>
 
+#include <16nar/tools/logger/logger.h>
 #include <16nar/tools/flatbuffers/flatbuffers_asset_reader.h>
 #include <16nar/tools/flatbuffers/flatbuffers_asset_writer.h>
 
@@ -22,15 +23,18 @@ SharedBufferPtr FlatBuffersAssetFileProcessor::read_asset_data( const File& file
      const auto size = file.read( ByteView{ reinterpret_cast< std::byte* >( &header ), sizeof( header ) } );
      if ( size != sizeof( header ) )
      {
+          LOG_16NAR_ERROR( "Cannot read flatbuffers asset header" );
           return SharedBufferPtr{};
      }
      if ( !header.size() || !NARENGINE_VERSION_CHECK( header.version(), NARENGINE_ASSET_VERSION_UINT32 ) )
      {
+          LOG_16NAR_ERROR( "Header of flatbuffers asset is corrupted or has incompatible version" );
           return SharedBufferPtr{};
      }
      auto ret = SharedBufferPtr::allocate( memory_resource_, header.size() );
      if ( header.size() != file.read( ret.get_view() ) )
      {
+          LOG_16NAR_ERROR( "Cannot read flatbuffers asset file of size %lu", header.size() );
           return SharedBufferPtr{};
      }
      return ret;
@@ -41,6 +45,7 @@ bool FlatBuffersAssetFileProcessor::write_asset_data( ConstByteView buffer, File
 {
      if ( !buffer )
      {
+          LOG_16NAR_ERROR( "Cannot write flatbuffers asset: passed empty buffer" );
           return false;
      }
 
@@ -50,10 +55,12 @@ bool FlatBuffersAssetFileProcessor::write_asset_data( ConstByteView buffer, File
           reinterpret_cast< const std::byte* >( &header ), sizeof( header ) } );
      if ( size != sizeof( header ) )
      {
+          LOG_16NAR_ERROR( "Cannot write flatbuffers asset header to file" );
           return false;
      }
      if ( buffer.size != file.write( buffer ) )
      {
+          LOG_16NAR_ERROR( "Cannot write flatbuffers asset file of size %zu", buffer.size );
           return false;
      }
      return true;

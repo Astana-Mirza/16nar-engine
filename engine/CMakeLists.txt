@@ -24,24 +24,10 @@ set(NARENGINE_COMMON_INCLUDE_DIRS
 )
 
 
-# Logger library
-set(NARENGINE_LOGGER_COMPILER_DEFS ${NARENGINE_COMMON_COMPILER_DEFS})
-set(NARENGINE_LOGGER_INCLUDE_DIRS PUBLIC ${NARENGINE_COMMON_INCLUDE_DIRS})
-set(NARENGINE_LOGGER_SOURCES
-    "${NARENGINE_SRC_DIR}/logger/logger.cpp"
-    "${NARENGINE_SRC_DIR}/logger/base_log_writer.cpp"
-    "${NARENGINE_SRC_DIR}/logger/terminal_log_writer.cpp"
-)
-add_library("${NAME}_logger" "${NARENGINE_LIB_TYPE}" ${NARENGINE_LOGGER_SOURCES})
-target_include_directories("${NAME}_logger" ${NARENGINE_LOGGER_INCLUDE_DIRS})
-target_compile_definitions("${NAME}_logger" ${NARENGINE_LOGGER_COMPILER_DEFS})
-set(NARENGINE_INSTALL_TARGETS ${NARENGINE_INSTALL_TARGETS} "${NAME}_logger")
-
-
 # Math library
 set(NARENGINE_MATH_COMPILER_DEFS ${NARENGINE_COMMON_COMPILER_DEFS})
 set(NARENGINE_MATH_INCLUDE_DIRS PUBLIC ${NARENGINE_COMMON_INCLUDE_DIRS})
-set(NARENGINE_MATH_LINK_LIBS PUBLIC "${NAME}_logger" "glm::glm")
+set(NARENGINE_MATH_LINK_LIBS PUBLIC "glm::glm")
 set(NARENGINE_MATH_SOURCES
     "${NARENGINE_SRC_DIR}/math/math_functions.cpp"
     "${NARENGINE_SRC_DIR}/math/transform_matrix.cpp"
@@ -163,7 +149,7 @@ if ("${NARENGINE_BUILD_TESTS}")
     )
     target_include_directories("${NAME}_math_test" PRIVATE ${NARENGINE_COMMON_INCLUDE_DIRS} ${CATCH2_INCLUDE_DIRS})
     target_link_directories("${NAME}_math_test" PRIVATE ${NARENGINE_COMMON_LINK_DIRS})
-    target_link_libraries("${NAME}_math_test" PRIVATE "${NAME}_math" "${NAME}_logger" "Catch2::Catch2WithMain")
+    target_link_libraries("${NAME}_math_test" PRIVATE "${NAME}_math" "Catch2::Catch2WithMain")
     add_test(NAME "${NAME}_math_test" COMMAND "${NAME}_math_test")
 
     add_executable("${NAME}_camera_test"

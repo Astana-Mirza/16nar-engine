@@ -1,5 +1,6 @@
 #include <16nar/tools/unified_storage.h>
 
+#include <16nar/tools/logger/logger.h>
 #include <16nar/tools/misc/name_table.h>
 #include <16nar/tools/memory_manager.h>
 #include <16nar/tools/memory_domain.h>
@@ -43,6 +44,10 @@ public:
           if ( storage_.convertor_ )
           {
                content = storage_.convertor_->convert_forward( content );
+               if ( !content.data )
+               {
+                    throw std::runtime_error{ storage_.convertor_->get_error_description() };
+               }
           }
           const auto data = reinterpret_cast< const std::uint8_t * >( content.data.data );
           flatbuffers::Verifier verifier{ data, content.data.size };
@@ -59,10 +64,12 @@ public:
                throw std::runtime_error{ "resource package is corrupted" };
           }
 
-          if ( !package.database.open( storage_.base_dir_ / package_buf->database()->c_str() ) )
+          const auto database_path = UnifiedStorage::correct_path(
+               storage_.base_dir_, package_buf->database()->c_str() );
+          if ( !package.database.open( database_path.c_str() ) )
           {
                throw std::runtime_error{ "cannot open resource package database "
-                    + std::string{ package_buf->database()->c_str() } };
+                    + database_path.string() };
           }
           storage_.packages_.emplace( package_name_, std::move( package ) );
 
@@ -89,7 +96,8 @@ public:
                }
                if ( result.first->second.type_id == desc.type_id )
                {
-                    // patching
+                    LOG_16NAR_DEBUG( "Patching resource '%s'",
+                         storage_.name_table_->get_name( res_name, true ).data() );
                     result.first->second = desc;
                }
                else
@@ -105,6 +113,18 @@ private:
      UnifiedStorage& storage_;
      StaticName package_name_;
 };
+
+
+std::filesystem::path UnifiedStorage::correct_path(
+     const std::filesystem::path& base_dir,
+     const std::filesystem::path& path )
+{
+     if ( !base_dir.empty() && path.is_relative() )
+     {
+          return base_dir / path;
+     }
+     return path;
+}
 
 
 UnifiedStorage::UnifiedStorage(
@@ -155,7 +175,7 @@ std::filesystem::path UnifiedStorage::get_path( StaticName name ) const
      const auto data = name_table_->get_name( name );
      if ( !data.empty() )
      {
-          result = base_dir_ / data;
+          return correct_path( base_dir_, data );
      }
      return result;
 }
@@ -169,16 +189,19 @@ SharedBufferPtr UnifiedStorage::load( StaticName name )
           const auto path = get_path( name );
           if ( path.empty() || !file.open( path ) )
           {
+               LOG_16NAR_ERROR( "Cannot open unpacked resource '%s'", path.c_str() );
                return SharedBufferPtr{};
           }
           const std::size_t size = file.get_size();
           if ( !size )
           {
+               LOG_16NAR_ERROR( "Cannot get size of unpacked resource '%s'", path.c_str() );
                return SharedBufferPtr{};
           }
           auto buffer = SharedBufferPtr::allocate( *memory_, size );
           if ( size != file.read( buffer.get_view() ) )
           {
+               LOG_16NAR_ERROR( "Cannot read data of unpacked resource '%s'", path.c_str() );
                return SharedBufferPtr{};
           }
           return buffer;
@@ -187,22 +210,34 @@ SharedBufferPtr UnifiedStorage::load( StaticName name )
      const auto iter = resources_.find( name );
      if ( iter == resources_.cend() )
      {
+          LOG_16NAR_ERROR( "Cannot find resource '%s'",
+               name_table_->get_name( name, true ).data() );
           return SharedBufferPtr{};
      }
      const auto& desc = iter->second;
      const auto pkg_iter = packages_.find( desc.package );
      if ( pkg_iter == packages_.end() )
      {
+          LOG_16NAR_ERROR( "Cannot find package '%s' while loading resource '%s'",
+               name_table_->get_name( desc.package, true ).data(),
+               name_table_->get_name( name, true ).data() );
           return SharedBufferPtr{};
      }
      auto& package = pkg_iter->second;
      if ( !package.database.seek( desc.chunk_id * package.chunk_size, File::SeekOrigin::Set ) )
      {
+          LOG_16NAR_ERROR( "Cannot seek chunk %u in package '%s' while loading resource '%s'",
+               desc.chunk_id,
+               name_table_->get_name( desc.package, true ).data(),
+               name_table_->get_name( name, true ).data() );
           return SharedBufferPtr{};
      }
      auto buffer = SharedBufferPtr::allocate( *memory_, desc.orig_size );
      if ( desc.orig_size != package.database.read( buffer.get_view() ) )
      {
+          LOG_16NAR_ERROR( "Cannot read resource '%s' from package '%s'",
+               name_table_->get_name( name, true ).data(),
+               name_table_->get_name( desc.package, true ).data() );
           return SharedBufferPtr{};
      }
      return buffer;
@@ -211,28 +246,32 @@ SharedBufferPtr UnifiedStorage::load( StaticName name )
 
 bool UnifiedStorage::mount( const std::filesystem::path& path )
 {
+     const auto full_path = correct_path( base_dir_, path );
      if ( unpacked_ )
      {
+          LOG_16NAR_INFO( "Mount package '%s' (disabled in unpacked mode)", full_path.c_str() );
           return true;
      }
 
-     StaticName name{ path.string() };
+     StaticName name{ path.c_str() };
      if ( packages_.count( name ) )
      {
-          // already mounted
+          LOG_16NAR_INFO( "Package '%s' is already mounted", full_path.c_str() );
           return true;
      }
 
-     const auto full_path{ base_dir_ / path };
+     LOG_16NAR_DEBUG( "Mounting package '%s'...", full_path.c_str() );
      File asset_file{};
      if ( !asset_file.open( full_path ) )
      {
+          LOG_16NAR_ERROR( "Cannot open package file '%s'", full_path.c_str() );
           return false;
      }
 
      auto data = file_processor_->read_asset_data( asset_file );
      if ( !data )
      {
+          LOG_16NAR_ERROR( "Cannot read data of package '%s'", full_path.c_str() );
           return false;
      }
 
@@ -242,10 +281,13 @@ bool UnifiedStorage::mount( const std::filesystem::path& path )
           ResourceParser parser{ *this, name };
           parser.process_resource_package( *asset_reader );
      }
-     catch ( const std::exception& )
+     catch ( const std::exception& ex )
      {
+          LOG_16NAR_ERROR( "Cannot mount package '%s': %s", full_path.c_str(), ex.what().c_str() );
           return false;
      }
+
+     LOG_16NAR_INFO( "Mounted package '%s'", full_path.c_str() );
      return true;
 }
 

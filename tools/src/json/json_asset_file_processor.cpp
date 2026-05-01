@@ -1,5 +1,6 @@
 #include <16nar/tools/json/json_asset_file_processor.h>
 
+#include <16nar/tools/logger/logger.h>
 #include <16nar/tools/json/json_asset_reader.h>
 #include <16nar/tools/json/json_asset_writer.h>
 #include <16nar/tools/json/literals.h>
@@ -19,11 +20,13 @@ SharedBufferPtr JsonAssetFileProcessor::read_asset_data( const File& file )
      const auto file_size = file.get_size();
      if ( file_size == 0 )
      {
+          LOG_16NAR_ERROR( "JSON asset file is empty" );
           return SharedBufferPtr{};
      }
      auto ret = SharedBufferPtr::allocate( memory_resource_, file_size );
      if ( file_size != file.read( ret.get_view() ) )
      {
+          LOG_16NAR_ERROR( "Cannot read JSON asset file of size %zu", file_size );
           return SharedBufferPtr{};
      }
 
@@ -37,16 +40,19 @@ SharedBufferPtr JsonAssetFileProcessor::read_asset_data( const File& file )
           std::uint8_t patch{};
           if ( std::sscanf( version.c_str(), "%hhu.%hhu.%hhu", &major, &minor, &patch ) != 3 )
           {
+               LOG_16NAR_ERROR( "Cannot read version of JSON asset" );
                return SharedBufferPtr{};
           }
           const std::uint32_t version_num = NARENGINE_VERSION_TO_UINT32( major, minor, patch );
           if ( !NARENGINE_VERSION_CHECK( version_num, NARENGINE_ASSET_VERSION_UINT32 ) )
           {
+               LOG_16NAR_ERROR( "Incompatible JSON asset version %hhu.%hhu.%hhu", major, minor, patch );
                return SharedBufferPtr{};
           }
      }
-     catch ( const nlohmann::json::exception& )
+     catch ( const nlohmann::json::exception& ex )
      {
+          LOG_16NAR_ERROR( "Cannot read JSON asset: %s", ex.what().c_str() );
           return SharedBufferPtr{};
      }
      return ret;
@@ -57,6 +63,7 @@ bool JsonAssetFileProcessor::write_asset_data( ConstByteView buffer, File& file 
 {
      if ( !buffer )
      {
+          LOG_16NAR_ERROR( "Cannot write JSON asset: passed empty buffer" );
           return false;
      }
 
@@ -71,14 +78,16 @@ bool JsonAssetFileProcessor::write_asset_data( ConstByteView buffer, File& file 
           json[ version_label ] = version;
           dumped = json.dump();
      }
-     catch ( const nlohmann::json::exception& )
+     catch ( const nlohmann::json::exception& ex )
      {
+          LOG_16NAR_ERROR( "Cannot write JSON asset: %s", ex.what().c_str() );
           return false;
      }
 
      if ( dumped.size() != file.write( ConstByteView{
           reinterpret_cast< const std::byte * >( dumped.c_str() ), dumped.size() } ) )
      {
+          LOG_16NAR_ERROR( "Cannot write JSON asset file of size %zu", dumped.size() );
           return false;
      }
      return true;

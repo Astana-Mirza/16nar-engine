@@ -30,7 +30,12 @@ set(NARENGINE_TOOLS_SOURCES
     "${NARENGINE_TOOLS_SRC_DIR}/misc/asset_iterator.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/misc/name_table.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/misc/stb_impl.cpp"
+
+    "${NARENGINE_TOOLS_SRC_DIR}/logger/logger.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/logger/terminal_log_writer.cpp"
+
     "${NARENGINE_TOOLS_SRC_DIR}/resources/resource_pkg_visitor.cpp"
+
     "${NARENGINE_TOOLS_SRC_DIR}/memory_domain.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/memory_manager.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/unified_storage.cpp"
