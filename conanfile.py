@@ -102,8 +102,7 @@ class NarengineRecipe(ConanFile):
                 ["16nar_tools"], ["flatbuffers::libflatbuffers"])
 
         # engine
-        self.add_package_component("16nar_logger")
-        self.add_package_component("16nar_math", ["16nar_logger"], ["glm::glm"])
+        self.add_package_component("16nar_math", [], ["glm::glm"])
         self.add_package_component("16nar_base", ["16nar_math"], ["glfw"])
 
         if self.options.with_render_opengl:

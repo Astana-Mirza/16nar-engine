@@ -16,6 +16,12 @@ using AssetActionId = std::uint32_t;
 /// @brief Identifier of asset content type.
 using ContentTypeId = std::uint32_t;
 
+/// @brief Resource descriptor.
+using ResID = std::uint32_t;
+
+/// @brief Identifier of resource data part.
+using DataID = std::uint32_t;
+
 /// @brief View of buffer of bytes.
 struct ByteView
 {
@@ -59,6 +65,10 @@ class IAssetDataConvertor;
 class NameTable;
 class MemoryManager;
 class MemoryDomain;
+class UnifiedStorage;
+class IResourceProcessor;
+class ILogWriter;
+
 using IAssetReaderPtr = std::shared_ptr< IAssetReader >;
 using IAssetWriterPtr = std::shared_ptr< IAssetWriter >;
 using IAssetFileProcessorPtr = std::shared_ptr< IAssetFileProcessor >;

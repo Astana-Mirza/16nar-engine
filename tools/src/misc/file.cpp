@@ -103,17 +103,4 @@ std::size_t File::get_size() const noexcept
      return ret;
 }
 
-
-std::filesystem::path correct_path(
-     const std::filesystem::path& base_dir,
-     const std::filesystem::path& path )
-{
-     std::filesystem::path result{ path };
-     if ( !base_dir.empty() && result.is_relative() )
-     {
-          result = std::filesystem::path{ base_dir } / result;
-     }
-     return result;
-}
-
 } // namespace _16nar::tools
