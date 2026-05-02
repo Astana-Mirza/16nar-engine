@@ -135,7 +135,7 @@ UnifiedStorage::UnifiedStorage(
      resources_{}, packages_{}, base_dir_{ base_dir },
      name_table_{ name_table },
      file_processor_{ file_processor },
-     convertor_{}, memory_{}, unpacked_{}
+     asset_reader_{}, convertor_{}, memory_{}, unpacked_{}
 {
      if ( !name_table_ || !file_processor_ )
      {
@@ -148,6 +148,7 @@ UnifiedStorage::UnifiedStorage(
           throw std::runtime_error{ "asset memory domain is not present" };
      }
      memory_ = &memory_domain->get_resource();
+     asset_reader_ = file_processor_->make_asset_reader();
 }
 
 
@@ -277,9 +278,9 @@ bool UnifiedStorage::mount( const std::filesystem::path& path )
 
      try
      {
-          auto asset_reader = file_processor_->make_asset_reader( data.get_const_view() );
+          asset_reader_->reset( data.get_const_view() );
           ResourceParser parser{ *this, name };
-          parser.process_resource_package( *asset_reader );
+          parser.process_resource_package( *asset_reader_ );
      }
      catch ( const std::exception& ex )
      {

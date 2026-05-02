@@ -25,10 +25,11 @@ public:
      /// @brief Default constructor.
      FlatBuffersAssetReader() noexcept;
 
-     /// @brief Constructor.
-     /// @throws std::runtime_error if cannot read asset.
-     /// @param[in] buffer flat buffer with asset data.
-     FlatBuffersAssetReader( ConstByteView buffer );
+     FlatBuffersAssetReader( const FlatBuffersAssetReader& ) = delete;
+     FlatBuffersAssetReader& operator=( const FlatBuffersAssetReader& ) = delete;
+
+     /// @copydoc IAssetReader::reset(ConstByteView)
+     void reset( ConstByteView buffer ) override;
 
      /// @copydoc IAssetReader::is_empty() const
      bool is_empty() const override;

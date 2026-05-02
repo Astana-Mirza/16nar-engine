@@ -67,9 +67,9 @@ bool FlatBuffersAssetFileProcessor::write_asset_data( ConstByteView buffer, File
 }
 
 
-IAssetReaderPtr FlatBuffersAssetFileProcessor::make_asset_reader( ConstByteView buffer )
+IAssetReaderPtr FlatBuffersAssetFileProcessor::make_asset_reader()
 {
-     return std::make_shared< FlatBuffersAssetReader >( buffer );
+     return std::make_shared< FlatBuffersAssetReader >();
 }
 
 

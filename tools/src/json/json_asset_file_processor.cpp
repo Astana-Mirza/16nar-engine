@@ -94,9 +94,9 @@ bool JsonAssetFileProcessor::write_asset_data( ConstByteView buffer, File& file 
 }
 
 
-IAssetReaderPtr JsonAssetFileProcessor::make_asset_reader( ConstByteView buffer )
+IAssetReaderPtr JsonAssetFileProcessor::make_asset_reader()
 {
-     return std::make_shared< JsonAssetReader >( buffer );
+     return std::make_shared< JsonAssetReader >();
 }
 
 

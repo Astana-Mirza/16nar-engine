@@ -207,6 +207,8 @@ void process( const std::vector< std::string >& paths, const AssetToolParams& pa
 
      auto writer = dst_processor->make_asset_writer();
      assert( writer );
+     auto reader = src_processor->make_asset_reader();
+     assert( reader );
 
      for ( const auto& path : paths )
      {
@@ -231,8 +233,7 @@ void process( const std::vector< std::string >& paths, const AssetToolParams& pa
           {
                throw std::runtime_error{ "cannot read asset data from file '" + path + "'" };
           }
-          auto reader = src_processor->make_asset_reader( buffer_ptr.get_const_view() );
-          assert( reader );
+          reader->reset( buffer_ptr.get_const_view() );
 
           const auto root_id = convert_recursive( *reader, *writer, *convertor, backward );
           const auto out_buffer = writer->finish( root_id );
