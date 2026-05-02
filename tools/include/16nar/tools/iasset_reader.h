@@ -19,6 +19,10 @@ public:
      /// @brief Virtual default destructor.
      virtual ~IAssetReader() = default;
 
+     /// @brief Reset current state of the reader to read asset from new buffer.
+     /// @param buffer buffer with asset data.
+     virtual void reset( ConstByteView buffer ) = 0;
+
      /// @brief Check if the reader is empty and does not have an asset to read.
      /// @return true if the reader is empty, false otherwise.
      virtual bool is_empty() const = 0;

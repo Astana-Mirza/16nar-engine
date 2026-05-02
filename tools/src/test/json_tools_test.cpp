@@ -30,8 +30,9 @@ TEST_CASE( "Asset reading", "[json_tools]" )
           REQUIRE( content.type_id == 0 );
      }
 
-     auto asset_reader = file_processor.make_asset_reader( buffer.get_const_view() );
+     auto asset_reader = file_processor.make_asset_reader();
      REQUIRE( asset_reader );
+     asset_reader->reset( buffer.get_const_view() );
 
      REQUIRE( !asset_reader->is_empty() );
      REQUIRE( asset_reader->get_name() == "test_container" );

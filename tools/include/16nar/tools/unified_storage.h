@@ -113,6 +113,7 @@ private:
      std::filesystem::path base_dir_;        ///< base directory of the application.
      NameTablePtr name_table_;               ///< name table.
      IAssetFileProcessorPtr file_processor_; ///< asset file processor.
+     IAssetReaderPtr asset_reader_;          ///< asset reader.
      IAssetDataConvertorPtr convertor_;      ///< asset data convertor.
      std::pmr::memory_resource *memory_;     ///< memory domain for asset reading allocations.
      bool unpacked_;                         ///< read unpacked resources insted of packages.

@@ -39,9 +39,12 @@ JsonAssetReader::JsonAssetReader() noexcept:
 {}
 
 
-JsonAssetReader::JsonAssetReader( ConstByteView buffer ):
-     json_{}, stack_{}, current_{}
+void JsonAssetReader::reset( ConstByteView buffer )
 {
+     current_ = nullptr;
+     stack_ = std::stack< JsonPtr >{};
+     json_.clear();
+
      if ( !buffer )
      {
           throw std::runtime_error{ "asset buffer is empty" };

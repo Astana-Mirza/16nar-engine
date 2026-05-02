@@ -27,8 +27,8 @@ public:
      /// @copydoc IAssetFileProcessor::write_asset_data(ConstByteView, File&)
      bool write_asset_data( ConstByteView buffer, File& file ) override;
 
-     /// @copydoc IAssetFileProcessor::make_asset_reader(ConstByteView)
-     IAssetReaderPtr make_asset_reader( ConstByteView buffer ) override;
+     /// @copydoc IAssetFileProcessor::make_asset_reader()
+     IAssetReaderPtr make_asset_reader() override;
 
      /// @copydoc IAssetFileProcessor::make_asset_writer()
      IAssetWriterPtr make_asset_writer() override;

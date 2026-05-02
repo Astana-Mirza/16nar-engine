@@ -36,9 +36,11 @@ FlatBuffersAssetReader::FlatBuffersAssetReader() noexcept:
 {}
 
 
-FlatBuffersAssetReader::FlatBuffersAssetReader( ConstByteView buffer ):
-     stack_{}, current_{}
+void FlatBuffersAssetReader::reset( ConstByteView buffer )
 {
+     current_ = nullptr;
+     stack_ = std::stack< const data::Asset * >{};
+
      if ( !buffer )
      {
           throw std::runtime_error{ "asset buffer is empty" };

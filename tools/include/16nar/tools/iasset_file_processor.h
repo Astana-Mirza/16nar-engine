@@ -30,12 +30,9 @@ public:
      /// @return true on success, false otherwise.
      virtual bool write_asset_data( ConstByteView buffer, File& file ) = 0;
 
-     /// @brief Make asset reader which reads data from given buffer.
-     /// @details Asset reader usually does not copy memory, so memory
-     /// of the @b buffer must not be released until the end of asset reader use.
-     /// @param[in] buffer data of the asset.
+     /// @brief Make asset reader.
      /// @return asset reader.
-     virtual IAssetReaderPtr make_asset_reader( ConstByteView buffer ) = 0;
+     virtual IAssetReaderPtr make_asset_reader() = 0;
 
      /// @brief Make asset writer.
      /// @return asset writer.

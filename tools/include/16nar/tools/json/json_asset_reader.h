@@ -23,10 +23,8 @@ public:
      JsonAssetReader( const JsonAssetReader& ) = delete;
      JsonAssetReader& operator=( const JsonAssetReader& ) = delete;
 
-     /// @brief Constructor.
-     /// @throws std::exception if cannot parse JSON.
-     /// @param[in] buffer buffer with string containing asset in JSON.
-     JsonAssetReader( ConstByteView buffer );
+     /// @copydoc IAssetReader::reset(ConstByteView)
+     void reset( ConstByteView buffer ) override;
 
      /// @copydoc IAssetReader::is_empty() const
      bool is_empty() const override;
