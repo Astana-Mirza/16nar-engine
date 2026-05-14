@@ -35,6 +35,7 @@ set(NARENGINE_TOOLS_SOURCES
     "${NARENGINE_TOOLS_SRC_DIR}/logger/terminal_log_writer.cpp"
 
     "${NARENGINE_TOOLS_SRC_DIR}/resources/resource_pkg_visitor.cpp"
+    "${NARENGINE_TOOLS_SRC_DIR}/resources/stb_texture_reader.cpp"
 
     "${NARENGINE_TOOLS_SRC_DIR}/memory_domain.cpp"
     "${NARENGINE_TOOLS_SRC_DIR}/memory_manager.cpp"

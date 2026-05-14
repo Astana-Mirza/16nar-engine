@@ -6,6 +6,7 @@
 #include <16nar/tools/defs.h>
 
 #include <16nar/tools/misc/shared_buffer_ptr.h>
+#include <16nar/tools/misc/static_name.h>
 
 namespace _16nar::tools
 {
@@ -20,6 +21,7 @@ public:
      /// @brief Read resource data to memory buffer.
      /// @param[in] name name of the resource.
      /// @param[in] storage unified storage of resources.
+     /// @return data of the resource, nullptr in case of error.
      virtual SharedBufferPtr read( StaticName name, UnifiedStorage& storage ) = 0;
 };
 
