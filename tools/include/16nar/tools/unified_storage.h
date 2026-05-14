@@ -30,7 +30,7 @@ public:
 
      /// @brief Constructor.
      /// @throws std::runtime_error if @b name_table or @b file_processor is null
-     /// or no suitable allocator present in @b memory_manager.
+     /// or no suitable memory domain ("asset") present in @b memory_manager.
      /// @param[in] base_dir base directory of the application.
      /// @param[in] memory_manager memory manager for allocations.
      /// @param[in] name_table name table.
@@ -62,7 +62,7 @@ public:
 
      /// @brief Load the resource data by name.
      /// @param[in] name name of the resource.
-     /// @return Data of the resource, nullptr if resource with given @b name does not exist.
+     /// @return data of the resource, nullptr if resource with given @b name does not exist.
      SharedBufferPtr load( StaticName name );
 
      /// @brief Mount the package.
@@ -115,7 +115,7 @@ private:
      IAssetFileProcessorPtr file_processor_; ///< asset file processor.
      IAssetReaderPtr asset_reader_;          ///< asset reader.
      IAssetDataConvertorPtr convertor_;      ///< asset data convertor.
-     std::pmr::memory_resource *memory_;     ///< memory domain for asset reading allocations.
+     std::pmr::memory_resource *memory_;     ///< memory resource for asset reading allocations.
      bool unpacked_;                         ///< read unpacked resources insted of packages.
 };
 

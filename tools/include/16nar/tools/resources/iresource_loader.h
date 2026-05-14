@@ -17,7 +17,7 @@ public:
      /// @brief Virtual default destructor.
      virtual ~IResourceLoader() = default;
 
-     /// @brief Load resource and pass it to consumer.
+     /// @brief Load resource and pass it to consuming processor.
      /// @param[in] name name of the resource.
      /// @param[in] processor object which processes the loaded resource data.
      virtual void load( StaticName name, IResourceProcessor& processor ) = 0;
