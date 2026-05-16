@@ -10,4 +10,4 @@ add_executable("test_package"
     "${PROJECT_SOURCE_DIR}/test_package.cpp"
 )
 
-target_link_libraries("test_package" "16nar::16nar_constructor2d" "16nar::16nar_render_gl")
+target_link_libraries("test_package" "16nar::16nar_core")
