@@ -14,7 +14,7 @@ namespace _16nar::assets
 /// @brief Interface for writing data asset.
 /// @details All assets written by a single writer are stored in one buffer. The assets
 /// are stored in a tree. Non-zero unsigned numbers are used for identification of written assets.
-class NARENGINE_CORE_API IAssetWriter
+class IAssetWriter
 {
 public:
      /// @brief Virtual default destructor.

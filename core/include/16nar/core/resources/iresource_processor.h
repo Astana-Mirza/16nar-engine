@@ -11,7 +11,7 @@ namespace _16nar::resources
 {
 
 /// @brief Interface for processing the resource during its load.
-class NARENGINE_CORE_API IResourceProcessor
+class IResourceProcessor
 {
 public:
      /// @brief Virtual default destructor.

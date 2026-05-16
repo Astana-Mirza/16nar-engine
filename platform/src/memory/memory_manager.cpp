@@ -7,6 +7,10 @@
 namespace _16nar::memory
 {
 
+MemoryManager::MemoryManager() = default;
+MemoryManager::~MemoryManager() = default;
+
+
 void MemoryManager::set_default_domain( MemoryDomainPtr domain )
 {
      default_domain_ = std::move( domain );

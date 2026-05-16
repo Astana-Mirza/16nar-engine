@@ -17,6 +17,12 @@ namespace _16nar::memory
 class NARENGINE_PLATFORM_API MemoryManager
 {
 public:
+     /// @brief Default constructor.
+     MemoryManager();
+
+     /// @brief Destructor.
+     ~MemoryManager();
+
      /// @brief Set the default domain which will be used as a fallback.
      /// @param[in] domain default memory domain.
      void set_default_domain( MemoryDomainPtr domain );
@@ -39,6 +45,10 @@ public:
      /// @brief Reset all memory domains with specified policy.
      /// @param[in] policy policy identifier.
      void reset_with_policy( std::uint32_t policy );
+
+private:
+     MemoryManager( const MemoryManager& ) = delete;
+     MemoryManager& operator=( const MemoryManager& ) = delete;
 
 private:
      using PolicyVector = std::unordered_map< std::uint32_t, std::vector< MemoryDomain * > >;

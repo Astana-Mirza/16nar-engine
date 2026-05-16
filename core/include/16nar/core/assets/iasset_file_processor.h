@@ -12,7 +12,7 @@ namespace _16nar::assets
 {
 
 /// @brief Interface for processing data asset file.
-class NARENGINE_CORE_API IAssetFileProcessor
+class IAssetFileProcessor
 {
 public:
      /// @brief Virtual default destructor.

@@ -11,7 +11,7 @@ namespace _16nar::assets
 {
 
 /// @brief Interface for conversion of asset data between formats.
-class NARENGINE_CORE_API IAssetDataConvertor
+class IAssetDataConvertor
 {
 public:
      /// @brief Virtual default destructor.

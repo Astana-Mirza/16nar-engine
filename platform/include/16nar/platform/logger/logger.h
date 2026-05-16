@@ -35,6 +35,9 @@ public:
      /// @return single instance of logger.
      static Logger& instance();
 
+     /// @brief Destructor.
+     ~Logger();
+
      /// @brief Write formatted string to log.
      /// @details Text line written to log has the following pattern:
      /// "YYYY-MM-DD HH:MM:ss [LEVEL]: formatted message". Maximum length of
@@ -55,7 +58,9 @@ public:
      void add_writer( WriterPtr writer );
 
 private:
-     Logger() = default;
+     /// @brief Default constructor.
+     Logger();
+
      Logger( const Logger& ) = delete;
      Logger& operator=( const Logger& ) = delete;
 

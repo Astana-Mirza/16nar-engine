@@ -12,7 +12,7 @@ namespace _16nar::logger
 {
 
 /// @brief Interface for log writing.
-class NARENGINE_PLATFORM_API ILogWriter
+class ILogWriter
 {
 public:
      /// @brief Virtual default destructor.

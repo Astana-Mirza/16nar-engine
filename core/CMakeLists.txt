@@ -134,12 +134,10 @@ if ("${NARENGINE_BUILD_TESTS}")
     target_link_libraries("${NAME}_core_test" ${NARENGINE_CORE_COMMON_LINK_LIBS}
         PRIVATE ${NARENGINE_CORE_LIBS} "Catch2::Catch2WithMain"
     )
-    if("${WIN32}")
-        add_custom_command(TARGET "${NAME}_core_test" POST_BUILD
-            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-            "$<TARGET_RUNTIME_DLLS:${NAME}_core_test>"
-            "$<TARGET_FILE_DIR:${NAME}_core_test>"
-            COMMAND_EXPAND_LISTS
+    message("PATH $$<TARGET_FILE_DIR:${NAME}_platform>")
+    if("${WIN32}" AND "${CONAN_RUNTIME_LIB_DIRS}")
+        set_tests_properties("${NAME}_core_test" PROPERTIES ENVIRONMENT_MODIFIED
+            "PATH=path_list_prepend:${CONAN_RUNTIME_LIB_DIRS};${PROJECT_BINARY_DIR}/bin"
         )
     endif()
     file(COPY "${NARENGINE_CORE_SRC_DIR}/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
