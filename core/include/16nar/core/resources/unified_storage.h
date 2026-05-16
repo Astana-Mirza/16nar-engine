@@ -87,6 +87,10 @@ public:
      assets::IAssetDataConvertorPtr get_convertor() const noexcept;
 
 private:
+     UnifiedStorage( const UnifiedStorage& ) = delete;
+     UnifiedStorage& operator=( const UnifiedStorage& ) = delete;
+
+private:
      /// @brief Description of resource in the package.
      struct ResourceDesc
      {

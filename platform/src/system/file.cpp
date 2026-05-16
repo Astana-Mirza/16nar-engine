@@ -39,7 +39,7 @@ bool File::open( const std::filesystem::path& path, bool write ) noexcept
      {
           close();
      }
-     handle_ = std::fopen( path.c_str(), write ? "wb+" : "rb" );
+     handle_ = std::fopen( path.string().c_str(), write ? "wb+" : "rb" );
      return is_open();
 }
 

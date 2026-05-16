@@ -11,7 +11,7 @@ namespace _16nar::resources
 {
 
 /// @brief Interface of a manager which holds resources of same type.
-class NARENGINE_CORE_API IResourceManager
+class IResourceManager
 {
 public:
      /// @brief Virtual default destructor.

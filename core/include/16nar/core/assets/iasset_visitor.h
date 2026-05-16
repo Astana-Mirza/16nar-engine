@@ -11,7 +11,7 @@ namespace _16nar::assets
 {
 
 /// @brief Interface for performing specific actions during asset tree parsing.
-class NARENGINE_CORE_API IAssetVisitor
+class IAssetVisitor
 {
 public:
      /// @brief Virtual default destructor.

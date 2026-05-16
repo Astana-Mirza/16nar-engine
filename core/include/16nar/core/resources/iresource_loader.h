@@ -13,7 +13,7 @@ namespace _16nar::resources
 /// @brief Main interface of resource loading.
 /// @details Resource loader manages the load process of resource metadata and data
 /// and uses @b IResourceProcessor to perform needed operations with the data.
-class NARENGINE_CORE_API IResourceLoader
+class IResourceLoader
 {
 public:
      /// @brief Virtual default destructor.

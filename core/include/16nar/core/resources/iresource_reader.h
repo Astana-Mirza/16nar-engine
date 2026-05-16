@@ -12,7 +12,7 @@ namespace _16nar::resources
 {
 
 /// @brief Interface for resource files reading.
-class NARENGINE_CORE_API IResourceReader
+class IResourceReader
 {
 public:
      /// @brief Virtual default destructor.

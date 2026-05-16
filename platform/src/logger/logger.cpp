@@ -34,6 +34,10 @@ Logger& Logger::instance()
 }
 
 
+Logger::Logger() = default;
+Logger::~Logger() = default;
+
+
 void Logger::log( LogLevel level, const char *format, ... )
 {
      if ( level > log_level_ || !format )

@@ -13,7 +13,7 @@ namespace _16nar::assets
 {
 
 /// @brief Interface for reading data asset.
-class NARENGINE_CORE_API IAssetReader
+class IAssetReader
 {
 public:
      /// @brief Virtual default destructor.

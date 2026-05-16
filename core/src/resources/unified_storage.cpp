@@ -65,11 +65,10 @@ public:
           }
 
           const auto database_path = UnifiedStorage::correct_path(
-               storage_.base_dir_, package_buf->database()->c_str() );
+               storage_.base_dir_, package_buf->database()->c_str() ).string();
           if ( !package.database.open( database_path.c_str() ) )
           {
-               throw std::runtime_error{ "cannot open resource package database "
-                    + database_path.string() };
+               throw std::runtime_error{ "cannot open resource package database " + database_path };
           }
           storage_.packages_.emplace( package_name_, std::move( package ) );
 
@@ -187,7 +186,7 @@ memory::SharedBufferPtr UnifiedStorage::load( strings::StaticName name )
      if ( unpacked_ )
      {
           system::File file;
-          const auto path = get_path( name );
+          const auto path = get_path( name ).string();
           if ( path.empty() || !file.open( path ) )
           {
                LOG_16NAR_ERROR( "Cannot open unpacked resource '%s'", path.c_str() );
@@ -247,14 +246,14 @@ memory::SharedBufferPtr UnifiedStorage::load( strings::StaticName name )
 
 bool UnifiedStorage::mount( const std::filesystem::path& path )
 {
-     const auto full_path = correct_path( base_dir_, path );
+     const auto full_path = correct_path( base_dir_, path ).string();
      if ( unpacked_ )
      {
           LOG_16NAR_INFO( "Mount package '%s' (disabled in unpacked mode)", full_path.c_str() );
           return true;
      }
 
-     strings::StaticName name{ path.c_str() };
+     strings::StaticName name{ path.string().c_str() };
      if ( packages_.count( name ) )
      {
           LOG_16NAR_INFO( "Package '%s' is already mounted", full_path.c_str() );

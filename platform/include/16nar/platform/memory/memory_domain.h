@@ -44,6 +44,10 @@ public:
      /// @param[in] child child memory domain.
      void add_child( MemoryDomainPtr child );
 
+private:
+     MemoryDomain( const MemoryDomain& ) = delete;
+     MemoryDomain& operator=( const MemoryDomain& ) = delete;
+
 protected:
      /// @brief Implementation of current domain reset.
      virtual void do_reset() = 0;
