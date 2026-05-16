@@ -1,0 +1,87 @@
+set(NARENGINE_PLATFORM_SRC_DIR "${PROJECT_SOURCE_DIR}/platform/src")
+set(NARENGINE_PLATFORM_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/platform/include")
+
+# Basic settings applied to all libraries on the layer
+set(NARENGINE_PLATFORM_COMMON_COMPILER_DEFS ${NARENGINE_COMMON_COMPILER_DEFS})
+set(NARENGINE_PLATFORM_COMMON_INCLUDE_DIRS ${NARENGINE_COMMON_INCLUDE_DIRS}
+    PUBLIC "$<BUILD_INTERFACE:${NARENGINE_PLATFORM_INCLUDE_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<INSTALL_INTERFACE:include>"
+)
+set(NARENGINE_PLATFORM_COMMON_LINK_DIRS ${NARENGINE_COMMON_LINK_DIRS}
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<INSTALL_INTERFACE:lib>"
+)
+set(NARENGINE_PLATFORM_COMMON_LINK_LIBS ${NARENGINE_COMMON_LINK_LIBS})
+configure_file("${NARENGINE_PLATFORM_INCLUDE_DIR}/${NAME}/platform/config.h.in" "${NAME}/platform/config.h")
+
+
+# Base Platform layer library
+set(NARENGINE_PLATFORM_COMPILER_DEFS ${NARENGINE_PLATFORM_COMMON_COMPILER_DEFS}
+    PUBLIC "GLFW_INCLUDE_NONE"
+)
+if ("${NARENGINE_WIN_EXPORT}")
+    set(NARENGINE_PLATFORM_COMPILER_DEFS ${NARENGINE_PLATFORM_COMPILER_DEFS}
+        PRIVATE "NARENGINE_PLATFORM_EXPORT"
+    )
+endif() # if ("${NARENGINE_WIN_EXPORT}")
+set(NARENGINE_PLATFORM_INCLUDE_DIRS ${NARENGINE_PLATFORM_COMMON_INCLUDE_DIRS})
+set(NARENGINE_PLATFORM_LINK_DIRS ${NARENGINE_PLATFORM_COMMON_LINK_DIRS})
+set(NARENGINE_PLATFORM_LINK_LIBS ${NARENGINE_PLATFORM_COMMON_LINK_LIBS}
+    PUBLIC "glm::glm"
+    PRIVATE "glfw" "Threads::Threads"
+)
+set(NARENGINE_PLATFORM_SOURCES
+    "${NARENGINE_PLATFORM_SRC_DIR}/system/file.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/system/dynamic_lib.cpp"
+
+    "${NARENGINE_PLATFORM_SRC_DIR}/strings/name_table.cpp"
+
+    "${NARENGINE_PLATFORM_SRC_DIR}/memory/shared_buffer_ptr.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/memory/memory_domain.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/memory/memory_manager.cpp"
+
+    "${NARENGINE_PLATFORM_SRC_DIR}/logger/logger.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/logger/terminal_log_writer.cpp"
+)
+add_library("${NAME}_platform" "${NARENGINE_LIB_TYPE}" ${NARENGINE_PLATFORM_SOURCES})
+narengine_add_deps("${NAME}_platform" "NARENGINE_PLATFORM")
+set(NARENGINE_PLATFORM_LIBS ${NARENGINE_PLATFORM_LIBS} "${NAME}_platform")
+
+set(NARENGINE_PLATFORM_ALL_TARGETS ${NARENGINE_PLATFORM_ALL_TARGETS} ${NARENGINE_PLATFORM_LIBS})
+
+
+# Testing
+if ("${NARENGINE_BUILD_TESTS}")
+    enable_testing()
+    set(NARENGINE_PLATFORM_TEST_SOURCES
+        "${NARENGINE_PLATFORM_SRC_DIR}/test/math/math_functions_test.cpp"
+        #"${NARENGINE_PLATFORM_SRC_DIR}/test/math/rectangle_test.cpp"
+        #"${NARENGINE_PLATFORM_SRC_DIR}/test/math/transform_matrix_test.cpp"
+        #"${NARENGINE_PLATFORM_SRC_DIR}/test/math/vec_test.cpp"
+    )
+    add_executable("${NAME}_platform_test" ${NARENGINE_PLATFORM_TEST_SOURCES})
+    target_include_directories("${NAME}_platform_test" ${NARENGINE_PLATFORM_COMMON_INCLUDE_DIRS}
+        PRIVATE ${CATCH2_INCLUDE_DIRS}
+    )
+    target_link_directories("${NAME}_platform_test" ${NARENGINE_PLATFORM_COMMON_LINK_DIRS})
+    target_link_libraries("${NAME}_platform_test" ${NARENGINE_PLATFORM_COMMON_LINK_LIBS}
+        PRIVATE ${NARENGINE_PLATFORM_LIBS} "Catch2::Catch2WithMain"
+    )
+    if("${WIN32}")
+        add_custom_command(TARGET "${NAME}_platform_test" POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "$<TARGET_RUNTIME_DLLS:${NAME}_platform_test>"
+            "$<TARGET_FILE_DIR:${NAME}_platform_test>"
+            COMMAND_EXPAND_LISTS
+        )
+    endif()
+    # file(COPY "${NARENGINE_PLATFORM_SRC_DIR}/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+    add_test(NAME "${NAME}_platform_test" COMMAND "${NAME}_platform_test")
+endif() # if ("${NARENGINE_BUILD_TESTS}")
+
+
+# Installation
+install(TARGETS ${NARENGINE_PLATFORM_ALL_TARGETS} EXPORT "16nar")
+install(DIRECTORY "${NARENGINE_PLATFORM_INCLUDE_DIR}/${NAME}" DESTINATION "include")
+install(FILES "${PROJECT_BINARY_DIR}/platform/${NAME}/platform/config.h" DESTINATION "include/${NAME}/platform")

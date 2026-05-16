@@ -1,6 +1,6 @@
 from conan import ConanFile
 from conan.tools.cmake import CMake, cmake_layout
-from conan.tools.build import check_min_cppstd
+from conan.tools.build import check_min_cppstd, can_run
 import re
 
 
@@ -10,43 +10,43 @@ class NarengineRecipe(ConanFile):
 
     url = "https://github.com/Astana-Mirza/16nar-engine"
 
-    exports_sources = "CMakeLists.txt", "engine/*", "schemas/*", "tools/*"
+    exports_sources = "CMakeLists.txt", "cmake/*", "schemas/*", "platform/*", "core/*", "plugins/*"
 
     settings = "os", "compiler", "build_type", "arch"
     options = {
         "shared": [True, False],
         "log_level": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        "enable_tests": [True, False],
         "with_utils": [True, False],
-        "with_tools_json": [True, False],
-        "with_tools_flatbuffers": [True, False],
-        "with_render_opengl": [True, False],
-        "with_arch_constructor2d": [True, False]
+        "with_assets_json": [True, False],
+        "with_render_vulkan": [True, False],
+        "with_render_opengl": [True, False]
     }
     default_options = {
         "shared": True,
         "log_level": 9,
+        "enable_tests": True,
         "with_utils": True,
-        "with_tools_json": True,
-        "with_tools_flatbuffers": True,
-        "with_render_opengl": True,
-        "with_arch_constructor2d": True
+        "with_assets_json": True,
+        "with_render_vulkan": True,
+        "with_render_opengl": False
     }
 
     generators = "CMakeToolchain", "CMakeDeps"
 
     def requirements(self):
-        self.requires("glfw/3.4")
+        self.requires("flatbuffers/24.3.25", transitive_headers=True)
         self.requires("glm/1.0.1", transitive_headers=True)
-        self.requires("stb/cci.20240213")
-        self.requires("flatbuffers/24.3.25")
-        if self.options.with_tools_json:
-            self.requires("nlohmann_json/3.11.3")
+        self.requires("glfw/3.4", visible=False)
+        self.requires("stb/cci.20240213", visible=False)
+        if self.options.with_assets_json:
+            self.requires("nlohmann_json/3.11.3", transitive_headers=True)
         if self.options.with_utils:
-            self.requires("cxxopts/3.3.1")
+            self.requires("cxxopts/3.3.1", visible=False)
         if self.options.with_render_opengl:
             self.requires("opengl/system")
-
-        self.test_requires("catch2/3.6.0")
+        if self.options.enable_tests:
+            self.test_requires("catch2/3.6.0")
 
     def validate(self):
         check_min_cppstd(self, "17")
@@ -54,25 +54,28 @@ class NarengineRecipe(ConanFile):
     def layout(self):
         cmake_layout(self)
 
+    def configure(self):
+        if self.options.shared:
+            self.package_type = "shared-library"
+        else:
+            self.package_type = "static-library"
+
     def build(self):
         version_items = re.split(r'\.|-|\+', self.version)
         cmake = CMake(self)
         cmake.configure({
             "NARENGINE_LOG_LEVEL": self.options.log_level,
             "NARENGINE_BUILD_UTILS": "ON" if self.options.with_utils else "OFF",
-            "NARENGINE_TOOLS_JSON": "ON" if self.options.with_tools_json else "OFF",
-            "NARENGINE_TOOLS_FLATBUFFERS": "ON" if self.options.with_tools_flatbuffers else "OFF",
+            "NARENGINE_ASSETS_JSON": "ON" if self.options.with_assets_json else "OFF",
+            "NARENGINE_RENDER_VULKAN": "ON" if self.options.with_render_vulkan else "OFF",
             "NARENGINE_RENDER_OPENGL": "ON" if self.options.with_render_opengl else "OFF",
-            "NARENGINE_BUILD_CONSTRUCTOR2D": "ON" if self.options.with_arch_constructor2d else "OFF",
             "NARENGINE_VERSION_MAJOR": version_items[ 0 ],
             "NARENGINE_VERSION_MINOR": version_items[ 1 ],
             "NARENGINE_VERSION_PATCH": version_items[ 2 ],
         })
         cmake.build()
-        if self.settings.os != "Windows":
-            # tests need libaries from different directories, which is impossible on Windows (Windows sucks)
-            # tests will be run only if tools.build:skip_test option is false (default is false)
-            cmake.test()
+        if self.options.enable_tests and can_run(self):
+            cmake.test(cli_args=["--verbose"])
 
     def package(self):
         cmake = CMake(self)
@@ -90,24 +93,25 @@ class NarengineRecipe(ConanFile):
         self.cpp_info.set_property("cmake_file_name", "16nar")
         self.cpp_info.set_property("cmake_find_mode", "both")
 
-        # tools
-        self.add_package_component("16nar_tools", [], ["flatbuffers::libflatbuffers"])
+        # Platform
+        self.add_package_component("16nar_platform", ["glm::glm"])
 
-        if self.options.with_tools_json:
-            self.add_package_component("16nar_tools_json", ["16nar_tools"])
-        if self.options.with_tools_flatbuffers:
-            self.add_package_component("16nar_tools_fb", ["16nar_tools"], ["flatbuffers::libflatbuffers"])
-        if self.options.with_arch_constructor2d:
-            self.add_package_component("16nar_tools_constructor2d",
-                ["16nar_tools"], ["flatbuffers::libflatbuffers"])
+        # Core
+        self.add_package_component("16nar_core", ["16nar_platform"])
+        self.add_package_component("16nar_assets_fb", [
+            "16nar_core",
+            "flatbuffers::libflatbuffers"
+        ])
+        if self.options.with_assets_json:
+            self.add_package_component("16nar_assets_json", [
+                "16nar_core",
+                "nlohmann_json::nlohmann_json",
+                "flatbuffers::libflatbuffers"
+            ])
 
-        # engine
-        self.add_package_component("16nar_math", [], ["glm::glm"])
-        self.add_package_component("16nar_base", ["16nar_math"], ["glfw"])
-
-        if self.options.with_render_opengl:
-            self.add_package_component("16nar_render_gl", ["16nar_base"], ["opengl::opengl"])
-
-        if self.options.with_arch_constructor2d:
-            self.add_package_component("16nar_constructor2d", ["16nar_base"])
+        # Plugins
+        #if self.options.with_render_vulkan:
+        #    self.add_package_component("16nar_render_vulkan", ["16nar_core"])
+        #if self.options.with_render_opengl:
+        #    self.add_package_component("16nar_render_opengl", ["16nar_core"])
 
