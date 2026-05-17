@@ -5,7 +5,7 @@
 
 #include <16nar/platform/defs.h>
 
-#include <string>
+#include <string_view>
 
 namespace _16nar::system
 {
@@ -15,9 +15,10 @@ class NARENGINE_PLATFORM_API DynamicLib
 {
 public:
      /// @brief Constructor.
+     /// @warning created object may be invalid if the library is not loaded.
+     /// Caller should check it via @b is_loaded() member function.
      /// @param[in] name relative path to the library.
-     /// @throws std::runtime_error.
-     DynamicLib( const std::string& name );
+     DynamicLib( std::string_view name );
 
      /// @brief Move constructor.
      /// @param[in] lib rvalue reference to DynamicLib.
@@ -25,25 +26,26 @@ public:
 
      /// @brief Move assignment.
      /// @param[in] lib rvalue reference to DynamicLib.
-     /// @return Reference to *this.
-     DynamicLib& operator= ( DynamicLib&& lib ) noexcept;
+     /// @return current object.
+     DynamicLib& operator=( DynamicLib&& lib ) noexcept;
 
      /// @brief Destructor, closes the handle.
-     ~DynamicLib();
+     ~DynamicLib() noexcept;
+
+     /// @brief Check if the library is loaded.
+     /// @return true if the library is loaded, false otherwise.
+     bool is_loaded() const noexcept;
 
      /// @brief Get the symbol with given name.
      /// @param[in] name name of the symbol.
      /// @return loaded symbol, nullptr in case of error.
-     /// @throws std::runtime_error.
-     void *get_symbol( const std::string& name ) const;
+     void *get_symbol( std::string_view name ) const;
 
 private:
-     // no copy construction and assignment
      DynamicLib( const DynamicLib& )             = delete;
      DynamicLib& operator= ( const DynamicLib& ) = delete;
 
-     std::string name_;                 ///< name of the library.
-     void *handle_ = nullptr;           ///< pointer to a handle of the library.
+     void *handle_; ///< handle of the library.
 };
 
 } // namespace _16nar::system

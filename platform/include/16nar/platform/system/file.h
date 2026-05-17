@@ -62,7 +62,7 @@ public:
      /// @param[in] offset desired offset.
      /// @param[in] origin origin of pointer modification.
      /// @return true on success, false on failure.
-     bool seek( std::size_t offset, SeekOrigin origin ) noexcept;
+     bool seek( int offset, SeekOrigin origin ) noexcept;
 
      /// @brief Write buffer to the file.
      /// @param[in] buffer buffer to be written.

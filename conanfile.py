@@ -37,7 +37,7 @@ class NarengineRecipe(ConanFile):
     def requirements(self):
         self.requires("flatbuffers/24.3.25", transitive_headers=True)
         self.requires("glm/1.0.1", transitive_headers=True)
-        self.requires("glfw/3.4", visible=False)
+        self.requires("glfw/3.4")
         self.requires("stb/cci.20240213", visible=False)
         if self.options.with_assets_json:
             self.requires("nlohmann_json/3.11.3", transitive_headers=True)
@@ -94,7 +94,7 @@ class NarengineRecipe(ConanFile):
         self.cpp_info.set_property("cmake_find_mode", "both")
 
         # Platform
-        self.add_package_component("16nar_platform", ["glm::glm"])
+        self.add_package_component("16nar_platform", ["glm::glm", "glfw::glfw"])
 
         # Core
         self.add_package_component("16nar_core", ["16nar_platform"])

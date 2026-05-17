@@ -52,9 +52,9 @@ bool File::is_open() const noexcept
 
 void File::close() noexcept
 {
-     if ( is_open() )
+     if ( is_open() && std::fclose( handle_ ) == 0 )
      {
-          std::fclose( handle_ );
+          handle_ = nullptr;
      }
 }
 
@@ -65,7 +65,7 @@ std::size_t File::tell() const noexcept
 }
 
 
-bool File::seek( std::size_t offset, SeekOrigin origin ) noexcept
+bool File::seek( int offset, SeekOrigin origin ) noexcept
 {
      return is_open() ? ( 0 == std::fseek( handle_, offset, origin ) ) : false;
 }
@@ -73,13 +73,13 @@ bool File::seek( std::size_t offset, SeekOrigin origin ) noexcept
 
 std::size_t File::write( memory::ConstByteView buffer ) noexcept
 {
-     return is_open() ? std::fwrite( buffer.data, buffer.size, 1, handle_ ) * buffer.size : 0;
+     return is_open() ? std::fwrite( buffer.data, 1, buffer.size, handle_ ) : 0;
 }
 
 
 std::size_t File::read( memory::ByteView buffer ) const noexcept
 {
-     return is_open() ? std::fread( buffer.data, buffer.size, 1, handle_ ) * buffer.size : 0;
+     return is_open() ? std::fread( buffer.data, 1, buffer.size, handle_ ) : 0;
 }
 
 
