@@ -4,11 +4,10 @@
 
 #include <16nar/platform/defs.h>
 
-#include <16nar/platform/math/vec.h>
-#include <16nar/platform/math/rectangle.h>
+#include <16nar/platform/math/defs.h>
 
 #include <vector>
-#include <string>
+#include <string_view>
 
 struct GLFWmonitor;
 
@@ -16,7 +15,7 @@ namespace _16nar::system
 {
 
 /// @brief Class for monitor representation.
-/// @detail User can change settings of monitor and make use of several monitors.
+/// @details User can change settings of monitor and make use of several monitors.
 /// For example, when creating a fullscreen window, the user needs to specify
 /// which monitor it will occupy.
 /// 
@@ -35,13 +34,13 @@ public:
      /// @brief Video mode of a monitor.
      struct VideoMode
      {
-          Vec3i depth;        ///< bit depth for red, green and blue channels.
-          Vec2i size;         ///< size of the video mode, in screen coordinates.
+          math::Vec3i depth;  ///< bit depth for red, green and blue channels.
+          math::Vec2i size;   ///< size of the video mode, in screen coordinates.
           int refresh_rate;   ///< refresh rate of the video mode, in Hz.
      };
 
      /// @brief Gamma ramp for a monitor.
-     /// @detail Work with gamma is restricted in Wayland.
+     /// @details Work with gamma is restricted in Wayland.
      struct GammaRamp
      {
           uint16_t *red;      ///< array of values for red channel.
@@ -51,41 +50,46 @@ public:
      };
 
      /// @brief Constructor with primary monitor.
-     /// @throws std::runtime_error if no monitors were found.
+     /// @warning created object may be invalid if the primary monitor is not found.
+     /// Caller should check it via @b valid() member function.
      Monitor();
 
      /// @brief Copy constructor.
      /// @param[in] other monitor to be copied.
-     Monitor( const Monitor& other );
+     Monitor( const Monitor& other ) noexcept;
 
      /// @brief Copy assignment operator.
      /// @param[in] other monitor to be copied.
      /// @return current object which was assigned to.
-     Monitor& operator=( const Monitor& other );
+     Monitor& operator=( const Monitor& other ) noexcept;
+
+     /// @brief Check if monitor object is valid.
+     /// @return true if monitor object is valid, false otherwise.
+     bool valid() const noexcept;
 
      /// @brief Get virtual position of the monitor's viewport.
      /// @return virtual position of the monitor's viewport.
-     Vec2i get_pos() const;
+     math::Vec2i get_pos() const noexcept;
 
      /// @brief Get monitor's size, in millimeters.
      /// @return monitor's size, in millimeters.
-     Vec2i get_physical_size() const;
+     math::Vec2i get_physical_size() const noexcept;
 
      /// @brief Get content scale ratio for X and Y.
      /// @return content scale ratio.
-     Vec2f get_content_scale() const;
+     math::Vec2f get_content_scale() const noexcept;
 
      /// @brief Get virtual area without OS taskbars.
      /// @return virtual area without OS taskbars.
-     IntRect get_workarea() const;
+     math::IntRect get_workarea() const noexcept;
 
      /// @brief Get monitor name.
      /// @return monitor name.
-     std::string get_name() const;
+     std::string_view get_name() const noexcept;
 
      /// @brief Get current video mode of the monitor.
      /// @return current video mode of the monitor.
-     VideoMode get_current_video_mode() const;
+     VideoMode get_current_video_mode() const noexcept;
 
      /// @brief Get supported video modes.
      /// @return supported video modes.
@@ -93,13 +97,13 @@ public:
 
      /// @brief Get gamma ramp applied to the monitor.
      /// @return gamma ramp applied to the monitor.
-     GammaRamp get_gamma_ramp() const;
+     GammaRamp get_gamma_ramp() const noexcept;
 
      /// @brief Set additional software gamma for the monitor.
      /// @detail New gamma ramp is calculated and applied.
      /// Setting gamma to 1.0 will produce default monitor behavior.
      /// @param[in] gamma gamma value (exponent).
-     void set_gamma( float gamma );
+     void set_gamma( float gamma ) noexcept;
 
      /// @brief Set gamma ramp for the monitor.
      /// @param[in] ramp gamma ramp.
@@ -122,14 +126,14 @@ public:
 private:
      /// @brief Constructor for inner use only.
      /// @param[in] monitor inner representation of monitor.
-     Monitor( ::GLFWmonitor *monitor );
+     Monitor( ::GLFWmonitor *monitor ) noexcept;
 
      /// @brief Inner callback function for GLFW monitor.
      /// @param[in] monitor monitor handle.
      /// @param[in] event received event number.
      static void glfw_monitor_callback( ::GLFWmonitor *monitor, int event );
 
-     ::GLFWmonitor *monitor_;                       ///< inner representation of monitor.
+     ::GLFWmonitor *monitor_;                     ///< inner representation of monitor.
      static ConnectCallback connect_callback_;    ///< callback for monitor connection.
      static ConnectCallback disconnect_callback_; ///< callback for monitor disconnection.
 };

@@ -7,83 +7,96 @@
 #ifdef __linux__
 #    include <dlfcn.h>
 #elif _WIN32
+#    if !defined( WIN32_LEAN_AND_MEAN )
+#         define WIN32_LEAN_AND_MEAN
+#    endif
 #    include <windows.h>
 #endif
 
 namespace _16nar::system
 {
 
-DynamicLib::DynamicLib( const std::string& name ):
-     name_{ name }
+DynamicLib::DynamicLib( std::string_view name ):
+     handle_{}
 {
 #ifdef __linux__
-     handle_ = ::dlopen( name_.c_str(), RTLD_LAZY );
+     handle_ = ::dlopen( name.data(), RTLD_LAZY );
      if ( !handle_ )
      {
-          throw std::runtime_error{ "Cannot open library: " + std::string{ ::dlerror() } };
+          LOG_16NAR_ERROR( "Cannot open library %s: %s", name.data(), ::dlerror() );
+          return;
      }
      ::dlerror();	// clear errors
 #elif _WIN32
-     handle_ = static_cast< void * >( ::LoadLibrary( name_.c_str() ) );
+     handle_ = static_cast< void * >( ::LoadLibrary( name.data() ) );
      if ( !handle_ )
      {
-         throw std::runtime_error{ "Cannot open library: error " + std::to_string( ::GetLastError() ) };
+          LOG_16NAR_ERROR( "Cannot open library %s: %s", name.data(), ::GetLastError() );
+          return;
      }
 #endif
-     LOG_16NAR_INFO( "Successfully loaded dynamic library '%s'", name_.c_str() );
+     LOG_16NAR_INFO( "Successfully loaded dynamic library '%s'", name.data() );
 }
 
 
 DynamicLib::DynamicLib( DynamicLib&& lib ) noexcept
 {
-     std::swap( name_, lib.name_ );
      std::swap( handle_, lib.handle_ );
 }
 
 
-DynamicLib& DynamicLib::operator= ( DynamicLib&& lib ) noexcept
+DynamicLib& DynamicLib::operator=( DynamicLib&& lib ) noexcept
 {
      if ( this != &lib )
      {
           handle_ = lib.handle_;
           lib.handle_ = nullptr;
-          name_ = std::move( lib.name_ );
      }
      return *this;
 }
 
 
-DynamicLib::~DynamicLib()
+DynamicLib::~DynamicLib() noexcept
 {
-     if ( handle_ )
+     if ( is_loaded() )
      {
 #ifdef __linux__
           ::dlclose( handle_ );
 #elif _WIN32
           ::FreeLibrary( static_cast< HMODULE >( handle_ ) );
 #endif
-          LOG_16NAR_INFO( "Successfully unloaded dynamic library '%s'", name_.c_str() );
      }
 }
 
 
-void *DynamicLib::get_symbol( const std::string& name ) const
+bool DynamicLib::is_loaded() const noexcept
 {
+     return handle_;
+}
+
+
+void *DynamicLib::get_symbol( std::string_view name ) const
+{
+     if ( !is_loaded() )
+     {
+          return nullptr;
+     }
 #ifdef __linux__
-     void *sym = ::dlsym( handle_, name.c_str() );
+     void *sym = ::dlsym( handle_, name.data() );
      const char *error = ::dlerror();
      if ( error )
      {
-          throw std::runtime_error{ "Cannot load symbol " + name +
-                                    " from library " + name_ + ": " + error };
+          LOG_16NAR_ERROR( "Cannot load symbol '%s': %s", name.data(), error );
+          return nullptr;
      }
+     return sym;
 #elif _WIN32
-     void *sym = ::GetProcAddress( static_cast< HMODULE >( handle_ ), name.c_str() );
+     void *sym = ::GetProcAddress( static_cast< HMODULE >( handle_ ), name.data() );
      if ( !sym )
      {
-          throw std::runtime_error{ "Cannot load symbol " + name + " from library " +
-                                    name_ + ": error " + std::to_string( ::GetLastError() ) };
+          LOG_16NAR_ERROR( "Cannot load symbol '%s': %s", name.data(), ::GetLastError() );
      }
+     return sym;
 #endif
      return nullptr;
 }

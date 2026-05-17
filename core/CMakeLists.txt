@@ -134,7 +134,6 @@ if ("${NARENGINE_BUILD_TESTS}")
     target_link_libraries("${NAME}_core_test" ${NARENGINE_CORE_COMMON_LINK_LIBS}
         PRIVATE ${NARENGINE_CORE_LIBS} "Catch2::Catch2WithMain"
     )
-    message("PATH $$<TARGET_FILE_DIR:${NAME}_platform>")
     if("${WIN32}" AND "${CONAN_RUNTIME_LIB_DIRS}")
         set_tests_properties("${NAME}_core_test" PROPERTIES ENVIRONMENT_MODIFIED
             "PATH=path_list_prepend:${CONAN_RUNTIME_LIB_DIRS};${PROJECT_BINARY_DIR}/bin"

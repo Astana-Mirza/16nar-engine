@@ -34,6 +34,7 @@ set(NARENGINE_PLATFORM_LINK_LIBS ${NARENGINE_PLATFORM_COMMON_LINK_LIBS}
 set(NARENGINE_PLATFORM_SOURCES
     "${NARENGINE_PLATFORM_SRC_DIR}/system/file.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/system/dynamic_lib.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/system/monitor.cpp"
 
     "${NARENGINE_PLATFORM_SRC_DIR}/strings/name_table.cpp"
 
@@ -55,10 +56,7 @@ set(NARENGINE_PLATFORM_ALL_TARGETS ${NARENGINE_PLATFORM_ALL_TARGETS} ${NARENGINE
 if ("${NARENGINE_BUILD_TESTS}")
     enable_testing()
     set(NARENGINE_PLATFORM_TEST_SOURCES
-        "${NARENGINE_PLATFORM_SRC_DIR}/test/math/math_functions_test.cpp"
-        #"${NARENGINE_PLATFORM_SRC_DIR}/test/math/rectangle_test.cpp"
-        #"${NARENGINE_PLATFORM_SRC_DIR}/test/math/transform_matrix_test.cpp"
-        #"${NARENGINE_PLATFORM_SRC_DIR}/test/math/vec_test.cpp"
+        "${NARENGINE_PLATFORM_SRC_DIR}/test/system/file_test.cpp"
     )
     add_executable("${NAME}_platform_test" ${NARENGINE_PLATFORM_TEST_SOURCES})
     target_include_directories("${NAME}_platform_test" ${NARENGINE_PLATFORM_COMMON_INCLUDE_DIRS}
@@ -73,7 +71,7 @@ if ("${NARENGINE_BUILD_TESTS}")
             ENVIRONMENT_MODIFIED "PATH=path_list_prepend:${CONAN_RUNTIME_LIB_DIRS};${PROJECT_BINARY_DIR}/bin"
         )
     endif()
-    # file(COPY "${NARENGINE_PLATFORM_SRC_DIR}/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+    file(COPY "${NARENGINE_PLATFORM_SRC_DIR}/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
     add_test(NAME "${NAME}_platform_test" COMMAND "${NAME}_platform_test")
 endif() # if ("${NARENGINE_BUILD_TESTS}")
 
