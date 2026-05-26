@@ -4,115 +4,150 @@
 
 #include <16nar/platform/defs.h>
 
-#include <16nar/platform/math/vec.h>
+#include <16nar/platform/math/defs.h>
 
 #include <string>
 
-struct GLFWwindow;
-
 namespace _16nar::system
 {
-
-/// @brief API for which context will be created.
-enum class ContextApi
-{
-#if defined( NARENGINE_RENDER_OPENGL )
-     OpenGL,             ///< OpenGL.
-#endif
-#if defined( NARENGINE_RENDER_OPENGL_ES )
-     OpenGLES,           ///< OpenGL ES.
-#endif
-     NoApi               ///< no any API (for Vulkan or DirectX).
-};
-
-
-/// @brief Settings for opening a window.
-/// @details Some (or all) settings may not be applied when opening a window.
-/// It's up to operating system to decide the resulting open settings, these are
-/// just hints, except of forward_compatible and compat_profile for OpenGL.
-///
-/// If OpenGL context version 3.3 or higher is stated, core profile will be
-/// requested.
-struct OpenSettings
-{
-     ContextApi api               = ContextApi::OpenGL; ///< API to create context.
-#if defined( NARENGINE_RENDER_OPENGL ) || defined( NARENGINE_RENDER_OPENGL_ES )
-     int  red_bits                = 8;       ///< bits for red channel (OpenGL or OpenGL ES).
-     int  green_bits              = 8;       ///< bits for green channel (OpenGL or OpenGL ES).
-     int  blue_bits               = 8;       ///< bits for blue channel (OpenGL or OpenGL ES).
-     int  stencil_bits            = 8;       ///< bits for stencil testing (OpenGL or OpenGL ES).
-     int  depth_bits              = 24;      ///< bits for depth testing (OpenGL or OpenGL ES).
-     int  inner_msaa_samples      = 0;       ///< count of sampling buffers for MSAA (OpenGL or OpenGL ES).
-     int  context_version_major   = 3;       ///< major version of OpenGL context (OpenGL or OpenGL ES).
-     int  context_version_minor   = 3;       ///< minor version of OpenGL context (OpenGL or OpenGL ES).
-     bool inner_srgb_capable      = false;   ///< sRGB support for the window (OpenGL or OpenGL ES).
-#endif // NARENGINE_RENDER_OPENGL || NARENGINE_RENDER_OPENGL_ES
-#if defined( NARENGINE_RENDER_OPENGL )
-     bool forward_compatible      = true;    ///< should the context be without deprecated functions (OpenGL >= 3.0 only).
-     bool compat_profile          = false;   ///< should the context use compatibility profile
-                                             /// (OpenGL >= 3.2 only, for lower versions, OS will choose).
-#endif // NARENGINE_RENDER_OPENGL
-     bool transparent_framebuffer = false;   ///< ability to make transparent framebuffer.
-     bool resizable               = true;    ///< ability to resize the window.
-     bool decorated               = true;    ///< make window with borders and buttons.
-                                             ///  Undecorated windows cannot be resized bu user.
-     bool focused                 = true;    ///< should the window be under focus after opening.
-     bool auto_iconify            = true;    ///< should the window be iconified after losing focus.
-     bool maximized               = false;   ///< should the window be expanded to monitor size.
-     bool center_cursor           = false;   ///< should the cursor be centered after opening (fulscreen only).
-     bool scale_to_monitor        = false;   ///< should the monitor's content scale be taken in account.
-};
-
 
 class Monitor;
 
 /// @brief Window of the application.
 /// @details Most functions operate with screen coordinates.
 /// Screen coordinates are not always mapped to pixels as 1:1.
-/// This should be taken in account. All functions must be called from main thread.
+/// This should be taken in account. All functions must be called
+/// from the same thread.
 /// 
 /// Some Window functions do not work on Wayland due to its limitations.
-/// For example, it is impossible to know window position on the screen.
 class NARENGINE_PLATFORM_API Window
 {
 public:
-     Window( const Window& ) = delete;
+     /// @brief API for which context will be created.
+     enum class ContextApi
+     {
+          OpenGL,             ///< OpenGL.
+          OpenGLES,           ///< OpenGL ES.
+          NoApi               ///< no any API (for Vulkan or DirectX).
+     };
+
+
+     /// @brief Settings for opening a window.
+     /// @details The settings are global and apply to every window open operation.
+     ///
+     /// Some (or all) settings may not be applied when opening a window.
+     /// It's up to operating system to decide the resulting open settings, these are
+     /// just hints, except of @b forward_compatible and @b compat_profile for OpenGL.
+     ///
+     /// If OpenGL context version 3.3 or higher is stated, core profile will be
+     /// requested.
+     struct OpenSettings
+     {
+          /// @brief Graphics API to create context.
+          ContextApi api = ContextApi::NoApi;
+
+          /// @brief Bits for red channel. Affects only OpenGL or OpenGL ES. Value -1 means no preference.
+          int red_bits = -1;
+
+          /// @brief Bits for green channel. Affects only OpenGL or OpenGL ES. Value -1 means no preference.
+          int green_bits = -1;
+
+          /// @brief Bits for blue channel. Affects only OpenGL or OpenGL ES. Value -1 means no preference.
+          int blue_bits = -1;
+
+          /// @brief Bits for alpha channel. Affects only OpenGL or OpenGL ES. Value -1 means no preference.
+          int alpha_bits = -1;
+
+          /// @brief Bits for stencil testing. Affects only OpenGL or OpenGL ES. Value -1 means no preference.
+          int stencil_bits = -1;
+
+          /// @brief Bits for depth testing. Affects only OpenGL or OpenGL ES. Value -1 means no preference.
+          int depth_bits = -1;
+
+          /// @brief Count of sampling buffers for MSAA. Affects only OpenGL or OpenGL ES.
+          /// @details Typically set to 0, because multisampling is implemented by user.
+          int inner_msaa_samples = 0;
+
+          /// @brief Major version of OpenGL context. Affects only OpenGL or OpenGL ES.
+          int context_version_major = 3;
+
+          /// @brief Minor version of OpenGL context. Affects only OpenGL or OpenGL ES.
+          int context_version_minor = 3;
+
+          /// @brief sRGB support for the window. Affects only OpenGL or OpenGL ES.
+          bool inner_srgb_capable = false;
+
+          /// @brief Enable debugging information for OpenGL context. Affects only OpenGL or OpenGL ES.
+          bool opengl_debug_context = false;
+
+          /// @brief Should the context be without deprecated functions. Affects only OpenGL >= 3.0.
+          bool forward_compatible = true;
+
+          /// @brief Should the context use compatibility profile. Affects only OpenGL.
+          /// @details This setting has effect only for OpenGL >= 3.2, for lower versions, OS will choose.
+          bool compat_profile = false;
+
+          /// @brief Ability to resize the window.
+          bool resizable = true;
+
+          /// @brief Should the window be visible on open.
+          /// @details Fullscreen windows are always visible.
+          bool visible = true;
+
+          /// @brief Make window with borders and buttons.
+          /// @details Undecorated windows cannot be resized by user.
+          bool decorated = true;
+
+          /// @brief Should the window be under focus after opening.
+          bool focused = true;
+
+          /// @brief Should the window be iconified after losing focus.
+          bool auto_iconify = true;
+
+          /// @brief Should the window be always on top.
+          bool always_on_top = false;
+
+          /// @brief Should the window be expanded to monitor size.
+          bool maximized = false;
+
+          /// @brief Should the cursor be centered after opening. Affects only fulscreen windows.
+          bool center_cursor = true;
+
+          /// @brief Should the window have transparent framebuffer.
+          bool transparent_framebuffer = false;
+
+          /// @brief Should the window be focused every time it's shown.
+          bool focus_on_show = true;
+
+          /// @brief Should the monitor's content scale be taken in account.
+          bool scale_to_monitor = false;
+     };
+
+     /// @brief Set hints for window opening.
+     /// @param[in] settings settings for opening the window.
+     static void init_window_hints( const OpenSettings& settings );
+
+     /// @brief Clear hints for window opening.
+     static void clear_window_hints();
 
      /// @brief Move constructor.
+     /// @details Opened window should be checked with @b is_open() function.
      /// @param[in] other window to be moved from.
      Window( Window&& other ) noexcept;
 
      /// @brief Constructor, makes non-fullscreen window.
+     /// @details Opened window should be checked with @b is_open() function.
      /// @param[in] size size dimensions of the window, in screen coordinates.
      /// @param[in] title title of the window.
      /// @param[in] settings settings for opening the window.
-     Window( math::Vec2i size, const std::string& title, const OpenSettings& settings = OpenSettings{} );
+     Window( math::Vec2i size, std::string_view title );
 
      /// @brief Constructor, makes fullscreen window on a monitor.
+     /// @details Opened window should be checked with @b is_open() function.
      /// @param[in] size size dimensions of the window, in screen coordinates, closest video mode will be requested.
      /// @param[in] title title of the window.
      /// @param[in] monitor monitor on which the window will be displayed.
-     Window( math::Vec2i size, const std::string& title, const Monitor& monitor,
-          const OpenSettings& settings = OpenSettings{} );
-
-#if defined( NARENGINE_RENDER_OPENGL ) || defined( NARENGINE_RENDER_OPENGL_ES )
-     /// @brief Constructor, makes non-fullscreen window sharing context with another window.
-     /// @param[in] size size dimensions of the window, in screen coordinates.
-     /// @param[in] title title of the window.
-     /// @param[in] other window to share the context with. On Windows, its context must not be active.
-     /// @param[in] settings settings for opening the window.
-     Window( math::Vec2i size, const std::string& title, const Window& other,
-          const OpenSettings& settings = OpenSettings{} );
-
-     /// @brief Constructor, makes fullscreen window on a monitor.
-     /// @param[in] size size dimensions of the window, in screen coordinates, closest video mode will be requested.
-     /// @param[in] title title of the window.
-     /// @param[in] other window to share the context with. On Windows, its context must not be active.
-     /// @param[in] monitor monitor on which the window will be displayed.
-     Window( math::Vec2i size, const std::string& title,
-             const Monitor& monitor,
-             const Window& other,
-             const OpenSettings& settings = OpenSettings{} );
+     Window( math::Vec2i size, std::string_view title, const Monitor& monitor );
 
      /// @brief Make context of the window to be current for OpenGL rendering.
      void make_context_current();
@@ -122,173 +157,144 @@ public:
      /// so use this function with caution. Does nothing if window is not opened.
      void swap_buffers();
 
-#endif // NARENGINE_RENDER_OPENGL || NARENGINE_RENDER_OPENGL_ES
-
      /// @brief Destructor, closes the window.
      ~Window();
 
      /// @brief Close the window.
      /// @details Window cannot be reopened. New window should be created for this purpose.
-     /// Operations with closed window will cause runtime_error.
-     /// @throws std::runtime_error.
+     /// Operations with closed window will do nothing.
      void close();
 
      /// @brief Set window position.
      /// @param[in] pos window position, in screen coordinates.
-     /// @details Always throws std::runtime_error on Wayland.
-     /// @throws std::runtime_error.
-     void set_pos( const math::Vec2i& pos );
+     void set_pos( math::Vec2i pos );
 
      /// @brief Set title of the window.
      /// @param[in] title new title of the window.
-     void set_title( const std::string& title );
+     void set_title( std::string_view title );
 
      /// @brief Set window's content area size, for fullscreen windows, closest video mode will be requested.
      /// @param[in] size desired size, in screen coordinates.
-     /// @details Always throws std::runtime_error on Wayland.
-     /// @throws std::runtime_error.
-     void set_size( const math::Vec2i& size );
+     void set_size( math::Vec2i size );
 
      /// @brief Set size limits for window.
      /// @details It is undefined behavior if size limits conflict with aspect ratio.
-     /// Always throws std::runtime_error on Wayland.
      /// @param[in] min minimal size of the window.
      /// @param[in] max maximal size of the window.
-     /// @throws std::runtime_error.
-     void set_size_limit( const math::Vec2i& min, const math::Vec2i& max );
+     void set_size_limit( math::Vec2i min, math::Vec2i max );
 
      /// @brief Set aspect ratio for window.
      /// @details It is undefined behavior if size limits conflict with aspect ratio.
-     /// Always throws std::runtime_error on Wayland.
-     /// @param[in] w width (numerator).
-     /// @param[in] h height (denominator).
-     /// @throws std::runtime_error.
-     void set_aspect_ratio( int w, int h );
+     /// @param[in] ratio aspect ratio, numerator and denominator.
+     void set_aspect_ratio( math::Vec2i ratio );
 
      /// @brief Switch window to fullscreen mode.
      /// @param[in] monitor monitor to keep fullscreen window.
-     /// @throws std::runtime_error.
      void make_fullscreen( const Monitor& monitor );
 
      /// @brief Switch window to non-fullscreen mode.
      /// @param[in] pos new position of the window, in screen coordinates.
      /// @param[in] size new size of the window, in screen coordinates.
-     /// @throws std::runtime_error.
-     void make_not_fullscreen( const math::Vec2i& pos, const math::Vec2i& size );
+     void make_not_fullscreen( math::Vec2i pos, math::Vec2i size );
 
      /// @brief Iconify window (to task bar).
-     /// @throws std::runtime_error.
      void iconify();
 
      /// @brief Maximize window, do not confuse with fullscreen.
-     /// @throws std::runtime_error.
      void maximize();
 
      /// @brief Restore window from being iconified or maximized.
-     /// @throws std::runtime_error.
      void restore();
 
      /// @brief Set focus on window.
-     /// @details Always throws std::runtime_error on Wayland.
-     /// @throws std::runtime_error.
      void focus();
 
      /// @brief Request attention, usually blinking on task bar.
-     /// @throws std::runtime_error.
      void request_attention();
 
      /// @brief Set window and decorations opacity.
-     /// @details Cannot be used with transparent framebuffer (will throw runtime_error).
+     /// @details Cannot be used with transparent framebuffer (will do nothing).
      /// @param[in] opacity desired window opacity from 0 to 1.
-     /// @throws std::runtime_error.
      void set_opacity( float opacity );
+
+     /// @brief Get underlying handle of the window.
+     /// @return underlying handle of the window.
+     inline void *get_handle() const noexcept
+     {
+          return window_;
+     }
 
      /// @brief Check if window is open.
      /// @return true if window is open, false otherwise.
-     bool is_open() const noexcept;
+     inline bool is_open() const noexcept
+     {
+          return window_ != nullptr;
+     }
 
      /// @brief Check if window is focused.
      /// @return true if window is focused, false otherwise.
-     /// @throws std::runtime_error.
      bool is_focused() const;
 
      /// @brief Check if window is iconified (to status bar).
-     /// @details Always returns false on Wayland.
-     /// @return true if window is iconified, false otherwise, always false on Wayland.
-     /// @throws std::runtime_error.
+     /// @return true if window is iconified, false otherwise.
      bool is_iconified() const;
 
      /// @brief Check if window is maximized.
      /// @return true if window is maximized, false otherwise.
-     /// @throws std::runtime_error.
      bool is_maximized() const;
 
      /// @brief Check if window is resizable.
      /// @return true if window is resizable, false otherwise.
-     /// @throws std::runtime_error.
      bool is_resizable() const;
 
      /// @brief Check if window is decorated.
      /// @return true if window is decorated, false otherwise.
-     /// @throws std::runtime_error.
      bool is_decorated() const;
 
      /// @brief Check if window is auto iconified on focus loss.
      /// @return true if window is auto iconified, false otherwise.
-     /// @throws std::runtime_error.
      bool is_auto_iconify() const;
 
      /// @brief Check if window has transparent framebuffer.
      /// @return true if window has transparent framebuffer, false otherwise.
-     /// @throws std::runtime_error.
      bool is_transparent_framebuffer() const;
 
      /// @brief Check if the window is in fullscreen mode.
      /// @return true if window is in fullscreen mode, false otherwise.
-     /// @throws std::runtime_error.
      bool is_fullscreen() const;
 
      /// @brief Get window position, in screen coordinates.
-     /// @details Always throws std::runtime_error on Wayland.
      /// @return window position.
-     /// @throws std::runtime_error.
-     Vec2i get_pos() const;
+     math::Vec2i get_pos() const;
 
      /// @brief Get window's content area size, in screen coordinates.
      /// @return window size.
-     /// @throws std::runtime_error.
-     Vec2i get_size() const;
+     math::Vec2i get_size() const;
 
      /// @brief Get window's edges size, including window's decorations, in screen coordinates.
      /// @param[out] left size of left edge of the window.
      /// @param[out] top size of top edge of the window.
      /// @param[out] right size of right edge of the window.
      /// @param[out] bottom size of bottom edge of the window.
-     /// @throws std::runtime_error.
      void get_size_decorated( int& left, int& top, int& right, int& bottom ) const;
 
      /// @brief Get window's framebuffer size, in pixels.
      /// @return window's framebuffer size.
-     /// @throws std::runtime_error.
-     Vec2i get_framebuffer_size() const;
+     math::Vec2i get_framebuffer_size() const;
 
      /// @brief Get window's content scale.
      /// @return window's content scale.
-     /// @throws std::runtime_error.
-     Vec2f get_content_scale() const;
+     math::Vec2f get_content_scale() const;
 
-     /// @brief Get window's monitor.
-     /// @details For fullscreen windows only. Throws runtime_error for non-fullscreen windows.
-     /// @return window's monitor.
-     /// @throws std::runtime_error.
+     /// @brief Get window's monitor, makes sense only for fullscreen windows.
+     /// @return window's monitor, default monitor if the window is not fullscreen or an error occured.
      Monitor get_monitor() const;
 
 private:
-     /// @brief Set GLFW hints for window opening.
-     /// @param[in] settings settings for opening the window.
-     void init_glfw_hints( const OpenSettings& settings ) const;
+     Window( const Window& ) = delete;
+     Window operator=( const Window& ) = delete;
 
-     ::GLFWwindow *window_;     ///< inner window handle.
+     void *window_;     ///< inner window handle.
 };
 
 } // namespace _16nar::system

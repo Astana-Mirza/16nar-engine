@@ -16,7 +16,7 @@ Monitor::ConnectCallback Monitor::disconnect_callback_ = nullptr;
 Monitor::Monitor():
      monitor_{ ::glfwGetPrimaryMonitor() }
 {
-     ::glfwSetMonitorCallback( Monitor::glfw_monitor_callback );
+     ::glfwSetMonitorCallback( Monitor::monitor_callback );
 }
 
 
@@ -44,7 +44,7 @@ bool Monitor::valid() const noexcept
 math::Vec2i Monitor::get_pos() const noexcept
 {
      math::Vec2i result;
-     ::glfwGetMonitorPos( monitor_, &result.x, &result.y );
+     ::glfwGetMonitorPos( static_cast< ::GLFWmonitor * >( monitor_ ), &result.x, &result.y );
      return result;
 }
 
@@ -52,7 +52,7 @@ math::Vec2i Monitor::get_pos() const noexcept
 math::Vec2i Monitor::get_physical_size() const noexcept
 {
      math::Vec2i result;
-     ::glfwGetMonitorPhysicalSize( monitor_, &result.x, &result.y );
+     ::glfwGetMonitorPhysicalSize( static_cast< ::GLFWmonitor * >( monitor_ ), &result.x, &result.y );
      return result;
 }
 
@@ -60,7 +60,7 @@ math::Vec2i Monitor::get_physical_size() const noexcept
 math::Vec2f Monitor::get_content_scale() const noexcept
 {
      math::Vec2f result;
-     ::glfwGetMonitorContentScale( monitor_, &result.x, &result.y );
+     ::glfwGetMonitorContentScale( static_cast< ::GLFWmonitor * >( monitor_ ), &result.x, &result.y );
      return result;
 }
 
@@ -68,14 +68,14 @@ math::Vec2f Monitor::get_content_scale() const noexcept
 math::IntRect Monitor::get_workarea() const noexcept
 {
      math::IntRect area;
-     ::glfwGetMonitorWorkarea( monitor_, &area.pos.x, &area.pos.y, &area.size.x, &area.size.y );
+     ::glfwGetMonitorWorkarea( static_cast< ::GLFWmonitor * >( monitor_ ), &area.pos.x, &area.pos.y, &area.size.x, &area.size.y );
      return area;
 }
 
 
 std::string_view Monitor::get_name() const noexcept
 {
-     const auto *name = ::glfwGetMonitorName( monitor_ );
+     const auto *name = ::glfwGetMonitorName( static_cast< ::GLFWmonitor * >( monitor_ ) );
      return name ? std::string_view{ name } : std::string_view{};
 }
 
@@ -83,7 +83,7 @@ std::string_view Monitor::get_name() const noexcept
 Monitor::VideoMode Monitor::get_current_video_mode() const noexcept
 {
      Monitor::VideoMode vmode{};
-     const auto *glfw_mode = ::glfwGetVideoMode( monitor_ );
+     const auto *glfw_mode = ::glfwGetVideoMode( static_cast< ::GLFWmonitor * >( monitor_ ) );
      vmode.depth.x = glfw_mode->redBits;
      vmode.depth.y = glfw_mode->greenBits;
      vmode.depth.z = glfw_mode->blueBits;
@@ -97,7 +97,7 @@ Monitor::VideoMode Monitor::get_current_video_mode() const noexcept
 std::vector< Monitor::VideoMode > Monitor::get_video_modes() const
 {
      int count{};
-     const auto *glfw_modes = ::glfwGetVideoModes( monitor_, &count );
+     const auto *glfw_modes = ::glfwGetVideoModes( static_cast< ::GLFWmonitor * >( monitor_ ), &count );
      std::vector< VideoMode > result( count );
      for ( int i = 0; i < count; i++ )
      {
@@ -114,7 +114,7 @@ std::vector< Monitor::VideoMode > Monitor::get_video_modes() const
 
 Monitor::GammaRamp Monitor::get_gamma_ramp() const noexcept
 {
-     const auto *ramp = ::glfwGetGammaRamp( monitor_ );
+     const auto *ramp = ::glfwGetGammaRamp( static_cast< ::GLFWmonitor * >( monitor_ ) );
      GammaRamp result{};
      result.red = ramp->red;
      result.green = ramp->green;
@@ -126,7 +126,7 @@ Monitor::GammaRamp Monitor::get_gamma_ramp() const noexcept
 
 void Monitor::set_gamma( float gamma ) noexcept
 {
-     ::glfwSetGamma( monitor_, gamma );
+     ::glfwSetGamma( static_cast< ::GLFWmonitor * >( monitor_ ), gamma );
 }
 
 
@@ -137,14 +137,14 @@ void Monitor::set_gamma_ramp( const Monitor::GammaRamp& ramp )
      glfw_ramp.green = ramp.green;
      glfw_ramp.blue = ramp.blue;
      glfw_ramp.size = static_cast< int >( ramp.size );
-     ::glfwSetGammaRamp( monitor_, &glfw_ramp );
+     ::glfwSetGammaRamp( static_cast< ::GLFWmonitor * >( monitor_ ), &glfw_ramp );
      LOG_16NAR_DEBUG( "Monitor gamma ramp was set (size: %u)", ramp.size );
 }
 
 
 std::vector< Monitor > Monitor::get_monitors()
 {
-     ::glfwSetMonitorCallback( Monitor::glfw_monitor_callback );
+     ::glfwSetMonitorCallback( Monitor::monitor_callback );
 
      int count{};
      auto **monitor_array = ::glfwGetMonitors( &count );
@@ -176,12 +176,12 @@ Monitor::ConnectCallback Monitor::set_disconnect_callback( Monitor::ConnectCallb
 }
 
 
-Monitor::Monitor( ::GLFWmonitor *monitor ) noexcept:
+Monitor::Monitor( void *monitor ) noexcept:
      monitor_{ monitor }
 {}
 
 
-void Monitor::glfw_monitor_callback( ::GLFWmonitor *monitor, int event )
+void Monitor::monitor_callback( ::GLFWmonitor *monitor, int event )
 {
      if ( event == GLFW_CONNECTED && connect_callback_ )
      {

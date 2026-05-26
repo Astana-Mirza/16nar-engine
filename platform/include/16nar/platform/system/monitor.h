@@ -126,14 +126,14 @@ public:
 private:
      /// @brief Constructor for inner use only.
      /// @param[in] monitor inner representation of monitor.
-     Monitor( ::GLFWmonitor *monitor ) noexcept;
+     Monitor( void *monitor ) noexcept;
 
      /// @brief Inner callback function for GLFW monitor.
      /// @param[in] monitor monitor handle.
      /// @param[in] event received event number.
-     static void glfw_monitor_callback( ::GLFWmonitor *monitor, int event );
+     static void monitor_callback( ::GLFWmonitor *monitor, int event );
 
-     ::GLFWmonitor *monitor_;                     ///< inner representation of monitor.
+     void *monitor_;                     ///< inner representation of monitor.
      static ConnectCallback connect_callback_;    ///< callback for monitor connection.
      static ConnectCallback disconnect_callback_; ///< callback for monitor disconnection.
 };

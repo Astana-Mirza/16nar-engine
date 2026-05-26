@@ -35,6 +35,7 @@ set(NARENGINE_PLATFORM_SOURCES
     "${NARENGINE_PLATFORM_SRC_DIR}/system/file.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/system/dynamic_lib.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/system/monitor.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/system/window.cpp"
 
     "${NARENGINE_PLATFORM_SRC_DIR}/strings/name_table.cpp"
 
