@@ -34,6 +34,7 @@ set(NARENGINE_PLATFORM_LINK_LIBS ${NARENGINE_PLATFORM_COMMON_LINK_LIBS}
 set(NARENGINE_PLATFORM_SOURCES
     "${NARENGINE_PLATFORM_SRC_DIR}/system/file.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/system/dynamic_lib.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/system/system.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/system/monitor.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/system/window.cpp"
 
