@@ -1,4 +1,5 @@
-/// @file Header file with ILogWriter interface declaration.
+/// @file
+/// @brief File with ILogWriter interface definition.
 #ifndef _16NAR_PLATFORM_LOGGER_ILOG_WRITER_H
 #define _16NAR_PLATFORM_LOGGER_ILOG_WRITER_H
 

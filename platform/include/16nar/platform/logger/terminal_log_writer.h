@@ -1,4 +1,5 @@
-/// @file Header file with TerminalLogWriter class declaration.
+/// @file
+/// @brief File with TerminalLogWriter class definition.
 #ifndef _16NAR_PLATFORM_LOGGER_TERMINAL_LOG_WRITER_H
 #define _16NAR_PLATFORM_LOGGER_TERMINAL_LOG_WRITER_H
 

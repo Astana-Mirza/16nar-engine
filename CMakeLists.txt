@@ -28,6 +28,7 @@ narengine_set_option(NARENGINE_ASSETS_JSON ON BOOL "Build tools for using assets
 narengine_set_option(NARENGINE_BUILD_UTILS ON BOOL "Build utilities for development with engine")
 narengine_set_option(NARENGINE_LOG_LEVEL "9" STRING "Maximum log level of engine logging library")
 narengine_set_option(NARENGINE_BUILD_TESTS "${PROJECT_IS_TOP_LEVEL}" BOOL "Build tests for engine")
+narengine_set_option(NARENGINE_BUILD_DOCS "${PROJECT_IS_TOP_LEVEL}" BOOL "Build documentation for engine")
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     set(NARENGINE_DEBUG_BUILD ON)
@@ -67,6 +68,9 @@ if ("${NARENGINE_BUILD_TESTS}")
     set(BUILD_TESTING ON)
     include(CTest)
 endif()
+if("${NARENGINE_BUILD_DOCS}")
+    find_package(Doxygen REQUIRED)
+endif()
 
 
 # Common settings
@@ -89,6 +93,9 @@ set(NARENGINE_COMMON_LINK_LIBS "")
 add_subdirectory("${PROJECT_SOURCE_DIR}/schemas")
 add_subdirectory("${PROJECT_SOURCE_DIR}/platform")
 add_subdirectory("${PROJECT_SOURCE_DIR}/core")
-add_subdirectory("${PROJECT_SOURCE_DIR}/plugins")
+add_subdirectory("${PROJECT_SOURCE_DIR}/plugin")
+if("${NARENGINE_BUILD_DOCS}")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/docs")
+endif()
 
 install(EXPORT "${NAME}" DESTINATION "lib/cmake" NAMESPACE "${NAME}::")

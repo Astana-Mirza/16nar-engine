@@ -1,4 +1,5 @@
-/// @file Header file with Logger class declaration.
+/// @file
+/// @brief File with Logger class definition.
 #ifndef _16NAR_PLATFORM_LOGGER_LOGGER_H
 #define _16NAR_PLATFORM_LOGGER_LOGGER_H
 

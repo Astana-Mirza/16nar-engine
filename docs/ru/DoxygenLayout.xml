@@ -1,0 +1,11 @@
+<doxygenlayout version="1.0">
+    <navindex>
+        <tab type="mainpage" visible="yes" title=""/>
+        <tab type="user" url="@ref arch_index" title="Архитектура"/>
+        <tab type="user" visible="yes" title="Справочник" url="#">
+            <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/>
+            <tab type="classlist" visible="yes" title="" intro=""/>
+            <tab type="filelist" visible="yes" title="" intro=""/>
+        </tab>
+    </navindex>
+</doxygenlayout>

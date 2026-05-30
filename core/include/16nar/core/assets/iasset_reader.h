@@ -66,7 +66,7 @@ public:
      /// @details Implementation may invalidate data pointed to views returned
      /// by @b get_content() and @b get_name() after calling this function.
      /// Caller should ensure that no dangling references remain.
-     /// @param[in] name name of the child.
+     /// @param[in] index index of the child.
      /// @return true if context was switched to child asset, false otherwise (e.g. the child does not exist).
      virtual bool to_child_index( std::size_t index ) = 0;
 

@@ -10,13 +10,15 @@ class NarengineRecipe(ConanFile):
 
     url = "https://github.com/Astana-Mirza/16nar-engine"
 
-    exports_sources = "CMakeLists.txt", "cmake/*", "schemas/*", "platform/*", "core/*", "plugins/*"
+    exports_sources = "CMakeLists.txt", "cmake/*", "schemas/*", \
+        "docs/*", "platform/*", "core/*", "plugin/*"
 
     settings = "os", "compiler", "build_type", "arch"
     options = {
         "shared": [True, False],
         "log_level": [1, 2, 3, 4, 5, 6, 7, 8, 9],
         "enable_tests": [True, False],
+        "with_docs": [True, False],
         "with_utils": [True, False],
         "with_assets_json": [True, False],
         "with_render_vulkan": [True, False],
@@ -26,6 +28,7 @@ class NarengineRecipe(ConanFile):
         "shared": True,
         "log_level": 9,
         "enable_tests": True,
+        "with_docs": False,
         "with_utils": True,
         "with_assets_json": True,
         "with_render_vulkan": True,
@@ -65,6 +68,7 @@ class NarengineRecipe(ConanFile):
         cmake = CMake(self)
         cmake.configure({
             "NARENGINE_LOG_LEVEL": self.options.log_level,
+            "NARENGINE_BUILD_DOCS": "ON" if self.options.with_docs else "OFF",
             "NARENGINE_BUILD_UTILS": "ON" if self.options.with_utils else "OFF",
             "NARENGINE_ASSETS_JSON": "ON" if self.options.with_assets_json else "OFF",
             "NARENGINE_RENDER_VULKAN": "ON" if self.options.with_render_vulkan else "OFF",
@@ -92,6 +96,7 @@ class NarengineRecipe(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "16nar")
         self.cpp_info.set_property("cmake_find_mode", "both")
+        self.cpp_info.resdirs = ["res"]
 
         # Platform
         self.add_package_component("16nar_platform", ["glm::glm", "glfw::glfw"])
@@ -109,7 +114,7 @@ class NarengineRecipe(ConanFile):
                 "flatbuffers::libflatbuffers"
             ])
 
-        # Plugins
+        # Plugin
         #if self.options.with_render_vulkan:
         #    self.add_package_component("16nar_render_vulkan", ["16nar_core"])
         #if self.options.with_render_opengl:

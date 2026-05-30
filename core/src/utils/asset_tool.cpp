@@ -1,6 +1,3 @@
-/// @file
-/// @brief Utility for engine resource management.
-
 #include <16nar/core/defs.h>
 
 #include <16nar/platform/strings/hash.h>
@@ -8,8 +5,6 @@
 #include <16nar/core/assets/flatbuffers/flatbuffers_asset_file_processor.h>
 #include <16nar/core/assets/flatbuffers/flatbuffers_asset_reader.h>
 #include <16nar/core/assets/flatbuffers/flatbuffers_asset_writer.h>
-/// @todo Make it plugin-based
-#define NARENGINE_ASSETS_JSON
 #if defined( NARENGINE_ASSETS_JSON )
 #    include <16nar/core/assets/json/json_asset_file_processor.h>
 #    include <16nar/core/assets/json/json_asset_reader.h>

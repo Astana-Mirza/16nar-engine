@@ -24,3 +24,4 @@ flatbuffers_generate_headers(TARGET flatbuffers-gen-cpp
 
 # Installation
 install(DIRECTORY "${NARENGINE_FB_GEN_INCLUDE_DIR}/${NAME}" DESTINATION "include")
+install(FILES ${NARENGINE_FLATBUFFERS_SCHEMAS} DESTINATION "res/schemas/flatbuffers")

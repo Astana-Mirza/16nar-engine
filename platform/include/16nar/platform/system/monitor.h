@@ -1,4 +1,5 @@
-/// @file Header file with Monitor class declaration.
+/// @file
+/// @brief Header file with Monitor class declaration.
 #ifndef _16NAR_PLATFORM_SYSTEM_MONITOR_H
 #define _16NAR_PLATFORM_SYSTEM_MONITOR_H
 
@@ -100,7 +101,7 @@ public:
      GammaRamp get_gamma_ramp() const noexcept;
 
      /// @brief Set additional software gamma for the monitor.
-     /// @detail New gamma ramp is calculated and applied.
+     /// @details New gamma ramp is calculated and applied.
      /// Setting gamma to 1.0 will produce default monitor behavior.
      /// @param[in] gamma gamma value (exponent).
      void set_gamma( float gamma ) noexcept;

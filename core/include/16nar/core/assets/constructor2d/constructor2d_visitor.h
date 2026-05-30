@@ -25,7 +25,7 @@ public:
           SceneEnd          = 6,   ///< finish parsing of the scene.
      };
 
-     /// @copydoc IAssetVisitor::visit(AssetActionId, const IAssetReader&)
+     /// @copydoc assets::IAssetVisitor::visit(AssetActionId, const IAssetReader&)
      void visit( AssetActionId action_id, const IAssetReader& reader ) override;
 
      /// @brief Process scene tree using the reader and make visits.

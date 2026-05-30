@@ -1,4 +1,5 @@
-/// @file Header file with Window class declaration.
+/// @file
+/// @brief Header file with Window class declaration.
 #ifndef _16NAR_PLATFORM_SYSTEM_WINDOW_H
 #define _16NAR_PLATFORM_SYSTEM_WINDOW_H
 
@@ -139,7 +140,6 @@ public:
      /// @details Opened window should be checked with @b is_open() function.
      /// @param[in] size size dimensions of the window, in screen coordinates.
      /// @param[in] title title of the window.
-     /// @param[in] settings settings for opening the window.
      Window( math::Vec2i size, std::string_view title );
 
      /// @brief Constructor, makes fullscreen window on a monitor.

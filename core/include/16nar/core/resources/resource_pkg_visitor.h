@@ -23,7 +23,7 @@ public:
           ResourceEnd       = 5,   ///< finish parsing the resource.
      };
 
-     /// @copydoc IAssetVisitor::visit(assets::AssetActionId, const assets::IAssetReader&)
+     /// @copydoc assets::IAssetVisitor::visit(assets::AssetActionId, const assets::IAssetReader&)
      void visit( assets::AssetActionId action_id, const assets::IAssetReader& reader ) override;
 
      /// @brief Process resource package tree using the reader and make visits.
