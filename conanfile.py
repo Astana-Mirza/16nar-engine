@@ -20,7 +20,6 @@ class NarengineRecipe(ConanFile):
         "enable_tests": [True, False],
         "with_docs": [True, False],
         "with_utils": [True, False],
-        "with_assets_json": [True, False],
         "with_render_vulkan": [True, False],
         "with_render_opengl": [True, False]
     }
@@ -30,7 +29,6 @@ class NarengineRecipe(ConanFile):
         "enable_tests": True,
         "with_docs": False,
         "with_utils": True,
-        "with_assets_json": True,
         "with_render_vulkan": True,
         "with_render_opengl": False
     }
@@ -41,9 +39,8 @@ class NarengineRecipe(ConanFile):
         self.requires("flatbuffers/24.3.25", transitive_headers=True)
         self.requires("glm/1.0.1", transitive_headers=True)
         self.requires("glfw/3.4")
+        self.requires("nlohmann_json/3.11.3", transitive_headers=True)
         self.requires("stb/cci.20240213", visible=False)
-        if self.options.with_assets_json:
-            self.requires("nlohmann_json/3.11.3", transitive_headers=True)
         if self.options.with_utils:
             self.requires("cxxopts/3.3.1", visible=False)
         if self.options.with_render_opengl:
@@ -70,7 +67,6 @@ class NarengineRecipe(ConanFile):
             "NARENGINE_LOG_LEVEL": self.options.log_level,
             "NARENGINE_BUILD_DOCS": "ON" if self.options.with_docs else "OFF",
             "NARENGINE_BUILD_UTILS": "ON" if self.options.with_utils else "OFF",
-            "NARENGINE_ASSETS_JSON": "ON" if self.options.with_assets_json else "OFF",
             "NARENGINE_RENDER_VULKAN": "ON" if self.options.with_render_vulkan else "OFF",
             "NARENGINE_RENDER_OPENGL": "ON" if self.options.with_render_opengl else "OFF",
             "NARENGINE_VERSION_MAJOR": version_items[ 0 ],
@@ -107,12 +103,11 @@ class NarengineRecipe(ConanFile):
             "16nar_core",
             "flatbuffers::libflatbuffers"
         ])
-        if self.options.with_assets_json:
-            self.add_package_component("16nar_assets_json", [
-                "16nar_core",
-                "nlohmann_json::nlohmann_json",
-                "flatbuffers::libflatbuffers"
-            ])
+        self.add_package_component("16nar_assets_json", [
+            "16nar_core",
+            "nlohmann_json::nlohmann_json",
+            "flatbuffers::libflatbuffers"
+        ])
 
         # Plugin
         #if self.options.with_render_vulkan:

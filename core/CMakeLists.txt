@@ -48,29 +48,26 @@ set(NARENGINE_CORE_LIBS ${NARENGINE_CORE_LIBS} "${NAME}_core")
 
 
 # JSON assets library
-if ("${NARENGINE_ASSETS_JSON}")
-    set(NARENGINE_ASSETS_JSON_COMPILER_DEFS ${NARENGINE_CORE_COMMON_COMPILER_DEFS})
-    if ("${NARENGINE_WIN_EXPORT}")
-        set(NARENGINE_ASSETS_JSON_COMPILER_DEFS ${NARENGINE_ASSETS_JSON_COMPILER_DEFS}
-            PRIVATE "NARENGINE_ASSETS_JSON_EXPORT"
-        )
-    endif() # if ("${NARENGINE_WIN_EXPORT}")
-    set(NARENGINE_ASSETS_JSON_INCLUDE_DIRS ${NARENGINE_CORE_COMMON_INCLUDE_DIRS})
-    set(NARENGINE_ASSETS_JSON_LINK_DIRS ${NARENGINE_CORE_COMMON_LINK_DIRS})
-    set(NARENGINE_ASSETS_JSON_LINK_LIBS ${NARENGINE_CORE_COMMON_LINK_LIBS}
-        PUBLIC "${NAME}_core" "nlohmann_json::nlohmann_json" "flatbuffers::libflatbuffers"
+set(NARENGINE_ASSETS_JSON_COMPILER_DEFS ${NARENGINE_CORE_COMMON_COMPILER_DEFS})
+if ("${NARENGINE_WIN_EXPORT}")
+    set(NARENGINE_ASSETS_JSON_COMPILER_DEFS ${NARENGINE_ASSETS_JSON_COMPILER_DEFS}
+        PRIVATE "NARENGINE_ASSETS_JSON_EXPORT"
     )
-    set(NARENGINE_ASSETS_JSON_SOURCES
-        "${NARENGINE_CORE_SRC_DIR}/assets/json/json_asset_reader.cpp"
-        "${NARENGINE_CORE_SRC_DIR}/assets/json/json_asset_writer.cpp"
-        "${NARENGINE_CORE_SRC_DIR}/assets/json/json_asset_file_processor.cpp"
-        "${NARENGINE_CORE_SRC_DIR}/assets/json/json_to_flatbuffers_convertor.cpp"
-    )
-
-    add_library("${NAME}_assets_json" "${NARENGINE_LIB_TYPE}" ${NARENGINE_ASSETS_JSON_SOURCES})
-    narengine_add_deps("${NAME}_assets_json" "NARENGINE_ASSETS_JSON")
-    set(NARENGINE_CORE_LIBS ${NARENGINE_CORE_LIBS} "${NAME}_assets_json")
-endif() # if ("${NARENGINE_ASSETS_JSON}")
+endif() # if ("${NARENGINE_WIN_EXPORT}")
+set(NARENGINE_ASSETS_JSON_INCLUDE_DIRS ${NARENGINE_CORE_COMMON_INCLUDE_DIRS})
+set(NARENGINE_ASSETS_JSON_LINK_DIRS ${NARENGINE_CORE_COMMON_LINK_DIRS})
+set(NARENGINE_ASSETS_JSON_LINK_LIBS ${NARENGINE_CORE_COMMON_LINK_LIBS}
+    PUBLIC "${NAME}_core" "nlohmann_json::nlohmann_json" "flatbuffers::libflatbuffers"
+)
+set(NARENGINE_ASSETS_JSON_SOURCES
+    "${NARENGINE_CORE_SRC_DIR}/assets/json/json_asset_reader.cpp"
+    "${NARENGINE_CORE_SRC_DIR}/assets/json/json_asset_writer.cpp"
+    "${NARENGINE_CORE_SRC_DIR}/assets/json/json_asset_file_processor.cpp"
+    "${NARENGINE_CORE_SRC_DIR}/assets/json/json_to_flatbuffers_convertor.cpp"
+)
+add_library("${NAME}_assets_json" "${NARENGINE_LIB_TYPE}" ${NARENGINE_ASSETS_JSON_SOURCES})
+narengine_add_deps("${NAME}_assets_json" "NARENGINE_ASSETS_JSON")
+set(NARENGINE_CORE_LIBS ${NARENGINE_CORE_LIBS} "${NAME}_assets_json")
 
 
 # flatbuffers assets library
@@ -116,16 +113,9 @@ endif() # if ("${NARENGINE_BUILD_UTILS}")
 if ("${NARENGINE_BUILD_TESTS}")
     enable_testing()
     set(NARENGINE_CORE_TEST_SOURCES
-        # test sources
-        # "${NARENGINE_CORE_SRC_DIR}/test/some_test.cpp"
-        ""
+        "${NARENGINE_CORE_SRC_DIR}/test/assets/json_assets_test.cpp"
+        "${NARENGINE_CORE_SRC_DIR}/test/assets/json_to_flatbuffers_convertor_test.cpp"
     )
-    if ("${NARENGINE_ASSETS_JSON}")
-        set(NARENGINE_CORE_TEST_SOURCES ${NARENGINE_CORE_TEST_SOURCES}
-            "${NARENGINE_CORE_SRC_DIR}/test/assets/json_assets_test.cpp"
-            "${NARENGINE_CORE_SRC_DIR}/test/assets/json_to_flatbuffers_convertor_test.cpp"
-        )
-    endif() # if ("${NARENGINE_ASSETS_JSON}")
     add_executable("${NAME}_core_test" ${NARENGINE_CORE_TEST_SOURCES})
     target_include_directories("${NAME}_core_test" ${NARENGINE_CORE_COMMON_INCLUDE_DIRS}
         PRIVATE ${CATCH2_INCLUDE_DIRS}

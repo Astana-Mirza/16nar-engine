@@ -23,8 +23,6 @@ narengine_set_option(NARENGINE_RENDER_VULKAN ON BOOL "Build with Vulkan support"
 narengine_set_option(NARENGINE_RENDER_OPENGL OFF BOOL "Build with OpenGL support") # not implemented
 #narengine_set_option(NARENGINE_RENDER_OPENGL_ES ON BOOL "Build with OpenGL ES support") # not implemented
 
-narengine_set_option(NARENGINE_ASSETS_JSON ON BOOL "Build tools for using assets in JSON format")
-
 narengine_set_option(NARENGINE_BUILD_UTILS ON BOOL "Build utilities for development with engine")
 narengine_set_option(NARENGINE_LOG_LEVEL "9" STRING "Maximum log level of engine logging library")
 narengine_set_option(NARENGINE_BUILD_TESTS "${PROJECT_IS_TOP_LEVEL}" BOOL "Build tests for engine")
@@ -53,12 +51,10 @@ find_package(Threads REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(flatbuffers CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(STB CONFIG REQUIRED)
 if ("${NARENGINE_RENDER_OPENGL}")
     find_package(OpenGL REQUIRED)
-endif()
-if ("${NARENGINE_ASSETS_JSON}")
-    find_package(nlohmann_json CONFIG REQUIRED)
-    find_package(STB CONFIG REQUIRED)
 endif()
 if ("${NARENGINE_BUILD_UTILS}")
     find_package(cxxopts CONFIG REQUIRED)

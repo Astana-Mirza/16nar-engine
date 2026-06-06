@@ -9,7 +9,9 @@
 namespace _16nar::strings
 {
 
-/// @brief Name which is used as hash in runtime.
+/// @brief Name which is used as string hash in runtime.
+/// @details In order to use fast integer operations instead of time-consuming string
+/// operations, one might use hashed strings represented with this class.
 struct StaticName
 {
      /// @brief Default constructor.

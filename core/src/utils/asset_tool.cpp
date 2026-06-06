@@ -5,12 +5,12 @@
 #include <16nar/core/assets/flatbuffers/flatbuffers_asset_file_processor.h>
 #include <16nar/core/assets/flatbuffers/flatbuffers_asset_reader.h>
 #include <16nar/core/assets/flatbuffers/flatbuffers_asset_writer.h>
-#if defined( NARENGINE_ASSETS_JSON )
-#    include <16nar/core/assets/json/json_asset_file_processor.h>
-#    include <16nar/core/assets/json/json_asset_reader.h>
-#    include <16nar/core/assets/json/json_asset_writer.h>
-#    include <16nar/core/assets/json/json_to_flatbuffers_convertor.h>
-#endif // defined( NARENGINE_ASSETS_JSON )
+
+#include <16nar/core/assets/json/json_asset_file_processor.h>
+#include <16nar/core/assets/json/json_asset_reader.h>
+#include <16nar/core/assets/json/json_asset_writer.h>
+#include <16nar/core/assets/json/json_to_flatbuffers_convertor.h>
+
 #include <16nar/core/assets/iasset_data_convertor.h>
 
 #include <cxxopts.hpp>
@@ -46,12 +46,10 @@ struct AssetToolParams
 
 void check_format( const std::string& format )
 {
-#if defined( NARENGINE_ASSETS_JSON )
      if ( format == "json" )
      {
           return;
      }
-#endif // defined( NARENGINE_ASSETS_JSON )
      if ( format == "flatbuffers" )
      {
           return;
@@ -64,12 +62,10 @@ IAssetFileProcessorPtr make_file_processor( const std::string& format )
 {
      auto* resource = std::pmr::get_default_resource();
      assert( resource );
-#if defined( NARENGINE_ASSETS_JSON )
      if ( format == "json" )
      {
           return std::make_shared< JsonAssetFileProcessor >( *resource );
      }
-#endif // defined( NARENGINE_ASSETS_JSON )
      if ( format == "flatbuffers" )
      {
           return std::make_shared< FlatBuffersAssetFileProcessor >( *resource );
@@ -80,7 +76,6 @@ IAssetFileProcessorPtr make_file_processor( const std::string& format )
 
 IAssetDataConvertorPtr make_convertor( const AssetToolParams& params, bool& backward )
 {
-#if defined( NARENGINE_ASSETS_JSON )
      std::shared_ptr< JsonToFlatBuffersConvertor > json_to_fb{};
      if ( params.src_format == "json" && params.dst_format == "flatbuffers" )
      {
@@ -119,7 +114,6 @@ IAssetDataConvertorPtr make_convertor( const AssetToolParams& params, bool& back
           }
           return json_to_fb;
      }
-#endif // defined( NARENGINE_ASSETS_JSON )
      throw std::runtime_error{ "cannot convert format '"
           + params.src_format + "' to '" + params.dst_format + "'" };
 }

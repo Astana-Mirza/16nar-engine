@@ -7,7 +7,7 @@
 
 #include <16nar/platform/system/file.h>
 #include <16nar/platform/strings/static_name.h>
-#include <16nar/platform/strings/name_table.h>
+#include <16nar/platform/strings/name_manager.h>
 #include <16nar/platform/memory/shared_buffer_ptr.h>
 
 #include <unordered_map>
@@ -39,7 +39,7 @@ public:
      UnifiedStorage(
           const std::filesystem::path& base_dir,
           memory::MemoryManager& memory_manager,
-          strings::NameTablePtr name_table,
+          strings::NameManager& name_manager,
           assets::IAssetFileProcessorPtr file_processor );
 
      /// @brief Set unpacked operation mode for the storage.
@@ -116,7 +116,7 @@ private:
      ResourceMap resources_;                           ///< resources with their names.
      ResourcePackageMap packages_;                     ///< resource packages with theris names.
      std::filesystem::path base_dir_;                  ///< base directory of the application.
-     strings::NameTablePtr name_table_;                ///< name table.
+     strings::NameTable *name_table_;                  ///< name table.
      assets::IAssetFileProcessorPtr file_processor_;   ///< asset file processor.
      assets::IAssetReaderPtr asset_reader_;            ///< asset reader.
      assets::IAssetDataConvertorPtr convertor_;        ///< asset data convertor.
