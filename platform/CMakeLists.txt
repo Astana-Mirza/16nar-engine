@@ -39,6 +39,7 @@ set(NARENGINE_PLATFORM_SOURCES
     "${NARENGINE_PLATFORM_SRC_DIR}/system/window.cpp"
 
     "${NARENGINE_PLATFORM_SRC_DIR}/strings/name_table.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/strings/name_manager.cpp"
 
     "${NARENGINE_PLATFORM_SRC_DIR}/memory/shared_buffer_ptr.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/memory/memory_domain.cpp"

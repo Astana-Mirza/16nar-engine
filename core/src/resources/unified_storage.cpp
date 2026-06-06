@@ -129,16 +129,21 @@ std::filesystem::path UnifiedStorage::correct_path(
 UnifiedStorage::UnifiedStorage(
      const std::filesystem::path& base_dir,
      memory::MemoryManager& memory_manager,
-     strings::NameTablePtr name_table,
+     strings::NameManager& name_manager,
      assets::IAssetFileProcessorPtr file_processor ):
      resources_{}, packages_{}, base_dir_{ base_dir },
-     name_table_{ name_table },
-     file_processor_{ file_processor },
+     name_table_{}, file_processor_{ file_processor },
      asset_reader_{}, convertor_{}, memory_{}, unpacked_{}
 {
-     if ( !name_table_ || !file_processor_ )
+     if ( !file_processor_ )
      {
-          throw std::runtime_error{ "nullptr passed into unified storage constructor" };
+          throw std::runtime_error{ "file processor is not present" };
+     }
+
+     name_table_ = name_manager.get_table( "asset" );
+     if ( !name_table_ )
+     {
+          throw std::runtime_error{ "asset name table is not present" };
      }
 
      auto *memory_domain = memory_manager.get_domain( strings::StaticName{ "asset" } );
