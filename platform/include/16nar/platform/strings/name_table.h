@@ -51,8 +51,8 @@ public:
      StaticName add_name( std::string_view name );
 
      /// @brief Remove name from the table.
-     /// @details In order to avoid string hash collision, it is recommended to pass
-     /// only the names returned with @ref get_name called with the same table.
+     /// @details In order to avoid unexpected behavior because of string hash collision,
+     /// it is recommended to pass only the names which are definitely stored in the table.
      /// @param[in] name name to be removed.
      void remove_name( StaticName name );
 
