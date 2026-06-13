@@ -5,7 +5,7 @@
 
 #include <16nar/platform/defs.h>
 #include <16nar/platform/strings/static_name.h>
-#include <16nar/platform/memory/memory_domain.h>
+#include <16nar/platform/memory/imemory_domain.h>
 
 #include <unordered_map>
 #include <string>
@@ -23,13 +23,15 @@ namespace _16nar::strings
 /// string by its static name. It also can check if the string is saved in the table.
 ///
 /// There is small probability of hash collision of strings. Such situation is repoted
-/// via error message in log.
+/// via error message in log. In order to avoid hash collisions, it is recommended to
+/// search only for static names that are known to be stored in the table (i.e. which
+/// where added before).
 class NARENGINE_PLATFORM_API NameTable
 {
 public:
      /// @brief Constructor.
      /// @param[in] domain memory domain for name tables allocation.
-     NameTable( memory::MemoryDomain& domain );
+     NameTable( memory::IMemoryDomain& domain );
 
      /// @brief Get static name of string if it is contained in the table.
      /// @param[in] name string to be checked.
@@ -55,6 +57,10 @@ public:
      /// it is recommended to pass only the names which are definitely stored in the table.
      /// @param[in] name name to be removed.
      void remove_name( StaticName name );
+
+private:
+     NameTable( const NameTable& ) = delete;
+     NameTable& operator=( const NameTable& ) = delete;
 
 private:
      std::pmr::unordered_map< StaticName, std::pmr::string > table_;  ///< name table.

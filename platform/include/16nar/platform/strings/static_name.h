@@ -22,7 +22,7 @@ struct StaticName
      /// @brief Constructor.
      /// @param[in] name name to be hashed.
      constexpr explicit StaticName( std::string_view name ) noexcept
-          :hash{ str_hash64( name ) }
+          :hash{ name.empty() ? 0ull : str_hash64( name ) }
      {}
 
      /// @brief Check if current name is empty.

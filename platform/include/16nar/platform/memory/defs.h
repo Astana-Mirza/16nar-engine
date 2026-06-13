@@ -39,10 +39,7 @@ struct ConstByteView
 
 
 class MemoryManager;
-class MemoryDomain;
-
 using MemoryManagerPtr = std::shared_ptr< MemoryManager >;
-using MemoryDomainPtr = std::unique_ptr< MemoryDomain >;
 
 } // namespace _16nar::memory
 

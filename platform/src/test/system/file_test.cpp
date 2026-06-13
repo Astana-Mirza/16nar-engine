@@ -12,30 +12,30 @@ TEST_CASE( "File read", "[system_file]" )
      _16nar::system::File file;
      REQUIRE( file.open( "data/file.txt" ) );
      REQUIRE( file.is_open() );
-     REQUIRE( file.tell() == 0 );
-     REQUIRE( file.get_size() == 80 );
+     CHECK( file.tell() == 0 );
+     CHECK( file.get_size() == 80 );
 
      REQUIRE( file.read( buf ) == buf.size );
-     REQUIRE( file.tell() == 8 );
-     REQUIRE( std::memcmp( "abcdefgh", buf.data, buf.size ) == 0 );
-     REQUIRE( file.seek( 2, _16nar::system::File::SeekOrigin::Set ) );
-     REQUIRE( file.tell() == 2 );
+     CHECK( file.tell() == 8 );
+     CHECK( std::memcmp( "abcdefgh", buf.data, buf.size ) == 0 );
+     CHECK( file.seek( 2, _16nar::system::File::SeekOrigin::Set ) );
+     CHECK( file.tell() == 2 );
      REQUIRE( file.read( buf ) == buf.size );
-     REQUIRE( std::memcmp( "cdefghab", buf.data, buf.size ) == 0 );
-     REQUIRE( file.seek( 5, _16nar::system::File::SeekOrigin::Cur ) );
-     REQUIRE( file.tell() == 15 );
+     CHECK( std::memcmp( "cdefghab", buf.data, buf.size ) == 0 );
+     CHECK( file.seek( 5, _16nar::system::File::SeekOrigin::Cur ) );
+     CHECK( file.tell() == 15 );
      REQUIRE( file.read( buf ) == buf.size );
-     REQUIRE( std::memcmp( "habcdefg", buf.data, buf.size ) == 0 );
-     REQUIRE( file.seek( -3, _16nar::system::File::SeekOrigin::End ) );
-     REQUIRE( file.tell() == 77 );
+     CHECK( std::memcmp( "habcdefg", buf.data, buf.size ) == 0 );
+     CHECK( file.seek( -3, _16nar::system::File::SeekOrigin::End ) );
+     CHECK( file.tell() == 77 );
      REQUIRE( file.read( buf ) == 3 );
-     REQUIRE( std::memcmp( "fgh", buf.data, 3 ) == 0 );
+     CHECK( std::memcmp( "fgh", buf.data, 3 ) == 0 );
 
      // ensure that get_size() works correctly regardless of seek position
-     REQUIRE( file.get_size() == 80 );
+     CHECK( file.get_size() == 80 );
 
      file.close();
-     REQUIRE( !file.is_open() );
+     CHECK( !file.is_open() );
 }
 
 
@@ -49,17 +49,17 @@ TEST_CASE( "File write", "[system_file]" )
      REQUIRE( file.open( "data/file_out.txt", true ) );
      REQUIRE( file.is_open() );
 
-     REQUIRE( file.write( buf ) == buf.size );
-     REQUIRE( file.tell() == 8 );
-     REQUIRE( file.get_size() == 8 );
+     CHECK( file.write( buf ) == buf.size );
+     CHECK( file.tell() == 8 );
+     CHECK( file.get_size() == 8 );
 
-     REQUIRE( file.seek( 2, _16nar::system::File::SeekOrigin::Set ) );
-     REQUIRE( file.write( buf ) == buf.size );
-     REQUIRE( file.tell() == 10 );
-     REQUIRE( file.get_size() == 10 );
+     CHECK( file.seek( 2, _16nar::system::File::SeekOrigin::Set ) );
+     CHECK( file.write( buf ) == buf.size );
+     CHECK( file.tell() == 10 );
+     CHECK( file.get_size() == 10 );
 
      file.close();
-     REQUIRE( !file.is_open() );
+     CHECK( !file.is_open() );
 
      char raw_read[ 10 ];
      _16nar::memory::ByteView read_buf{
@@ -68,5 +68,5 @@ TEST_CASE( "File write", "[system_file]" )
      _16nar::system::File read_file;
      REQUIRE( read_file.open( "data/file_out.txt" ) );
      REQUIRE( read_file.read( read_buf ) == read_buf.size );
-     REQUIRE( std::memcmp( "ababcdefgh", read_buf.data, read_buf.size ) == 0 );
+     CHECK( std::memcmp( "ababcdefgh", read_buf.data, read_buf.size ) == 0 );
 }

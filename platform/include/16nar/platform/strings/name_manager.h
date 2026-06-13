@@ -6,7 +6,7 @@
 #include <16nar/platform/defs.h>
 
 #include <16nar/platform/strings/name_table.h>
-#include <16nar/platform/memory/memory_domain.h>
+#include <16nar/platform/memory/imemory_domain.h>
 
 namespace _16nar::strings
 {
@@ -17,7 +17,7 @@ class NARENGINE_PLATFORM_API NameManager
 public:
      /// @brief Constructor.
      /// @param[in] domain memory domain for name tables allocation.
-     NameManager( memory::MemoryDomain& domain );
+     NameManager( memory::IMemoryDomain& domain );
 
      /// @brief Add new name table.
      /// @details Attempt to create duplicate name table (with the same name) is an error.
@@ -40,9 +40,13 @@ public:
      void remove_table( std::string_view name );
 
 private:
+     NameManager( const NameManager& ) = delete;
+     NameManager& operator=( const NameManager& ) = delete;
+
+private:
      NameTable table_names_;                                     ///< table of table names.
      std::pmr::unordered_map< StaticName, NameTable > tables_;   ///< name tables.
-     memory::MemoryDomain& domain_;                              ///< memory domain for allocations.
+     memory::IMemoryDomain& domain_;                             ///< memory domain for allocations.
 };
 
 } // namespace _16nar::strings

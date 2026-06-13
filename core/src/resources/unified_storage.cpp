@@ -2,7 +2,7 @@
 
 #include <16nar/platform/logger/logger.h>
 #include <16nar/platform/memory/memory_manager.h>
-#include <16nar/platform/memory/memory_domain.h>
+#include <16nar/platform/memory/imemory_domain.h>
 
 #include <16nar/core/assets/iasset_file_processor.h>
 #include <16nar/core/assets/iasset_data_convertor.h>

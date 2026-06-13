@@ -42,8 +42,8 @@ set(NARENGINE_PLATFORM_SOURCES
     "${NARENGINE_PLATFORM_SRC_DIR}/strings/name_manager.cpp"
 
     "${NARENGINE_PLATFORM_SRC_DIR}/memory/shared_buffer_ptr.cpp"
-    "${NARENGINE_PLATFORM_SRC_DIR}/memory/memory_domain.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/memory/memory_manager.cpp"
+    "${NARENGINE_PLATFORM_SRC_DIR}/memory/proxy_resource.cpp"
 
     "${NARENGINE_PLATFORM_SRC_DIR}/logger/logger.cpp"
     "${NARENGINE_PLATFORM_SRC_DIR}/logger/terminal_log_writer.cpp"
@@ -60,6 +60,7 @@ if ("${NARENGINE_BUILD_TESTS}")
     enable_testing()
     set(NARENGINE_PLATFORM_TEST_SOURCES
         "${NARENGINE_PLATFORM_SRC_DIR}/test/system/file_test.cpp"
+        "${NARENGINE_PLATFORM_SRC_DIR}/test/memory/memory_manager_test.cpp"
     )
     add_executable("${NAME}_platform_test" ${NARENGINE_PLATFORM_TEST_SOURCES})
     target_include_directories("${NAME}_platform_test" ${NARENGINE_PLATFORM_COMMON_INCLUDE_DIRS}
@@ -75,7 +76,7 @@ if ("${NARENGINE_BUILD_TESTS}")
         )
     endif()
     file(COPY "${NARENGINE_PLATFORM_SRC_DIR}/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-    add_test(NAME "${NAME}_platform_test" COMMAND "${NAME}_platform_test")
+    add_test(NAME "${NAME}_platform_test" COMMAND "${NAME}_platform_test" --success)
 endif() # if ("${NARENGINE_BUILD_TESTS}")
 
 

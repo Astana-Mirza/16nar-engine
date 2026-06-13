@@ -3,7 +3,7 @@
 namespace _16nar::strings
 {
 
-NameManager::NameManager( memory::MemoryDomain& domain ):
+NameManager::NameManager( memory::IMemoryDomain& domain ):
      table_names_{ domain },
      tables_{ &domain.get_resource() },
      domain_{ domain }

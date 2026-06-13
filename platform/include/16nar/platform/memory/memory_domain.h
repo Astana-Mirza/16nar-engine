@@ -1,60 +1,51 @@
 /// @file
-/// @brief File with MemoryDomain abstract class definition.
+/// @brief File with MemoryDomain template class definition.
 #ifndef _16NAR_PLATFORM_MEMORY_MEMORY_DOMAIN_H
 #define _16NAR_PLATFORM_MEMORY_MEMORY_DOMAIN_H
 
-#include <16nar/platform/memory/defs.h>
-
-#include <string>
-#include <optional>
-#include <vector>
-#include <memory_resource>
+#include <16nar/platform/memory/imemory_domain.h>
 
 namespace _16nar::memory
 {
 
-/// @brief Abstract memory domain having its own memory resource.
-class NARENGINE_PLATFORM_API MemoryDomain
+/// @brief Memory domain using template memory resource.
+/// @note Memory resource must have @b get_usage() and @b release() member functions.
+/// @tparam Resource type of memory resource.
+template < typename Resource >
+class MemoryDomain : public IMemoryDomain
 {
 public:
      /// @brief Constructor.
-     /// @param[in] name name of the memory domain.
-     MemoryDomain( std::string_view name );
+     /// @tparam Args types of memory resource constructor arguments.
+     /// @param[in] upstream upstream memory resource.
+     /// @param[in] args arguments of memory resource constructor.
+     template < typename... Args >
+     MemoryDomain( std::pmr::memory_resource *upstream, Args... args ):
+          IMemoryDomain::IMemoryDomain( upstream ),
+          resource_( upstream, args... )
+     {}
 
-     /// @brief Destructor.
-     virtual ~MemoryDomain();
+     /// @copydoc IMemoryDomain::get_resource()
+     std::pmr::memory_resource& get_resource() override
+     {
+          return resource_;
+     }
 
-     /// @brief Get memory resource of the domain.
-     /// @return memory resource of the domain.
-     virtual std::pmr::memory_resource& get_resource() = 0; 
-
-     /// @brief Get usage of the memory domain, in bytes.
-     /// @return usage of the memory domain, in bytes, may be undefined.
-     virtual std::optional< std::uint64_t > get_usage() const;
-
-     /// @brief Get name otf the domain.
-     /// @return name of the domain.
-     std::string_view get_name() const noexcept;
-
-     /// @brief Reset the memory domain and release all the memory, if possible.
-     /// @details Children domains will be reset before the parent domain.
-     void reset();
-
-     /// @brief Add child memory domain.
-     /// @param[in] child child memory domain.
-     void add_child( MemoryDomainPtr child );
-
-private:
-     MemoryDomain( const MemoryDomain& ) = delete;
-     MemoryDomain& operator=( const MemoryDomain& ) = delete;
+     /// @copydoc IMemoryDomain::get_usage() const
+     MemoryUsage get_usage() const override
+     {
+          return resource_.get_usage();
+     }
 
 protected:
-     /// @brief Implementation of current domain reset.
-     virtual void do_reset() = 0;
+     /// @copydoc IMemoryDomain::reset()
+     void reset() override
+     {
+          resource_.release();
+     }
 
 private:
-     std::string name_;                           ///< name of the domain.
-     std::vector< MemoryDomainPtr > children_;    ///< children domains.
+     Resource resource_; ///< memory resource of the domain.
 };
 
 } // namespace _16nar::memory
