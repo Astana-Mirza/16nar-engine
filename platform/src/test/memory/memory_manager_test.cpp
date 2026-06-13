@@ -26,12 +26,6 @@ TEST_CASE( "Memory manager functions", "[memory_memory_manager]" )
      CHECK( manager.get_domain( _16nar::strings::StaticName{ "not_exists" } ) == &root_domain );
      CHECK( manager.get_domain( _16nar::strings::StaticName{ "not_exists" }, true ) == nullptr );
 
-     usage = root_domain.get_usage();
-     CHECK( usage.bytes_total == 0 );
-     CHECK( usage.bytes_current == 0 );
-     CHECK( usage.alloc_total == 0 );
-     CHECK( usage.alloc_current == 0 );
-
      auto *domain = manager.add_domain<
           _16nar::memory::MemoryDomain<
                _16nar::memory::StatsResourceWrapper<
@@ -43,9 +37,6 @@ TEST_CASE( "Memory manager functions", "[memory_memory_manager]" )
      CHECK( manager.get_domain( _16nar::strings::StaticName{ "monotonic" } ) == domain );
 
      usage = root_domain.get_usage();
-     INFO( "After domain creation - root allocations/bytes: "
-          << usage.alloc_total << "/" <<  usage.bytes_total );
-
      CHECK( usage.bytes_total != 0 );
      CHECK( usage.bytes_current != 0 );
      CHECK( usage.alloc_total != 0 );

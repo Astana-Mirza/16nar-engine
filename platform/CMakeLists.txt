@@ -76,7 +76,7 @@ if ("${NARENGINE_BUILD_TESTS}")
         )
     endif()
     file(COPY "${NARENGINE_PLATFORM_SRC_DIR}/test/data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-    add_test(NAME "${NAME}_platform_test" COMMAND "${NAME}_platform_test" --success)
+    add_test(NAME "${NAME}_platform_test" COMMAND "${NAME}_platform_test")
 endif() # if ("${NARENGINE_BUILD_TESTS}")
 
 
