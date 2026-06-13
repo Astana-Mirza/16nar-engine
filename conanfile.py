@@ -75,7 +75,7 @@ class NarengineRecipe(ConanFile):
         })
         cmake.build()
         if self.options.enable_tests and can_run(self):
-            cmake.test(cli_args=["--verbose"])
+            cmake.ctest(cli_args=["--output-on-failure"])
 
     def package(self):
         cmake = CMake(self)
