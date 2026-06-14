@@ -61,6 +61,9 @@ if ("${NARENGINE_BUILD_TESTS}")
     set(NARENGINE_PLATFORM_TEST_SOURCES
         "${NARENGINE_PLATFORM_SRC_DIR}/test/system/file_test.cpp"
         "${NARENGINE_PLATFORM_SRC_DIR}/test/memory/memory_manager_test.cpp"
+        "${NARENGINE_PLATFORM_SRC_DIR}/test/strings/static_name_test.cpp"
+        "${NARENGINE_PLATFORM_SRC_DIR}/test/strings/name_table_test.cpp"
+        "${NARENGINE_PLATFORM_SRC_DIR}/test/strings/name_manager_test.cpp"
     )
     add_executable("${NAME}_platform_test" ${NARENGINE_PLATFORM_TEST_SOURCES})
     target_include_directories("${NAME}_platform_test" ${NARENGINE_PLATFORM_COMMON_INCLUDE_DIRS}

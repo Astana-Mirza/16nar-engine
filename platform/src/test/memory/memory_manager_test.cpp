@@ -26,13 +26,14 @@ TEST_CASE( "Memory manager functions", "[memory_memory_manager]" )
      CHECK( manager.get_domain( _16nar::strings::StaticName{ "not_exists" } ) == &root_domain );
      CHECK( manager.get_domain( _16nar::strings::StaticName{ "not_exists" }, true ) == nullptr );
 
+     std::byte buffer[ 4096 ];
      auto *domain = manager.add_domain<
           _16nar::memory::MemoryDomain<
                _16nar::memory::StatsResourceWrapper<
                     std::pmr::monotonic_buffer_resource, std::uint64_t
                >
           >
-     >( "monotonic", _16nar::strings::StaticName{} );
+     >( "monotonic", _16nar::strings::StaticName{}, buffer, sizeof( buffer ) );
      REQUIRE( domain != nullptr );
      CHECK( manager.get_domain( _16nar::strings::StaticName{ "monotonic" } ) == domain );
 
