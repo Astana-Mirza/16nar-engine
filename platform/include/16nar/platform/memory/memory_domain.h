@@ -10,6 +10,8 @@ namespace _16nar::memory
 
 /// @brief Memory domain using template memory resource.
 /// @note Memory resource must have @b get_usage() and @b release() member functions.
+/// Also, memory resource must accept upstream resource as its construcor's last parameter,
+/// in order to conform to Standard Library memory resources.
 /// @tparam Resource type of memory resource.
 template < typename Resource >
 class MemoryDomain : public IMemoryDomain
@@ -22,7 +24,7 @@ public:
      template < typename... Args >
      MemoryDomain( std::pmr::memory_resource *upstream, Args... args ):
           IMemoryDomain::IMemoryDomain( upstream ),
-          resource_( upstream, args... )
+          resource_( args..., upstream )
      {}
 
      /// @copydoc IMemoryDomain::get_resource()
