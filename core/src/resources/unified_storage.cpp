@@ -1,8 +1,6 @@
 #include <16nar/core/resources/unified_storage.h>
 
 #include <16nar/platform/logger/logger.h>
-#include <16nar/platform/memory/memory_manager.h>
-#include <16nar/platform/memory/imemory_domain.h>
 
 #include <16nar/core/assets/iasset_file_processor.h>
 #include <16nar/core/assets/iasset_data_convertor.h>
@@ -97,13 +95,13 @@ public:
                if ( result.first->second.type_id == desc.type_id )
                {
                     LOG_16NAR_DEBUG( "Patching resource '%s'",
-                         storage_.name_table_->get_name( res_name, true ).data() );
+                         storage_.path_names_.get_name( res_name, true ).data() );
                     result.first->second = desc;
                }
                else
                {
                     throw std::runtime_error{ "cannot add resource "
-                         + std::string{ storage_.name_table_->get_name( res_name, true ) }
+                         + std::string{ storage_.path_names_.get_name( res_name, true ) }
                          + " - possible type mismatch or hash collision" };
                }
           }
@@ -128,31 +126,20 @@ std::filesystem::path UnifiedStorage::correct_path(
 
 
 UnifiedStorage::UnifiedStorage(
-     const std::filesystem::path& base_dir,
-     memory::MemoryManager& memory_manager,
-     strings::NameManager& name_manager,
+     std::pmr::memory_resource& resource,
+     std::pmr::memory_resource& big_resource,
+     strings::NameTable& path_names,
      assets::IAssetFileProcessorPtr file_processor ):
-     resources_{}, packages_{}, base_dir_{ base_dir },
-     name_table_{}, file_processor_{ file_processor },
-     asset_reader_{}, convertor_{}, memory_{}, unpacked_{}
+     resources_( &resource ), packages_( &resource ),
+     base_dir_{ std::filesystem::current_path() },
+     path_names_( path_names ), file_processor_{ file_processor },
+     asset_reader_{}, convertor_{}, resource_{ resource },
+     big_resource_{ big_resource }, unpacked_{}
 {
      if ( !file_processor_ )
      {
           throw std::runtime_error{ "file processor is not present" };
      }
-
-     name_table_ = name_manager.get_table( "asset" );
-     if ( !name_table_ )
-     {
-          throw std::runtime_error{ "asset name table is not present" };
-     }
-
-     auto *memory_domain = memory_manager.get_domain( strings::StaticName{ "asset" } );
-     if ( !memory_domain )
-     {
-          throw std::runtime_error{ "asset memory domain is not present" };
-     }
-     memory_ = &memory_domain->get_resource();
      asset_reader_ = file_processor_->make_asset_reader();
 }
 
@@ -169,6 +156,12 @@ bool UnifiedStorage::get_unpacked_mode() const noexcept
 }
 
 
+void UnifiedStorage::set_base_dir( const std::filesystem::path& base_dir )
+{
+     base_dir_ = base_dir;
+}
+
+
 const std::filesystem::path& UnifiedStorage::get_base_dir() const noexcept
 {
      return base_dir_;
@@ -178,7 +171,7 @@ const std::filesystem::path& UnifiedStorage::get_base_dir() const noexcept
 std::filesystem::path UnifiedStorage::get_path( strings::StaticName name ) const
 {
      std::filesystem::path result{};
-     const auto data = name_table_->get_name( name );
+     const auto data = path_names_.get_name( name );
      if ( !data.empty() )
      {
           return correct_path( base_dir_, data );
@@ -204,7 +197,7 @@ memory::SharedBufferPtr UnifiedStorage::load( strings::StaticName name )
                LOG_16NAR_ERROR( "Cannot get size of unpacked resource '%s'", path.c_str() );
                return memory::SharedBufferPtr{};
           }
-          auto buffer = memory::SharedBufferPtr::allocate( *memory_, size );
+          auto buffer = memory::SharedBufferPtr::allocate( big_resource_, size );
           if ( size != file.read( buffer.get_view() ) )
           {
                LOG_16NAR_ERROR( "Cannot read data of unpacked resource '%s'", path.c_str() );
@@ -217,7 +210,7 @@ memory::SharedBufferPtr UnifiedStorage::load( strings::StaticName name )
      if ( iter == resources_.cend() )
      {
           LOG_16NAR_ERROR( "Cannot find resource '%s'",
-               name_table_->get_name( name, true ).data() );
+               path_names_.get_name( name, true ).data() );
           return memory::SharedBufferPtr{};
      }
      const auto& desc = iter->second;
@@ -225,8 +218,8 @@ memory::SharedBufferPtr UnifiedStorage::load( strings::StaticName name )
      if ( pkg_iter == packages_.end() )
      {
           LOG_16NAR_ERROR( "Cannot find package '%s' while loading resource '%s'",
-               name_table_->get_name( desc.package, true ).data(),
-               name_table_->get_name( name, true ).data() );
+               path_names_.get_name( desc.package, true ).data(),
+               path_names_.get_name( name, true ).data() );
           return memory::SharedBufferPtr{};
      }
      auto& package = pkg_iter->second;
@@ -234,16 +227,16 @@ memory::SharedBufferPtr UnifiedStorage::load( strings::StaticName name )
      {
           LOG_16NAR_ERROR( "Cannot seek chunk %u in package '%s' while loading resource '%s'",
                desc.chunk_id,
-               name_table_->get_name( desc.package, true ).data(),
-               name_table_->get_name( name, true ).data() );
+               path_names_.get_name( desc.package, true ).data(),
+               path_names_.get_name( name, true ).data() );
           return memory::SharedBufferPtr{};
      }
-     auto buffer = memory::SharedBufferPtr::allocate( *memory_, desc.orig_size );
+     auto buffer = memory::SharedBufferPtr::allocate( big_resource_, desc.orig_size );
      if ( desc.orig_size != package.database.read( buffer.get_view() ) )
      {
           LOG_16NAR_ERROR( "Cannot read resource '%s' from package '%s'",
-               name_table_->get_name( name, true ).data(),
-               name_table_->get_name( desc.package, true ).data() );
+               path_names_.get_name( name, true ).data(),
+               path_names_.get_name( desc.package, true ).data() );
           return memory::SharedBufferPtr{};
      }
      return buffer;

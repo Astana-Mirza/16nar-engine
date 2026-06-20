@@ -7,9 +7,10 @@
 
 #include <16nar/platform/system/file.h>
 #include <16nar/platform/strings/static_name.h>
-#include <16nar/platform/strings/name_manager.h>
+#include <16nar/platform/strings/name_table.h>
 #include <16nar/platform/memory/shared_buffer_ptr.h>
 
+#include <memory_resource>
 #include <unordered_map>
 #include <filesystem>
 
@@ -30,16 +31,14 @@ public:
           const std::filesystem::path& path );
 
      /// @brief Constructor.
-     /// @throws std::runtime_error if @b name_table or @b file_processor is null
-     /// or no suitable memory domain ("asset") present in @b memory_manager.
-     /// @param[in] base_dir base directory of the application.
-     /// @param[in] memory_manager memory manager for allocations.
-     /// @param[in] name_table name table.
+     /// @param[in] resource memory resource for utility allocations.
+     /// @param[in] big_resource memory resource for payload allocations.
+     /// @param[in] path_names name table for paths.
      /// @param[in] file_processor asset file processor.
      UnifiedStorage(
-          const std::filesystem::path& base_dir,
-          memory::MemoryManager& memory_manager,
-          strings::NameManager& name_manager,
+          std::pmr::memory_resource& resource,
+          std::pmr::memory_resource& big_resource,
+          strings::NameTable& path_names,
           assets::IAssetFileProcessorPtr file_processor );
 
      /// @brief Set unpacked operation mode for the storage.
@@ -51,6 +50,10 @@ public:
      /// @brief Get unpacked mode flag.
      /// @return unpacked mode flag.
      bool get_unpacked_mode() const noexcept;
+
+     /// @brief Set base directory of the application.
+     /// @param[in] base_dir base directory of the application.
+     void set_base_dir( const std::filesystem::path& base_dir );
 
      /// @brief Get base directory of the application.
      /// @return base directory of the application.
@@ -109,18 +112,19 @@ private:
           system::File database{};      ///< file of the package database.
      };
 
-     using ResourceMap = std::unordered_map< strings::StaticName, ResourceDesc >;
-     using ResourcePackageMap = std::unordered_map< strings::StaticName, ResourcePackage >;
+     using ResourceMap = std::pmr::unordered_map< strings::StaticName, ResourceDesc >;
+     using ResourcePackageMap = std::pmr::unordered_map< strings::StaticName, ResourcePackage >;
      friend class ResourceParser;
 
      ResourceMap resources_;                           ///< resources with their names.
      ResourcePackageMap packages_;                     ///< resource packages with theris names.
      std::filesystem::path base_dir_;                  ///< base directory of the application.
-     strings::NameTable *name_table_;                  ///< name table.
+     strings::NameTable& path_names_;                  ///< name table for paths.
      assets::IAssetFileProcessorPtr file_processor_;   ///< asset file processor.
      assets::IAssetReaderPtr asset_reader_;            ///< asset reader.
      assets::IAssetDataConvertorPtr convertor_;        ///< asset data convertor.
-     std::pmr::memory_resource *memory_;               ///< memory resource for asset reading allocations.
+     std::pmr::memory_resource& resource_;             ///< memory resource for utility allocations.
+     std::pmr::memory_resource& big_resource_;         ///< memory resource for payload allocations.
      bool unpacked_;                                   ///< read unpacked resources insted of packages.
 };
 

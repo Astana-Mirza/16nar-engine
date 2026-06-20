@@ -14,16 +14,9 @@
 namespace _16nar::resources
 {
 
-StbTextureReader::StbTextureReader( memory::MemoryManager& memory_manager ):
-     memory_{}
-{
-     auto *memory_domain = memory_manager.get_domain( strings::StaticName{ "asset" } );
-     if ( !memory_domain )
-     {
-          throw std::runtime_error{ "asset memory domain is not present" };
-     }
-     memory_ = &memory_domain->get_resource();
-}
+StbTextureReader::StbTextureReader( std::pmr::memory_resource& big_resource ):
+     big_resource_{ big_resource }
+{}
 
 
 memory::SharedBufferPtr StbTextureReader::read( strings::StaticName name, UnifiedStorage& storage )
@@ -51,7 +44,7 @@ memory::SharedBufferPtr StbTextureReader::read( strings::StaticName name, Unifie
           * static_cast< std::size_t >( height )
           * static_cast< std::size_t >( channels )
           * sizeof( ::stbi_uc );
-     auto result = memory::SharedBufferPtr::allocate( *memory_, size );
+     auto result = memory::SharedBufferPtr::allocate( big_resource_, size );
      std::memcpy( result.get_view().data, data, size );
      return result;
 }
