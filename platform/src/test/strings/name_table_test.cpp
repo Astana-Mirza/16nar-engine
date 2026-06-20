@@ -1,16 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <16nar/platform/strings/name_table.h>
-#include <16nar/platform/memory/memory_domain.h>
-#include <16nar/platform/memory/proxy_resource.h>
+
+#include <memory_resource>
 
 TEST_CASE( "Name addition and removal", "[strings_name_table]" )
 {
-     _16nar::memory::MemoryDomain< _16nar::memory::ProxyResource > root_domain{
-          std::pmr::new_delete_resource()
-     };
+     _16nar::strings::NameTable name_table{ *std::pmr::get_default_resource() };
 
-     _16nar::strings::NameTable name_table{ root_domain };
      CHECK( name_table.get_name( _16nar::strings::StaticName{ "not_exists" } ).empty() );
      CHECK( name_table.get_name( _16nar::strings::StaticName{ "not_exists" }, true ) == "[0xfad5ab6316cd0ccf]" );
 
@@ -38,11 +35,7 @@ TEST_CASE( "Name addition and removal", "[strings_name_table]" )
 
 TEST_CASE( "Getting static name by string", "[strings_name_table]" )
 {
-     _16nar::memory::MemoryDomain< _16nar::memory::ProxyResource > root_domain{
-          std::pmr::new_delete_resource()
-     };
-
-     _16nar::strings::NameTable name_table{ root_domain };
+     _16nar::strings::NameTable name_table{ *std::pmr::get_default_resource() };
 
      auto name1 = name_table.add_name( "test_string" );
      CHECK( name1 == name_table.get_static_name( "test_string" ) );

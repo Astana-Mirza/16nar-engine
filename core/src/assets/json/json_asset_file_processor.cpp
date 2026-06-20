@@ -11,8 +11,10 @@
 namespace _16nar::assets
 {
 
-JsonAssetFileProcessor::JsonAssetFileProcessor( std::pmr::memory_resource& memory_resource ) noexcept:
-     memory_resource_{ memory_resource }
+JsonAssetFileProcessor::JsonAssetFileProcessor( std::pmr::memory_resource& resource,
+     std::pmr::memory_resource& big_resource ) noexcept:
+     resource_{ resource },
+     big_resource_{ big_resource }
 {}
 
 
@@ -24,7 +26,7 @@ memory::SharedBufferPtr JsonAssetFileProcessor::read_asset_data( const system::F
           LOG_16NAR_ERROR( "JSON asset file is empty" );
           return memory::SharedBufferPtr{};
      }
-     auto ret = memory::SharedBufferPtr::allocate( memory_resource_, file_size );
+     auto ret = memory::SharedBufferPtr::allocate( resource_, file_size );
      if ( file_size != file.read( ret.get_view() ) )
      {
           LOG_16NAR_ERROR( "Cannot read JSON asset file of size %zu", file_size );
@@ -97,13 +99,13 @@ bool JsonAssetFileProcessor::write_asset_data( memory::ConstByteView buffer, sys
 
 IAssetReaderPtr JsonAssetFileProcessor::make_asset_reader()
 {
-     return std::make_shared< JsonAssetReader >();
+     return std::make_shared< JsonAssetReader >( resource_ );
 }
 
 
 IAssetWriterPtr JsonAssetFileProcessor::make_asset_writer()
 {
-     return std::make_shared< JsonAssetWriter >();
+     return std::make_shared< JsonAssetWriter >( resource_, big_resource_ );
 }
 
 } // namespace _16nar::assets

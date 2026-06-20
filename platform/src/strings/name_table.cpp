@@ -15,8 +15,8 @@ static thread_local char pretty_print_buffer[21]{};
 } // anonymous namespace
 
 
-NameTable::NameTable( memory::IMemoryDomain& domain ):
-     table_{ &domain.get_resource() }
+NameTable::NameTable( std::pmr::memory_resource& resource ):
+     table_( &resource )
 {}
 
 

@@ -11,8 +11,11 @@ namespace _16nar::assets
 {
 
 FlatBuffersAssetFileProcessor::FlatBuffersAssetFileProcessor(
-     std::pmr::memory_resource& memory_resource, std::size_t initial_size, bool check_names ) noexcept:
-     memory_resource_{ memory_resource },
+     std::pmr::memory_resource& resource,
+     std::pmr::memory_resource& big_resource,
+     std::size_t initial_size, bool check_names ) noexcept:
+     resource_{ resource },
+     big_resource_{ big_resource },
      initial_size_{ initial_size },
      check_names_{ check_names }
 {}
@@ -33,7 +36,7 @@ memory::SharedBufferPtr FlatBuffersAssetFileProcessor::read_asset_data( const sy
           LOG_16NAR_ERROR( "Header of flatbuffers asset is corrupted or has incompatible version" );
           return memory::SharedBufferPtr{};
      }
-     auto ret = memory::SharedBufferPtr::allocate( memory_resource_, header.size() );
+     auto ret = memory::SharedBufferPtr::allocate( big_resource_, header.size() );
      if ( header.size() != file.read( ret.get_view() ) )
      {
           LOG_16NAR_ERROR( "Cannot read flatbuffers asset file of size %lu", header.size() );
@@ -71,13 +74,13 @@ bool FlatBuffersAssetFileProcessor::write_asset_data( memory::ConstByteView buff
 
 IAssetReaderPtr FlatBuffersAssetFileProcessor::make_asset_reader()
 {
-     return std::make_shared< FlatBuffersAssetReader >();
+     return std::make_shared< FlatBuffersAssetReader >( resource_ );
 }
 
 
 IAssetWriterPtr FlatBuffersAssetFileProcessor::make_asset_writer()
 {
-     return std::make_shared< FlatBuffersAssetWriter >( memory_resource_, initial_size_, check_names_ );
+     return std::make_shared< FlatBuffersAssetWriter >( resource_, big_resource_, initial_size_, check_names_ );
 }
 
 } // namespace _16nar::assets

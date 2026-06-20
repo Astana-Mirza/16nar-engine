@@ -18,7 +18,8 @@ class NARENGINE_ASSETS_JSON_API JsonAssetReader : public IAssetReader
 {
 public:
      /// @brief Default constructor.
-     JsonAssetReader() noexcept;
+     /// @param[in] resource memory resource for utiliy data allocations.
+     JsonAssetReader( std::pmr::memory_resource& resource ) noexcept;
 
      JsonAssetReader( const JsonAssetReader& ) = delete;
      JsonAssetReader& operator=( const JsonAssetReader& ) = delete;
@@ -45,7 +46,7 @@ public:
      std::size_t get_children_count() const override;
 
      /// @copydoc IAssetReader::get_children_names() const
-     std::vector< std::string > get_children_names() const override;
+     std::pmr::vector< std::pmr::string > get_children_names() const override;
 
      /// @copydoc IAssetReader::to_child(std::string_view)
      bool to_child( std::string_view name ) override;
@@ -59,9 +60,10 @@ public:
 private:
      using JsonPtr = const nlohmann::json::object_t *;
 
-     nlohmann::json json_;         ///< JSON with asset data.
-     std::stack< JsonPtr > stack_; ///< current stack of parent assets.
-     JsonPtr current_;             ///< current asset object.
+     nlohmann::json json_;                   ///< JSON with asset data.
+     std::pmr::vector< JsonPtr > stack_;     ///< current stack of parent assets.
+     JsonPtr current_;                       ///< current asset object.
+     std::pmr::memory_resource& resource_;   ///< memory resource for utiliy data allocations.
 };
 
 } // namespace _16nar::assets

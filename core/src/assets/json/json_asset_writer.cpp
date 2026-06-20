@@ -5,13 +5,14 @@
 namespace _16nar::assets
 {
 
-JsonAssetWriter::JsonAssetWriter():
-     ids_{}, result_{}, current_id_{}
+JsonAssetWriter::JsonAssetWriter( std::pmr::memory_resource& resource,
+     std::pmr::memory_resource& big_resource ):
+     ids_( &resource ), result_( &big_resource ), current_id_{}
 {}
 
 
 std::uint32_t JsonAssetWriter::write_asset( std::string_view name, AssetData content,
-          const std::vector< std::uint32_t >& children, bool is_array )
+          const std::uint32_t *children, std::uint32_t children_count, bool is_array )
 {
      if ( !result_.empty() )
      {
@@ -22,8 +23,10 @@ std::uint32_t JsonAssetWriter::write_asset( std::string_view name, AssetData con
      nlohmann::json asset;
      nlohmann::json children_set{};
      nlohmann::json children_arr = nlohmann::json::array();
-     for ( const auto id : children )
+     const std::uint32_t children_total = children ? children_count : 0;
+     for( std::uint32_t i = 0; i < children_total; ++i )
      {
+          const auto id = children[ i ];
           auto iter = ids_.find( id );
           if ( iter == ids_.cend() )
           {
@@ -62,7 +65,7 @@ std::uint32_t JsonAssetWriter::write_asset( std::string_view name, AssetData con
      if ( content.data )
      {
           nlohmann::json content_json;
-          content_json[ type_id_label ] = content.type_id;
+          content_json[ type_id_label ] = content.type_id.hash;
           content_json[ data_label ] = std::string{
                reinterpret_cast< const char * >( content.data.data ), content.data.size };
           asset[ content_label ] = std::move( content_json );

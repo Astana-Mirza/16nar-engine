@@ -16,8 +16,8 @@ class NARENGINE_PLATFORM_API NameManager
 {
 public:
      /// @brief Constructor.
-     /// @param[in] domain memory domain for name tables allocation.
-     NameManager( memory::IMemoryDomain& domain );
+     /// @param[in] resource memory resource for name tables allocation.
+     NameManager( std::pmr::memory_resource& resource );
 
      /// @brief Add new name table.
      /// @details Attempt to create duplicate name table (with the same name) is an error.
@@ -46,7 +46,7 @@ private:
 private:
      NameTable table_names_;                                     ///< table of table names.
      std::pmr::unordered_map< StaticName, NameTable > tables_;   ///< name tables.
-     memory::IMemoryDomain& domain_;                             ///< memory domain for allocations.
+     std::pmr::memory_resource& resource_;                       ///< memory resource for allocations.
 };
 
 } // namespace _16nar::strings

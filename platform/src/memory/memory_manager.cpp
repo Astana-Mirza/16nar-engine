@@ -1,7 +1,5 @@
 #include <16nar/platform/memory/memory_manager.h>
 
-#include <16nar/platform/memory/imemory_domain.h>
-
 #include <stdexcept>
 
 namespace _16nar::memory
@@ -10,7 +8,7 @@ namespace _16nar::memory
 MemoryManager::MemoryManager( IMemoryDomain& root_domain ):
      names_{ &root_domain.get_resource() },
      tree_{ &root_domain.get_resource() },
-     names_table_{ root_domain },
+     names_table_{ root_domain.get_resource() },
      root_domain_{ root_domain }
 {}
 

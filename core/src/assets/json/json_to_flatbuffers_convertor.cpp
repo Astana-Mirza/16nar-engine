@@ -5,8 +5,8 @@
 namespace _16nar::assets
 {
 
-JsonToFlatBuffersConvertor::JsonToFlatBuffersConvertor():
-     parser_{}, type_names_{}, json_out_{}, error_{}
+JsonToFlatBuffersConvertor::JsonToFlatBuffersConvertor( strings::NameTable& type_names ):
+     parser_{}, type_names_{ type_names }, json_out_{}, error_{}
 {
      // use quotes in field names
      parser_.opts.strict_json = true;
@@ -44,12 +44,6 @@ bool JsonToFlatBuffersConvertor::add_schema( const std::string& schema_data,
      return parser_.Parse( schema_data.c_str(),
           c_paths.empty() ? nullptr : c_paths.data(),
           posix_schema_path.empty() ? nullptr : posix_schema_path.c_str() );
-}
-
-
-void JsonToFlatBuffersConvertor::set_type_name( ContentTypeId type_id, std::string_view name )
-{
-     type_names_[ type_id ].assign( name.cbegin(), name.cend() );
 }
 
 
@@ -112,20 +106,21 @@ AssetData JsonToFlatBuffersConvertor::convert_backward( AssetData content )
 }
 
 
-std::string JsonToFlatBuffersConvertor::get_error_description() const
+std::string_view JsonToFlatBuffersConvertor::get_error_description() const
 {
      return error_;
 }
 
 
-bool JsonToFlatBuffersConvertor::set_root_type( ContentTypeId type_id )
+bool JsonToFlatBuffersConvertor::set_root_type( strings::StaticName type_id )
 {
-     const auto iter = type_names_.find( type_id );
-     if ( iter != type_names_.cend() )
+     const auto name = type_names_.get_name( type_id );
+     if ( !name.empty() )
      {
-          if ( !parser_.SetRootType( iter->second.c_str() ) )
+          if ( !parser_.SetRootType( name.data() ) )
           {
-               error_ = "unknown type name: " + iter->second;
+               error_ = "unknown type name: ";
+               error_ += name;
                return false;
           }
      }

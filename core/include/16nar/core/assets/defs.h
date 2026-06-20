@@ -5,6 +5,7 @@
 
 #include <16nar/core/defs.h>
 #include <16nar/platform/memory/defs.h>
+#include <16nar/platform/strings/static_name.h>
 
 #include <memory>
 #include <cstdint>
@@ -32,15 +33,12 @@ namespace _16nar::assets
 /// @brief Identifier of action of asset parsing.
 using AssetActionId = std::uint32_t;
 
-/// @brief Identifier of asset content type.
-using ContentTypeId = std::uint32_t;
-
 
 /// @brief Data of the asset.
 struct AssetData
 {
-     ContentTypeId type_id{};           ///< identifier of asset data type.
-     memory::ConstByteView data{};    ///< binary buffer with asset data.
+     strings::StaticName type_id{};     ///< identifier of asset data type.
+     memory::ConstByteView data{};      ///< binary buffer with asset data.
 };
 
 

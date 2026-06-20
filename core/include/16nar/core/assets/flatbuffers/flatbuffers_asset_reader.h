@@ -23,7 +23,8 @@ class NARENGINE_ASSETS_FB_API FlatBuffersAssetReader : public IAssetReader
 {
 public:
      /// @brief Default constructor.
-     FlatBuffersAssetReader() noexcept;
+     /// @param[in] resource memory resource for utility data allocations.
+     FlatBuffersAssetReader( std::pmr::memory_resource& resource ) noexcept;
 
      FlatBuffersAssetReader( const FlatBuffersAssetReader& ) = delete;
      FlatBuffersAssetReader& operator=( const FlatBuffersAssetReader& ) = delete;
@@ -50,7 +51,7 @@ public:
      std::size_t get_children_count() const override;
 
      /// @copydoc IAssetReader::get_children_names() const
-     std::vector< std::string > get_children_names() const override;
+     std::pmr::vector< std::pmr::string > get_children_names() const override;
 
      /// @copydoc IAssetReader::to_child(std::string_view)
      bool to_child( std::string_view name ) override;
@@ -62,8 +63,9 @@ public:
      bool to_parent() override;
 
 private:
-     std::stack< const data::Asset * > stack_;    ///< current stack of parent assets.
-     const data::Asset *current_;                 ///< current asset object.
+     std::pmr::vector< const data::Asset * > stack_;   ///< current stack of parent assets.
+     std::pmr::memory_resource& resource_;             ///< memory resource for utility data allocations.
+     const data::Asset *current_;                      ///< current asset object.
 };
 
 } // namespace _16nar::assets

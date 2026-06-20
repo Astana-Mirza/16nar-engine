@@ -1,6 +1,6 @@
 #include <16nar/core/defs.h>
 
-#include <16nar/platform/strings/hash.h>
+#include <16nar/platform/strings/name_table.h>
 
 #include <16nar/core/assets/flatbuffers/flatbuffers_asset_file_processor.h>
 #include <16nar/core/assets/flatbuffers/flatbuffers_asset_reader.h>
@@ -60,59 +60,57 @@ void check_format( const std::string& format )
 
 IAssetFileProcessorPtr make_file_processor( const std::string& format )
 {
-     auto* resource = std::pmr::get_default_resource();
+     auto *resource = std::pmr::get_default_resource();
      assert( resource );
      if ( format == "json" )
      {
-          return std::make_shared< JsonAssetFileProcessor >( *resource );
+          return std::make_shared< JsonAssetFileProcessor >( *resource, *resource );
      }
      if ( format == "flatbuffers" )
      {
-          return std::make_shared< FlatBuffersAssetFileProcessor >( *resource );
+          return std::make_shared< FlatBuffersAssetFileProcessor >( *resource, *resource );
      }
      throw std::runtime_error{ "unknown format '" + format + "'" };
 }
 
 
-IAssetDataConvertorPtr make_convertor( const AssetToolParams& params, bool& backward )
+IAssetDataConvertorPtr make_convertor( const AssetToolParams& params,
+     strings::NameTable& type_names, bool& backward )
 {
-     std::shared_ptr< JsonToFlatBuffersConvertor > json_to_fb{};
+     bool json_to_fb{};
      if ( params.src_format == "json" && params.dst_format == "flatbuffers" )
      {
           backward = false;
-          json_to_fb = std::make_shared< JsonToFlatBuffersConvertor >();
+          json_to_fb = true;
      }
      if ( params.src_format == "flatbuffers" && params.dst_format == "json" )
      {
           backward = true;
-          json_to_fb = std::make_shared< JsonToFlatBuffersConvertor >();
+          json_to_fb = true;
      }
      if ( json_to_fb )
      {
+          auto convertor = std::make_shared< JsonToFlatBuffersConvertor >( type_names );
           for ( const auto& schema_path : params.schemas )
           {
                std::ifstream schema_input{ schema_path };
                const std::string schema_data{
                     std::istreambuf_iterator< char >( schema_input ),
                     std::istreambuf_iterator< char >() };
-               if ( !json_to_fb->add_schema( schema_data, params.include_paths, schema_path ) )
+               if ( !convertor->add_schema( schema_data, params.include_paths, schema_path ) )
                {
                     throw std::runtime_error{ "cannot register schema " + schema_path };
                }
           }
-          std::unordered_map< std::uint32_t, std::string > hashes{};
           for ( const auto& type : params.types )
           {
                std::string_view type_sv{ type.c_str() };
-               const auto hash = strings::str_hash32( type_sv );
-               if ( !hashes.insert( { hash, type } ).second )
+               if ( type_names.add_name( type_sv ).empty() )
                {
-                    throw std::runtime_error{ "duplicate hashes found for types '"
-                         + hashes[ hash ] + "' and '" + type + "'" };
+                    throw std::runtime_error{ "cannot add type name '" + type + "'" };
                }
-               json_to_fb->set_type_name( hash, type_sv );
           }
-          return json_to_fb;
+          return convertor;
      }
      throw std::runtime_error{ "cannot convert format '"
           + params.src_format + "' to '" + params.dst_format + "'" };
@@ -149,7 +147,8 @@ std::uint32_t convert_recursive( IAssetReader& reader, IAssetWriter& writer,
           {
                if ( !reader.to_child( name.c_str() ) )
                {
-                    throw std::runtime_error{ "cannot go to asset child '" + name + "'" };
+                    throw std::runtime_error{
+                         std::string{ "cannot go to asset child '" } + name.c_str() + "'" };
                }
                children_ids.emplace_back( convert_recursive( reader, writer, convertor, backward ) );
                if ( !reader.to_parent() )
@@ -167,10 +166,12 @@ std::uint32_t convert_recursive( IAssetReader& reader, IAssetWriter& writer,
                convertor.convert_backward( in_content ) : convertor.convert_forward( in_content );
           if ( !out_content.data )
           {
-               throw std::runtime_error{ convertor.get_error_description() };
+               const auto desc = convertor.get_error_description();
+               throw std::runtime_error{ std::string{ desc.begin(), desc.end() } };
           }
      }
-     const auto ret = writer.write_asset( name, out_content, children_ids, is_array );
+     const auto ret = writer.write_asset( name, out_content,
+          children_ids.data(), children_ids.size(), is_array );
      if ( !ret )
      {
           throw std::runtime_error{ "cannot write asset " + std::string{ name.cbegin(), name.cend() } };
@@ -181,8 +182,12 @@ std::uint32_t convert_recursive( IAssetReader& reader, IAssetWriter& writer,
 
 void process( const std::vector< std::string >& paths, const AssetToolParams& params )
 {
+     auto *resource = std::pmr::get_default_resource();
+     assert( resource );
+     strings::NameTable type_names{ *resource };
+
      bool backward{};
-     auto convertor = make_convertor( params, backward );
+     auto convertor = make_convertor( params, type_names, backward );
      auto src_processor = make_file_processor( params.src_format );
      auto dst_processor = make_file_processor( params.dst_format );
 

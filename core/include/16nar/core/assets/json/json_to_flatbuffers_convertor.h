@@ -5,6 +5,8 @@
 
 #include <16nar/core/assets/iasset_data_convertor.h>
 
+#include <16nar/platform/strings/name_table.h>
+
 #include <flatbuffers/idl.h>
 
 #include <vector>
@@ -15,11 +17,14 @@ namespace _16nar::assets
 {
 
 /// @brief Class for conversion asset data from JSON to flatbuffers format.
+/// @details If the name for converted type is not set, convertor will attempt to convert to
+/// "root_type" of latest loaded schema. The name must include namespaces, e.g. "my_project.data.my_type".
 class NARENGINE_ASSETS_JSON_API JsonToFlatBuffersConvertor : public IAssetDataConvertor
 {
 public:
      /// @brief Constructor.
-     JsonToFlatBuffersConvertor();
+     /// @param[in] type_names table of names.
+     JsonToFlatBuffersConvertor( strings::NameTable& type_names );
 
      /// @brief Add flatbuffers schema to convertor.
      /// @details This function resets current converted asset data, if any.
@@ -34,13 +39,6 @@ public:
           const std::vector< std::string >& include_paths = {},
           const std::string& schema_path = {} );
 
-     /// @brief Set name of type with given identifier.
-     /// @details If type name is not set, convertor will attempt to convert to "root_type" of
-     /// latest loaded schema. @b name must include namespaces, e.g. "my_project.data.my_type".
-     /// @param type_id type identifier.
-     /// @param name type name in flatbuffers schema.
-     void set_type_name( ContentTypeId type_id, std::string_view name );
-
      /// @copydoc IAssetDataConvertor::convert_forward(AssetData)
      AssetData convert_forward( AssetData content ) override;
 
@@ -48,19 +46,19 @@ public:
      AssetData convert_backward( AssetData content ) override;
 
      /// @copydoc IAssetDataConvertor::get_error_description()
-     std::string get_error_description() const override;
+     std::string_view get_error_description() const override;
 
 private:
      /// @brief Sets root type name to parser if its name is registered.
      /// @param[in] type_id type identifier.
      /// @return true on success or if name is not registered, false on error.
-     bool set_root_type( ContentTypeId type_id );
+     bool set_root_type( strings::StaticName type_id );
 
 private:
-     flatbuffers::Parser parser_;                                     ///< flatbuffers parser.
-     std::unordered_map< ContentTypeId, std::string > type_names_;    ///< type names.
-     std::string json_out_;                                           ///< JSON output of backward conversion.
-     std::string error_;                                              ///< latest error message.
+     flatbuffers::Parser parser_;       ///< flatbuffers parser.
+     strings::NameTable& type_names_;   ///< type names.
+     std::string json_out_;             ///< JSON output of backward conversion.
+     std::string error_;                ///< latest error message.
 };
 
 } // namespace _16nar::assets

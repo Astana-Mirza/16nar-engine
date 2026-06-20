@@ -37,7 +37,7 @@ public:
           }
 
           auto content = reader.get_content();
-          if ( !content.data || content.type_id != strings::str_hash32( pkg_asset_name ) )
+          if ( !content.data || content.type_id != strings::StaticName( pkg_asset_name ) )
           {
                throw std::runtime_error{ "resource package buffer is corrupted" };
           }
@@ -46,7 +46,8 @@ public:
                content = storage_.convertor_->convert_forward( content );
                if ( !content.data )
                {
-                    throw std::runtime_error{ storage_.convertor_->get_error_description() };
+                    const auto desc = storage_.convertor_->get_error_description();
+                    throw std::runtime_error{ std::string{ desc.begin(), desc.end() } };
                }
           }
           const auto data = reinterpret_cast< const std::uint8_t * >( content.data.data );
@@ -75,7 +76,7 @@ public:
           for ( const auto res_ptr : *package_buf->resources() )
           {
                UnifiedStorage::ResourceDesc desc{};
-               desc.type_id = res_ptr->hash().type_id();
+               desc.type_id.hash = res_ptr->hash().type_id();
                desc.chunk_id = res_ptr->chunk_id();
                desc.size = res_ptr->size();
                desc.orig_size = res_ptr->orig_size();
