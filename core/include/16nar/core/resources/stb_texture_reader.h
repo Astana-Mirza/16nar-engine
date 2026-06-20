@@ -7,6 +7,8 @@
 
 #include <16nar/core/resources/iresource_reader.h>
 
+#include <memory_resource>
+
 namespace _16nar::resources
 {
 
@@ -17,15 +19,14 @@ class NARENGINE_CORE_API StbTextureReader : public IResourceReader
 {
 public:
      /// @brief Constructor.
-     /// @throws std::runtime_error if no suitable memory domain ("asset") present in @b memory_manager.
-     /// @param[in] memory_manager memory manager.
-     StbTextureReader( memory::MemoryManager& memory_manager );
+     /// @param[in] big_resource memory resource for payload allocations.
+     StbTextureReader( std::pmr::memory_resource& big_resource );
 
      /// @copydoc IResourceReader::read(strings::StaticName, UnifiedStorage&)
      memory::SharedBufferPtr read( strings::StaticName name, UnifiedStorage& storage ) override;
 
 private:
-     std::pmr::memory_resource *memory_;     ///< memory resource for asset reading allocations.
+     std::pmr::memory_resource& big_resource_;    ///< memory resource for payload allocations.
 };
 
 } // namespace _16nar::resources
