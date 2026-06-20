@@ -99,13 +99,19 @@ bool JsonAssetFileProcessor::write_asset_data( memory::ConstByteView buffer, sys
 
 IAssetReaderPtr JsonAssetFileProcessor::make_asset_reader()
 {
-     return std::make_shared< JsonAssetReader >( resource_ );
+     return std::allocate_shared< JsonAssetReader >(
+          std::pmr::polymorphic_allocator< JsonAssetReader >( &resource_ ),
+          resource_
+     );
 }
 
 
 IAssetWriterPtr JsonAssetFileProcessor::make_asset_writer()
 {
-     return std::make_shared< JsonAssetWriter >( resource_, big_resource_ );
+     return std::allocate_shared< JsonAssetWriter >(
+          std::pmr::polymorphic_allocator< JsonAssetWriter >( &resource_ ),
+          resource_, big_resource_
+     );
 }
 
 } // namespace _16nar::assets

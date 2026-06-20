@@ -7,6 +7,8 @@
 
 #include <16nar/gen/flatbuffers/asset_generated.h>
 
+#include <memory>
+
 namespace _16nar::assets
 {
 
@@ -74,13 +76,19 @@ bool FlatBuffersAssetFileProcessor::write_asset_data( memory::ConstByteView buff
 
 IAssetReaderPtr FlatBuffersAssetFileProcessor::make_asset_reader()
 {
-     return std::make_shared< FlatBuffersAssetReader >( resource_ );
+     return std::allocate_shared< FlatBuffersAssetReader >(
+          std::pmr::polymorphic_allocator< FlatBuffersAssetReader >( &resource_ ),
+          resource_
+     );
 }
 
 
 IAssetWriterPtr FlatBuffersAssetFileProcessor::make_asset_writer()
 {
-     return std::make_shared< FlatBuffersAssetWriter >( resource_, big_resource_, initial_size_, check_names_ );
+     return std::allocate_shared< FlatBuffersAssetWriter >(
+          std::pmr::polymorphic_allocator< FlatBuffersAssetWriter >( &resource_ ),
+          resource_, big_resource_, initial_size_, check_names_
+     );
 }
 
 } // namespace _16nar::assets
