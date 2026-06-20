@@ -1,16 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <16nar/platform/strings/name_manager.h>
-#include <16nar/platform/memory/memory_domain.h>
-#include <16nar/platform/memory/proxy_resource.h>
+
+#include <memory_resource>
 
 TEST_CASE( "Name table addition and removal", "[strings_name_manager]" )
 {
-     _16nar::memory::MemoryDomain< _16nar::memory::ProxyResource > root_domain{
-          std::pmr::new_delete_resource()
-     };
+     _16nar::strings::NameManager name_manager{ *std::pmr::get_default_resource() };
 
-     _16nar::strings::NameManager name_manager{ root_domain };
      CHECK( name_manager.get_table( "not_exists" ) == nullptr );
      CHECK( name_manager.get_table( "" ) == nullptr );
 

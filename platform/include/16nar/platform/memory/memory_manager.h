@@ -6,6 +6,7 @@
 #include <16nar/platform/memory/defs.h>
 
 #include <16nar/platform/strings/name_table.h>
+#include <16nar/platform/memory/imemory_domain.h>
 
 #include <vector>
 #include <unordered_map>

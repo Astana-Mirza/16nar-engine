@@ -17,11 +17,15 @@ class NARENGINE_ASSETS_JSON_API JsonAssetWriter : public IAssetWriter
 {
 public:
      /// @brief Default constructor.
-     JsonAssetWriter();
+     /// @param[in] resource memory resource for utility allocations.
+     /// @param[in] big_resource memory resource for payload allocations.
+     JsonAssetWriter( std::pmr::memory_resource& resource, std::pmr::memory_resource& big_resource );
 
-     /// @copydoc IAssetWriter::write_asset(std::string_view, AssetData, const std::vector<std::uint32_t>&, bool)
+     /// @copydoc IAssetWriter::write_asset(std::string_view, AssetData, const std::uint32_t*, std::uint32_t, bool)
      std::uint32_t write_asset( std::string_view name, AssetData content,
-          const std::vector< std::uint32_t >& children = {}, bool is_array = false ) override;
+          const std::uint32_t *children = nullptr,
+          std::uint32_t children_count = 0,
+          bool is_array = false ) override;
 
      /// @copydoc IAssetWriter::finish(std::uint32_t)
      memory::ConstByteView finish( std::uint32_t root_id ) override;
@@ -30,9 +34,9 @@ public:
      void reset() override;
 
 private:
-     std::unordered_map< std::uint32_t, nlohmann::json > ids_;   ///< identifiers of written assets.
-     std::string result_;                                        ///< resulting JSON.
-     std::uint32_t current_id_;                                  ///< current asset id.
+     std::pmr::unordered_map< std::uint32_t, nlohmann::json > ids_;   ///< identifiers of written assets.
+     std::pmr::string result_;                                        ///< resulting JSON.
+     std::uint32_t current_id_;                                       ///< current asset id.
 };
 
 } // namespace _16nar::assets

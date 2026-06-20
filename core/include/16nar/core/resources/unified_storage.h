@@ -94,7 +94,7 @@ private:
      /// @brief Description of resource in the package.
      struct ResourceDesc
      {
-          assets::ContentTypeId type_id{};   ///< type of the resource.
+          strings::StaticName type_id{};     ///< type name of the resource.
           std::uint32_t chunk_id{};          ///< id of starting chunk of the resource.
           std::uint32_t size{};              ///< size of the resource in the package, in bytes.
           std::uint32_t orig_size{};         ///< original size of the resource data, in bytes.

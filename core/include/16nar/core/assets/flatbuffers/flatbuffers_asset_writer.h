@@ -20,20 +20,21 @@ namespace _16nar::assets
 class NARENGINE_ASSETS_FB_API FlatBuffersAssetWriter : public IAssetWriter
 {
 public:
-     /// @brief Default constructor.
-     FlatBuffersAssetWriter() noexcept;
-
      /// @brief Constructor.
-     /// @param[in] resource memory resource for the allocation.
+     /// @param[in] resource memory resource for utility allocations.
+     /// @param[in] big_resource memory resource for payload allocations.
      /// @param[in] initial_size initial size of builder buffer.
      /// @param[in] check_names true if name uniqueness needs to be
      /// checked while saving children sets (has performance and memory costs), false otherwise.
      FlatBuffersAssetWriter( std::pmr::memory_resource& resource,
+          std::pmr::memory_resource& big_resource,
           std::size_t initial_size, bool check_names = false );
 
-     /// @copydoc IAssetWriter::write_asset(std::string_view, AssetData, const std::vector<std::uint32_t>&, bool)
+     /// @copydoc IAssetWriter::write_asset(std::string_view, AssetData, const std::uint32_t*, std::uint32_t, bool)
      std::uint32_t write_asset( std::string_view name, AssetData content,
-          const std::vector< std::uint32_t >& children = {}, bool is_array = false ) override;
+          const std::uint32_t *children = nullptr,
+          std::uint32_t children_count = 0,
+          bool is_array = false ) override;
 
      /// @copydoc IAssetWriter::finish(std::uint32_t)
      memory::ConstByteView finish( std::uint32_t root_id ) override;
@@ -42,13 +43,20 @@ public:
      void reset() override;
 
 private:
-     FlatBuffersPmrAllocator allocator_;                              ///< allocator for buffer builder.
-     flatbuffers::FlatBufferBuilder builder_;                         ///< asset buffer builder.
-     std::unordered_map< std::uint32_t, std::string > asset_names_;   ///< names of assets.
-     std::unordered_map< std::uint32_t, flatbuffers::Offset<> > ids_; ///< identifiers of written assets.
-     std::uint32_t current_id_;                                       ///< current asset id.
-     bool finished_;                                                  ///< flag of finished buffer.
-     bool check_names_;                                               ///< check names of children in sets.
+     /// @brief Map of asset identifiers and names.
+     using NameMap = std::pmr::unordered_map< std::uint32_t, std::pmr::string >;
+
+     /// @brief Map of asset identifiers and offsets.
+     using OffsetMap = std::pmr::unordered_map< std::uint32_t, flatbuffers::Offset<> >;
+
+     FlatBuffersPmrAllocator allocator_;          ///< allocator for buffer builder.
+     flatbuffers::FlatBufferBuilder builder_;     ///< asset buffer builder.
+     NameMap asset_names_;                        ///< names of assets.
+     OffsetMap ids_;                              ///< identifiers of written assets.
+     std::pmr::memory_resource& resource_;        ///< memory resource for utility allocations.
+     std::uint32_t current_id_;                   ///< current asset id.
+     bool finished_;                              ///< flag of finished buffer.
+     bool check_names_;                           ///< check names of children in sets.
 };
 
 } // namespace _16nar::assets

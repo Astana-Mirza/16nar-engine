@@ -3,10 +3,10 @@
 namespace _16nar::strings
 {
 
-NameManager::NameManager( memory::IMemoryDomain& domain ):
-     table_names_{ domain },
-     tables_{ &domain.get_resource() },
-     domain_{ domain }
+NameManager::NameManager( std::pmr::memory_resource& resource ):
+     table_names_{ resource },
+     tables_{ &resource },
+     resource_{ resource }
 {}
 
 
@@ -18,7 +18,7 @@ NameTable *NameManager::add_table( std::string_view name )
           return nullptr;
      }
 
-     const auto ret = tables_.try_emplace( key, domain_ );
+     const auto ret = tables_.try_emplace( key, resource_ );
      return ret.second ? &( ret.first->second ) : nullptr;
 }
 

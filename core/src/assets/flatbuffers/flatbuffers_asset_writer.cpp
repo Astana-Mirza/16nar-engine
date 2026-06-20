@@ -8,35 +8,34 @@
 namespace _16nar::assets
 {
 
-FlatBuffersAssetWriter::FlatBuffersAssetWriter() noexcept:
-     allocator_{}, builder_{}, ids_{}, current_id_{}, finished_{}
-{}
-
-
 FlatBuffersAssetWriter::FlatBuffersAssetWriter(
-     std::pmr::memory_resource& resource, std::size_t initial_size, bool check_names ):
-     allocator_{ resource }, builder_{ initial_size, &allocator_ },
-     asset_names_{}, ids_{}, current_id_{}, finished_{}, check_names_{ check_names }
+     std::pmr::memory_resource& resource, std::pmr::memory_resource& big_resource,
+     std::size_t initial_size, bool check_names ):
+     allocator_{ big_resource }, builder_{ initial_size, &allocator_ },
+     asset_names_( &resource ), ids_( &resource ), resource_{ resource },
+     current_id_{}, finished_{}, check_names_{ check_names }
 {}
 
 
 std::uint32_t FlatBuffersAssetWriter::write_asset( std::string_view name, AssetData content,
-          const std::vector< std::uint32_t >& children, bool is_array )
+          const std::uint32_t *children, std::uint32_t children_count, bool is_array )
 {
      if ( finished_ )
      {
           return 0;
      }
 
-     std::vector< flatbuffers::Offset< _16nar::data::Asset > > children_offsets{};
+     std::pmr::vector< flatbuffers::Offset< _16nar::data::Asset > > children_offsets( &resource_ );
      flatbuffers::Offset< flatbuffers::Vector<
           flatbuffers::Offset< _16nar::data::Asset > > > children_offset{ 0 };
      flatbuffers::Offset< flatbuffers::String > name_offset{ 0 };
      flatbuffers::Offset< _16nar::data::AssetData > content_offset{ 0 };
 
-     std::unordered_set< std::string > children_names;
-     for( const auto id : children )
+     std::pmr::unordered_set< std::pmr::string > children_names( &resource_ );
+     const std::uint32_t children_total = children ? children_count : 0;
+     for( std::uint32_t i = 0; i < children_total; ++i )
      {
+          const auto id = children[ i ];
           const auto iter = ids_.find( id );
           if ( iter == ids_.cend() )
           {
@@ -81,7 +80,7 @@ std::uint32_t FlatBuffersAssetWriter::write_asset( std::string_view name, AssetD
                sizeof( std::uint8_t ), alignof( std::max_align_t ) );
           const auto data_offset = builder_.CreateVector< std::uint8_t >(
                reinterpret_cast< const std::uint8_t * >( content.data.data ), content.data.size );
-          content_offset = _16nar::data::CreateAssetData( builder_, content.type_id, data_offset );
+          content_offset = _16nar::data::CreateAssetData( builder_, content.type_id.hash, data_offset );
      }
 
      const auto asset_offset = _16nar::data::CreateAsset(
@@ -91,7 +90,7 @@ std::uint32_t FlatBuffersAssetWriter::write_asset( std::string_view name, AssetD
 
      if ( check_names_ && !name.empty() )
      {
-          asset_names_[ result ] = std::string( name.data(), name.size() );
+          asset_names_[ result ] = name;
      }
 
      return result;

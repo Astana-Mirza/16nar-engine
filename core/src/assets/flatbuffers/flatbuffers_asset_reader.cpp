@@ -31,15 +31,15 @@ const _16nar::data::Asset *find_child( const _16nar::data::Asset *parent, std::s
 } // anonymous namespace
 
 
-FlatBuffersAssetReader::FlatBuffersAssetReader() noexcept:
-     stack_{}, current_{}
+FlatBuffersAssetReader::FlatBuffersAssetReader( std::pmr::memory_resource& resource ) noexcept:
+     stack_( &resource ), resource_{ resource }, current_{}
 {}
 
 
 void FlatBuffersAssetReader::reset( memory::ConstByteView buffer )
 {
      current_ = nullptr;
-     stack_ = std::stack< const data::Asset * >{};
+     stack_.clear();
 
      if ( !buffer )
      {
@@ -99,7 +99,7 @@ AssetData FlatBuffersAssetReader::get_content() const
      assert( content_data != nullptr );
 
      AssetData result{};
-     result.type_id = content->type_id();
+     result.type_id.hash = content->type_id();
      result.data = content_data->size() ?
           memory::ConstByteView{ reinterpret_cast< const std::byte * >( content_data->data() ),
           content_data->size() } : memory::ConstByteView{};
@@ -125,9 +125,9 @@ std::size_t FlatBuffersAssetReader::get_children_count() const
 }
 
 
-std::vector< std::string > FlatBuffersAssetReader::get_children_names() const
+std::pmr::vector< std::pmr::string > FlatBuffersAssetReader::get_children_names() const
 {
-     std::vector< std::string > result{};
+     std::pmr::vector< std::pmr::string > result( &resource_ );
      if ( !current_ || is_array() )
      {
           return result;
@@ -165,7 +165,7 @@ bool FlatBuffersAssetReader::to_child( std::string_view name )
      {
           return false;
      }
-     stack_.emplace( current_ );
+     stack_.emplace_back( current_ );
      current_ = child;
      return true;
 }
@@ -187,7 +187,7 @@ bool FlatBuffersAssetReader::to_child_index( std::size_t index )
      {
           return false;
      }
-     stack_.emplace( current_ );
+     stack_.emplace_back( current_ );
      current_ = child;
      return true;
 }
@@ -199,8 +199,8 @@ bool FlatBuffersAssetReader::to_parent()
      {
           return false;
      }
-     current_ = stack_.top();
-     stack_.pop();
+     current_ = stack_.back();
+     stack_.pop_back();
      return true;
 }
 

@@ -5,7 +5,6 @@
 
 #include <16nar/platform/defs.h>
 #include <16nar/platform/strings/static_name.h>
-#include <16nar/platform/memory/imemory_domain.h>
 
 #include <unordered_map>
 #include <string>
@@ -30,8 +29,8 @@ class NARENGINE_PLATFORM_API NameTable
 {
 public:
      /// @brief Constructor.
-     /// @param[in] domain memory domain for name tables allocation.
-     NameTable( memory::IMemoryDomain& domain );
+     /// @param[in] resource memory resource for name tables allocation.
+     NameTable( std::pmr::memory_resource& resource );
 
      /// @brief Get static name of string if it is contained in the table.
      /// @param[in] name string to be checked.

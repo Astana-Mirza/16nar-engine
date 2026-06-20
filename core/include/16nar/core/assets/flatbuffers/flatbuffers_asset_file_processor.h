@@ -13,12 +13,14 @@ class NARENGINE_ASSETS_FB_API FlatBuffersAssetFileProcessor : public IAssetFileP
 {
 public:
      /// @brief Constructor.
-     /// @param[in] memory_resource memory resource for data allocations.
+     /// @param[in] resource memory resource for utility data allocations.
+     /// @param[in] big_resource memory resource for payload data allocations.
      /// @param[in] initial_size initial size of builder buffer for asset writer.
      /// @param[in] check_names true if, for asset writer, name uniqueness needs to be
      /// checked while saving children sets (has performance and memory costs), false otherwise.
      FlatBuffersAssetFileProcessor(
-          std::pmr::memory_resource& memory_resource,
+          std::pmr::memory_resource& resource,
+          std::pmr::memory_resource& big_resource,
           std::size_t initial_size = 1024, bool check_names = false ) noexcept;
 
      /// @copydoc IAssetFileProcessor::read_asset_data(const system::File&)
@@ -34,7 +36,8 @@ public:
      IAssetWriterPtr make_asset_writer() override;
 
 private:
-     std::pmr::memory_resource& memory_resource_; ///< memory resource for data allocations.
+     std::pmr::memory_resource& resource_;        ///< memory resource for utility data allocations.
+     std::pmr::memory_resource& big_resource_;    ///< memory resource for payload data allocations.
      std::size_t initial_size_;                   ///< initial size of builder buffer for asset writer.
      bool check_names_;                           ///< check names of children in sets for asset writer.
 };

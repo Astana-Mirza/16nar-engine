@@ -5,7 +5,7 @@
 
 #include <16nar/core/assets/defs.h>
 
-#include <string>
+#include <string_view>
 
 namespace _16nar::assets
 {
@@ -31,7 +31,7 @@ public:
 
      /// @brief Get description of latest error.
      /// @return Description of latest error, empty string if there was no error.
-     virtual std::string get_error_description() const = 0;
+     virtual std::string_view get_error_description() const = 0;
 };
 
 } // namespace _16nar::assets

@@ -13,8 +13,10 @@ class NARENGINE_ASSETS_JSON_API JsonAssetFileProcessor : public IAssetFileProces
 {
 public:
      /// @brief Constructor.
-     /// @param[in] memory_resource memory resource for data allocations.
-     explicit JsonAssetFileProcessor( std::pmr::memory_resource& memory_resource ) noexcept;
+     /// @param[in] resource memory resource for utiliy data allocations.
+     /// @param[in] big_resource memory resource for payload allocations.
+     explicit JsonAssetFileProcessor( std::pmr::memory_resource& resource,
+          std::pmr::memory_resource& big_resource ) noexcept;
 
      /// @copydoc IAssetFileProcessor::read_asset_data(const system::File&)
      memory::SharedBufferPtr read_asset_data( const system::File& file ) override;
@@ -29,7 +31,8 @@ public:
      IAssetWriterPtr make_asset_writer() override;
 
 private:
-     std::pmr::memory_resource& memory_resource_; ///< memory resource for data allocations.
+     std::pmr::memory_resource& resource_;        ///< memory resource for utiliy data allocations.
+     std::pmr::memory_resource& big_resource_;    ///< memory resource for payload data allocations.
 };
 
 } // namespace _16nar::assets

@@ -52,7 +52,7 @@ public:
 
      /// @brief Get names of child assets.
      /// @return names of child assets, empty vector if current node's children are not stored as a set.
-     virtual std::vector< std::string > get_children_names() const = 0;
+     virtual std::pmr::vector< std::pmr::string > get_children_names() const = 0;
 
      /// @brief Set current context for reading data of the child asset with given name.
      /// @details Implementation may invalidate data pointed to views returned

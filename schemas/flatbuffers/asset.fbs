@@ -13,7 +13,7 @@ struct FileHeader
 /// @brief Data of the asset.
 table AssetData
 {
-     type_id:  uint32;
+     type_id:  uint64;
      data:     [ubyte]   (required);
 }
 
@@ -32,7 +32,7 @@ table Asset
 struct Hash
 {
      name:     uint64;
-     type_id:  uint32;
+     type_id:  uint64;
 }
 
 

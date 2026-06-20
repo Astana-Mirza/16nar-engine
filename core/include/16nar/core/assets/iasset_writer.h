@@ -25,11 +25,14 @@ public:
      /// assets can be structured into a tree.
      /// @param[in] name name of the asset, may be empty.
      /// @param[in] content content of the asset, may be empty.
-     /// @param[in] children children asset identifiers, may be empty.
+     /// @param[in] children array of children asset identifiers, may be nullptr.
+     /// @param[in] children_count size of children array, may be zero.
      /// @param[in] is_array true if asset's children are stored in array rather than map, false otherwise.
      /// @return identifier of written asset, 0 in case of error.
      virtual std::uint32_t write_asset( std::string_view name, AssetData content,
-          const std::vector< std::uint32_t >& children = {}, bool is_array = false ) = 0;
+          const std::uint32_t *children = {},
+          std::uint32_t children_count = 0,
+          bool is_array = false ) = 0;
 
      /// @brief Finish the write and get the result buffer.
      /// @details After the buffer is accessed, further write is impossible.
