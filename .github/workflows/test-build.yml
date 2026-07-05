@@ -48,6 +48,7 @@ jobs:
             --settings=build_type=${{ env.BUILD_TYPE }}
             --settings=compiler.cppstd=17
             --options=*:shared=${{ matrix.shared }}
+            --options=inih/*:shared=False
             --build=missing
 
     - name: Build and test Conan package
@@ -55,5 +56,6 @@ jobs:
             --settings=build_type=${{ env.BUILD_TYPE }}
             --settings=compiler.cppstd=17
             --options=*:shared=${{ matrix.shared }}
+            --options=inih/*:shared=False
             --build=missing
 

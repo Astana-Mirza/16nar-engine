@@ -31,7 +31,7 @@ set(NARENGINE_CORE_INCLUDE_DIRS ${NARENGINE_CORE_COMMON_INCLUDE_DIRS}
 set(NARENGINE_CORE_LINK_DIRS ${NARENGINE_CORE_COMMON_LINK_DIRS})
 set(NARENGINE_CORE_LINK_LIBS ${NARENGINE_CORE_COMMON_LINK_LIBS}
     PUBLIC "${NAME}_platform"
-    PRIVATE "stb::stb" "flatbuffers::libflatbuffers"
+    PRIVATE "stb::stb" "flatbuffers::libflatbuffers" "inih::inih"
 )
 set(NARENGINE_CORE_SOURCES
     "${NARENGINE_CORE_SRC_DIR}/assets/asset_iterator.cpp"
@@ -40,6 +40,8 @@ set(NARENGINE_CORE_SOURCES
     "${NARENGINE_CORE_SRC_DIR}/resources/resource_pkg_visitor.cpp"
     "${NARENGINE_CORE_SRC_DIR}/resources/stb_texture_reader.cpp"
     "${NARENGINE_CORE_SRC_DIR}/resources/stb_impl.cpp"
+
+    "${NARENGINE_CORE_SRC_DIR}/config/config_manager.cpp"
 )
 add_library("${NAME}_core" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CORE_SOURCES})
 add_dependencies("${NAME}_core" "flatbuffers-gen-cpp" "GENERATE_flatbuffers-gen-cpp")
@@ -113,6 +115,7 @@ endif() # if ("${NARENGINE_BUILD_UTILS}")
 if ("${NARENGINE_BUILD_TESTS}")
     enable_testing()
     set(NARENGINE_CORE_TEST_SOURCES
+        "${NARENGINE_CORE_SRC_DIR}/test/config/config_manager_test.cpp"
         "${NARENGINE_CORE_SRC_DIR}/test/assets/json_assets_test.cpp"
         "${NARENGINE_CORE_SRC_DIR}/test/assets/json_to_flatbuffers_convertor_test.cpp"
     )
