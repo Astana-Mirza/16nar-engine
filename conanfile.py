@@ -41,6 +41,7 @@ class NarengineRecipe(ConanFile):
         self.requires("glfw/3.4")
         self.requires("nlohmann_json/3.11.3", transitive_headers=True)
         self.requires("stb/cci.20240213", visible=False)
+        self.requires("inih/62")
         if self.options.with_utils:
             self.requires("cxxopts/3.3.1", visible=False)
         if self.options.with_render_opengl:
@@ -98,7 +99,10 @@ class NarengineRecipe(ConanFile):
         self.add_package_component("16nar_platform", ["glm::glm", "glfw::glfw"])
 
         # Core
-        self.add_package_component("16nar_core", ["16nar_platform"])
+        self.add_package_component("16nar_core", [
+            "16nar_platform",
+            "inih::inih"
+        ])
         self.add_package_component("16nar_assets_fb", [
             "16nar_core",
             "flatbuffers::libflatbuffers"
