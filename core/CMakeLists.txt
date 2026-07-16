@@ -43,7 +43,7 @@ set(NARENGINE_CORE_SOURCES
 
     "${NARENGINE_CORE_SRC_DIR}/config/config_manager.cpp"
 
-    "${NARENGINE_CORE_SRC_DIR}/ecs/ecs_manager.cpp"
+    "${NARENGINE_CORE_SRC_DIR}/ecs/ecs_storage.cpp"
     "${NARENGINE_CORE_SRC_DIR}/ecs/page_registry.cpp"
 )
 add_library("${NAME}_core" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CORE_SOURCES})
@@ -119,6 +119,7 @@ if ("${NARENGINE_BUILD_TESTS}")
     enable_testing()
     set(NARENGINE_CORE_TEST_SOURCES
         "${NARENGINE_CORE_SRC_DIR}/test/config/config_manager_test.cpp"
+        "${NARENGINE_CORE_SRC_DIR}/test/ecs/ecs_storage_test.cpp"
         "${NARENGINE_CORE_SRC_DIR}/test/assets/json_assets_test.cpp"
         "${NARENGINE_CORE_SRC_DIR}/test/assets/json_to_flatbuffers_convertor_test.cpp"
     )
