@@ -23,6 +23,13 @@ using EcsId = std::uint32_t;
 /// dangling reference safety.
 struct alignas( std::uint64_t ) EntityId
 {
+     /// @brief Bool cast operator.
+     /// @return true if identifier is valid, false otherwise.
+     explicit operator bool() const noexcept
+     {
+          return gen_id;
+     }
+
      EcsId gen_id{};     ///< generation ID of the entity.
      EcsId id{};         ///< identifier of the node in the world.
 };

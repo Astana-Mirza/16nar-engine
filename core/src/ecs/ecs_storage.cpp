@@ -1,7 +1,8 @@
-#include <16nar/core/ecs/ecs_manager.h>
+#include <16nar/core/ecs/ecs_storage.h>
 
 #include <16nar/platform/logger/logger.h>
 
+#include <cinttypes>
 #include <limits>
 #include <climits>
 #include <cassert>
@@ -32,7 +33,7 @@ constexpr unsigned int ntz64( std::uint64_t x ) noexcept
 } // anonymous namespace
 
 
-EcsManager::EcsManager( strings::NameTable& type_names,
+EcsStorage::EcsStorage( strings::NameTable& type_names,
           std::pmr::memory_resource& resource,
           std::pmr::memory_resource& big_resource )
      : components_( &resource )
@@ -50,7 +51,13 @@ EcsManager::EcsManager( strings::NameTable& type_names,
 }
 
 
-bool EcsManager::register_component_type( strings::StaticName type,
+EcsStorage::~EcsStorage()
+{
+     clear();
+}
+
+
+bool EcsStorage::register_component_type( strings::StaticName type,
      std::size_t size,
      LifetimeController construct,
      LifetimeController destruct )
@@ -63,6 +70,9 @@ bool EcsManager::register_component_type( strings::StaticName type,
      auto [ iter, result ] = components_.try_emplace( type, resource_ );
      if ( !result )
      {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Component type '%.*s' is already registered",
+               static_cast< int >( type_name.size() ), type_name.data() );
           return false;
      }
 
@@ -75,17 +85,21 @@ bool EcsManager::register_component_type( strings::StaticName type,
      iter->second.blocks_delayed.resize( page_mask_count );
      iter->second.data.resize( page_count );
      iter->second.component_size = size;
-     iter->second.construct = construct;
-     iter->second.destruct = destruct;
+     if ( size )
+     {
+          iter->second.construct = construct;
+          iter->second.destruct = destruct;
+     }
 
      return true;
 }
 
 
-EntityId EcsManager::add_entity( strings::StaticName quasitype )
+EntityId EcsStorage::add_entity( strings::StaticName quasitype )
 {
      if ( quasitype.empty() )
      {
+          LOG_16NAR_ERROR( "Cannot add ECS entity with empty quasitype name" );
           return EntityId{};
      }
 
@@ -106,7 +120,8 @@ EntityId EcsManager::add_entity( strings::StaticName quasitype )
      {
           page_index = iter->second.get_top_page();
           assert( page_index < pages_.size() );
-          gen_id = ++pages_[ page_index ].gen_id;
+          while ( ++pages_[ page_index ].gen_id == 0 );     // overflow protection
+          gen_id = pages_[ page_index ].gen_id;
      }
 
      assert( page_index < metadata_->present.size() );
@@ -128,7 +143,7 @@ EntityId EcsManager::add_entity( strings::StaticName quasitype )
 }
 
 
-void EcsManager::delete_entity( EntityId id )
+void EcsStorage::delete_entity( EntityId id )
 {
      const EcsId page_index = id.id / entities_per_page;
      const EcsId local_index = id.id % entities_per_page;
@@ -142,18 +157,70 @@ void EcsManager::delete_entity( EntityId id )
 }
 
 
-void EcsManager::delete_component( EntityId id, strings::StaticName type )
+bool EcsStorage::has_entity( EntityId id ) const noexcept
+{
+     const EcsId page_index = id.id / entities_per_page;
+     const EcsId local_index = id.id % entities_per_page;
+     return check_entity( id.gen_id, page_index, local_index );
+}
+
+
+bool EcsStorage::add_flag_component( EntityId id, strings::StaticName type )
 {
      const EcsId page_index = id.id / entities_per_page;
      const EcsId local_index = id.id % entities_per_page;
      if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
      {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Cannot add flag component '%.*s' for entity [%" PRIu32 ".%"
+                    PRIu32 "], wrong parameter",
+               static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
+          return false;
+     }
+     const auto iter = components_.find( type );
+     if ( iter == components_.end() )
+     {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Cannot add flag component '%.*s' for entity [%" PRIu32 ".%"
+                    PRIu32 "], unknown type",
+               static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
+          return false;
+     }
+     if ( iter->second.component_size )
+     {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Cannot add flag component '%.*s' for entity [%" PRIu32 ".%"
+                    PRIu32 "], not a flag type",
+               static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
+          return false;
+     }
+     set_masks( page_index, local_index, iter->second.present, iter->second.blocks_present );
+     return true;
+}
+
+
+void EcsStorage::delete_component( EntityId id, strings::StaticName type )
+{
+     const EcsId page_index = id.id / entities_per_page;
+     const EcsId local_index = id.id % entities_per_page;
+     if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
+     {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Cannot delete component '%.*s' for entity [%" PRIu32 ".%"
+                    PRIu32 "], wrong parameter",
+               static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return;
      }
-
      const auto iter = components_.find( type );
-     if ( iter == components_.end()
-          || !iter->second.present[ page_index ].test( local_index ) )
+     if ( iter == components_.end() )
+     {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Cannot delete component '%.*s' for entity [%" PRIu32 ".%"
+                    PRIu32 "], unknown type",
+               static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
+          return;
+     }
+     if ( !iter->second.present[ page_index ].test( local_index ) )
      {
           return;
      }
@@ -163,7 +230,25 @@ void EcsManager::delete_component( EntityId id, strings::StaticName type )
 }
 
 
-void EcsManager::commit()
+bool EcsStorage::has_component( EntityId id, strings::StaticName type ) const noexcept
+{
+     const EcsId page_index = id.id / entities_per_page;
+     const EcsId local_index = id.id % entities_per_page;
+     if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
+     {
+          return false;
+     }
+     const auto iter = components_.find( type );
+     if ( iter == components_.end() )
+     {
+          return false;
+     }
+     return iter->second.present[ page_index ].test( local_index )
+          && !iter->second.delayed[ page_index ].test( local_index );
+}
+
+
+void EcsStorage::commit()
 {
      if ( !has_delayed_changes_ )
      {
@@ -184,11 +269,26 @@ void EcsManager::commit()
 }
 
 
-void EcsManager::preassign_pages( strings::StaticName quasitype, std::size_t count )
+void EcsStorage::clear()
+{
+     has_delayed_changes_ = false;
+     for ( auto& [ type, desc ] : components_ )
+     {
+          clear_component_type( desc );
+     }
+     registries_.clear();
+     pages_.clear();
+}
+
+
+void EcsStorage::preassign_pages( strings::StaticName quasitype, std::size_t count )
 {
      count = std::min( std::numeric_limits< EcsId >::max() - pages_.size() - 1, count );
      if ( quasitype.empty() || !count )
      {
+          const auto type_name = type_names_.get_name( quasitype, true );
+          LOG_16NAR_ERROR( "Cannot preassign %zu pages of quasitype '%.*s'",
+               count, static_cast< int >( type_name.size() ), type_name.data() );
           return;
      }
      auto iter = registries_.try_emplace( quasitype, resource_ ).first;
@@ -202,9 +302,9 @@ void EcsManager::preassign_pages( strings::StaticName quasitype, std::size_t cou
 }
 
 
-bool EcsManager::check_entity( EcsId gen_id, EcsId page_index, EcsId local_index ) const noexcept
+bool EcsStorage::check_entity( EcsId gen_id, EcsId page_index, EcsId local_index ) const noexcept
 {
-     if ( page_index < pages_.size() )
+     if ( page_index >= pages_.size() )
      {
           return false;
      }
@@ -225,8 +325,41 @@ bool EcsManager::check_entity( EcsId gen_id, EcsId page_index, EcsId local_index
 }
 
 
-std::byte *EcsManager::add_component_impl(
-     EcsManager::ComponentDescription& desc,
+std::byte *EcsStorage::add_component_raw( EntityId id, strings::StaticName type )
+{
+     const EcsId page_index = id.id / entities_per_page;
+     const EcsId local_index = id.id % entities_per_page;
+     if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
+     {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Cannot add component '%.*s' for entity [%" PRIu32 ".%"
+                    PRIu32 "], wrong parameter",
+               static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
+          return nullptr;
+     }
+     const auto iter = components_.find( type );
+     if ( iter == components_.end() || !iter->second.component_size )
+     {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Cannot add component '%.*s' for entity [%" PRIu32 ".%"
+                    PRIu32 "], unknown or wrong type",
+               static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
+          return nullptr;
+     }
+     auto *raw_ptr = add_component_impl( iter->second, page_index, local_index );
+     if ( !raw_ptr )
+     {
+          const auto type_name = type_names_.get_name( type, true );
+          LOG_16NAR_ERROR( "Cannot add component '%.*s' for entity [%" PRIu32 ".%"
+               PRIu32 "], already added",
+          static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
+     }
+     return raw_ptr;
+}
+
+
+std::byte *EcsStorage::add_component_impl(
+     ComponentDescription& desc,
      EcsId page_index, EcsId local_index )
 {
      std::byte *result{};
@@ -234,35 +367,50 @@ std::byte *EcsManager::add_component_impl(
      {
           return result;
      }
-     if ( desc.component_size )
+     if ( !desc.data[ page_index ] )
      {
-          if ( !desc.data[ page_index ] )
-          {
-               desc.data[ page_index ] = memory::SharedBufferPtr::allocate(
-                    big_resource_, entities_per_page * desc.component_size );
-          }
-          auto buffer = desc.data[ page_index ].get_view();
-          result = buffer.data + local_index * desc.component_size;
-          if ( desc.construct )
-          {
-               desc.construct( result );
-          }
+          desc.data[ page_index ] = memory::SharedBufferPtr::allocate(
+               big_resource_, entities_per_page * desc.component_size );
+     }
+     auto buffer = desc.data[ page_index ].get_view();
+     result = buffer.data + local_index * desc.component_size;
+     if ( desc.construct )
+     {
+          desc.construct( result );
      }
      set_masks( page_index, local_index, desc.present, desc.blocks_present );
      return result;
 }
 
 
-void EcsManager::set_masks( EcsId page_index, EcsId local_index,
-     std::pmr::vector< EcsManager::BlockMask >& mask,
-     std::pmr::vector< std::uint64_t > block_mask )
+const std::byte *EcsStorage::get_component_raw( EntityId id, strings::StaticName type ) const noexcept
+{
+     const EcsId page_index = id.id / entities_per_page;
+     const EcsId local_index = id.id % entities_per_page;
+     if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
+     {
+          return nullptr;
+     }
+     const auto iter = components_.find( type );
+     if ( iter == components_.end() || !iter->second.data[ page_index ] )
+     {
+          return nullptr;
+     }
+     auto buffer = iter->second.data[ page_index ].get_const_view();
+     return buffer.data + local_index * iter->second.component_size;
+}
+
+
+void EcsStorage::set_masks( EcsId page_index, EcsId local_index,
+     std::pmr::vector< BlockMask >& mask,
+     std::pmr::vector< std::uint64_t >& block_mask )
 {
      mask[ page_index ].set( local_index );
      block_mask[ page_index / bits_per_mask ] |= ( 1ULL << ( page_index % bits_per_mask ) );
 }
 
 
-void EcsManager::adjust_page_masks()
+void EcsStorage::adjust_page_masks()
 {
      const auto page_count = pages_.size();
      const auto page_mask_count = page_count ?
@@ -278,7 +426,7 @@ void EcsManager::adjust_page_masks()
 }
 
 
-void EcsManager::commit_component_type( EcsManager::ComponentDescription& desc )
+void EcsStorage::commit_component_type( ComponentDescription& desc )
 {
      if ( !metadata_->has_delayed_changes && !desc.has_delayed_changes )
      {
@@ -307,7 +455,7 @@ void EcsManager::commit_component_type( EcsManager::ComponentDescription& desc )
 }
 
 
-void EcsManager::commit_block( EcsManager::ComponentDescription& desc, EcsId page_index )
+void EcsStorage::commit_block( ComponentDescription& desc, EcsId page_index )
 {
      BlockMask orig_mask = metadata_->delayed[ page_index ];
      orig_mask &= desc.present[ page_index ];
@@ -333,7 +481,7 @@ void EcsManager::commit_block( EcsManager::ComponentDescription& desc, EcsId pag
 }
 
 
-void EcsManager::commit_metadata()
+void EcsStorage::commit_metadata()
 {
      if ( !metadata_->has_delayed_changes )
      {
@@ -359,7 +507,7 @@ void EcsManager::commit_metadata()
 }
 
 
-void EcsManager::commit_metadata_block( EcsId page_index )
+void EcsStorage::commit_metadata_block( EcsId page_index )
 {
      BlockMask orig_mask = metadata_->delayed[ page_index ];
      const bool was_full = metadata_->present[ page_index ].all();
@@ -378,7 +526,32 @@ void EcsManager::commit_metadata_block( EcsId page_index )
 }
 
 
-EcsManager::ComponentDescription::ComponentDescription( std::pmr::memory_resource& resource )
+void EcsStorage::clear_component_type( ComponentDescription& desc )
+{
+     if ( desc.destruct )
+     {
+          for ( std::size_t page_index = 0; page_index < desc.data.size(); ++page_index )
+          {
+               auto& mask = desc.present[ page_index ];
+               while ( !mask.none() )
+               {
+                    const auto local_index = mask.find_set();
+                    desc.destruct( desc.data[ page_index ].get_view().data + local_index * desc.component_size );
+                    const auto mask_part = local_index / bits_per_mask;
+                    mask.mask[ mask_part ] &= ( mask.mask[ mask_part ] - 1 ); // clear rightmost set bit
+               }
+          }
+     }
+     desc.data.clear();
+     desc.present.clear();
+     desc.delayed.clear();
+     desc.blocks_present.clear();
+     desc.blocks_delayed.clear();
+     desc.has_delayed_changes = false;
+}
+
+
+ComponentDescription::ComponentDescription( std::pmr::memory_resource& resource )
      : present( &resource )
      , delayed( &resource )
      , blocks_present( &resource )
@@ -390,19 +563,19 @@ EcsManager::ComponentDescription::ComponentDescription( std::pmr::memory_resourc
 {}
 
 
-bool EcsManager::BlockMask::none() const noexcept
+bool BlockMask::none() const noexcept
 {
      return !mask[ 0 ] && !mask[ 1 ] && !mask[ 2 ] && !mask[ 3 ];
 }
 
 
-bool EcsManager::BlockMask::all() const noexcept
+bool BlockMask::all() const noexcept
 {
      return mask[ 0 ] && mask[ 1 ] && mask[ 2 ] && mask[ 3 ];
 }
 
 
-EcsId EcsManager::BlockMask::find_unset() const noexcept
+EcsId BlockMask::find_unset() const noexcept
 {
      for ( std::size_t i = 0; i < mask_size; ++i )
      {
@@ -416,7 +589,7 @@ EcsId EcsManager::BlockMask::find_unset() const noexcept
 }
 
 
-EcsId EcsManager::BlockMask::find_set() const noexcept
+EcsId BlockMask::find_set() const noexcept
 {
      for ( std::size_t i = 0; i < mask_size; ++i )
      {
@@ -429,19 +602,19 @@ EcsId EcsManager::BlockMask::find_set() const noexcept
 }
 
 
-bool EcsManager::BlockMask::test( EcsId index ) const noexcept
+bool BlockMask::test( EcsId index ) const noexcept
 {
      return mask[ index / bits_per_mask ] & ( 1 << ( index % bits_per_mask ) );
 }
 
 
-void EcsManager::BlockMask::set( EcsId index ) noexcept
+void BlockMask::set( EcsId index ) noexcept
 {
      mask[ index / bits_per_mask ] |= ( 1 << ( index % bits_per_mask ) );
 }
 
 
-EcsManager::BlockMask EcsManager::BlockMask::operator~() noexcept
+BlockMask BlockMask::operator~() noexcept
 {
      BlockMask result;
      result.mask[ 0 ] = ~mask[ 0 ];
@@ -452,7 +625,7 @@ EcsManager::BlockMask EcsManager::BlockMask::operator~() noexcept
 }
 
 
-EcsManager::BlockMask& EcsManager::BlockMask::operator&=( const EcsManager::BlockMask& other ) noexcept
+BlockMask& BlockMask::operator&=( const BlockMask& other ) noexcept
 {
      mask[ 0 ] &= other.mask[ 0 ];
      mask[ 1 ] &= other.mask[ 1 ];
@@ -462,7 +635,7 @@ EcsManager::BlockMask& EcsManager::BlockMask::operator&=( const EcsManager::Bloc
 }
 
 
-EcsManager::BlockMask& EcsManager::BlockMask::operator|=( const EcsManager::BlockMask& other ) noexcept
+BlockMask& BlockMask::operator|=( const BlockMask& other ) noexcept
 {
      mask[ 0 ] |= other.mask[ 0 ];
      mask[ 1 ] |= other.mask[ 1 ];

@@ -1,7 +1,7 @@
 /// @file
-/// @brief File with EcsManager class definition.
-#ifndef _16NAR_CORE_ECS_ECS_MANAGER_H
-#define _16NAR_CORE_ECS_ECS_MANAGER_H
+/// @brief File with EcsStorage class definition.
+#ifndef _16NAR_CORE_ECS_ECS_STORAGE_H
+#define _16NAR_CORE_ECS_ECS_STORAGE_H
 
 #include <16nar/core/ecs/defs.h>
 
@@ -15,6 +15,73 @@
 
 namespace _16nar::ecs
 {
+
+/// @brief Bitmask of a single 256-component block.
+struct BlockMask
+{
+     constexpr static std::size_t mask_size = 4;  ///< count of integers in bitmask.
+
+     /// @brief Check if no bits of the block are set.
+     /// @return true if the block is empty, false otherwise.
+     bool none() const noexcept;
+
+     /// @brief Check if all bits of the block are set.
+     /// @return true if the block is full, false otherwise.
+     bool all() const noexcept;
+
+     /// @brief Find index of the first unset bit of the block.
+     /// @return index of the first unset bit of the block, -1 if not found.
+     EcsId find_unset() const noexcept;
+
+     /// @brief Find index of the first set bit of the block.
+     /// @return index of the first set bit of the block, -1 if not found.
+     EcsId find_set() const noexcept;
+
+     /// @brief Test if specific bit is set.
+     /// @param[in] index index of the bit within the block.
+     /// @return true if the bit is set, false otherwise.
+     bool test( EcsId index ) const noexcept;
+
+     /// @brief Set specific bit.
+     /// @param[in] index index of the bit within the block.
+     void set( EcsId index ) noexcept;
+
+     /// @brief Binary NOT.
+     /// @return Mask with all bits negated.
+     BlockMask operator~() noexcept;
+
+     /// @brief Binary AND with assignment.
+     /// @param[in] other right operand.
+     /// @return current object after binary AND application.
+     BlockMask& operator&=( const BlockMask& other ) noexcept;
+
+     /// @brief Binary OR with assignment.
+     /// @param[in] other right operand.
+     /// @return current object after binary OR application.
+     BlockMask& operator|=( const BlockMask& other ) noexcept;
+
+     std::uint64_t mask[ mask_size ]{};           ///< representation of a bitmask.
+};
+
+
+/// @brief Description of a component type.
+struct ComponentDescription
+{
+     /// @brief Constructor.
+     /// @param[in] resource memory resource for utility data allocations.
+     ComponentDescription( std::pmr::memory_resource& resource );
+
+     std::pmr::vector< BlockMask > present;            ///< bitmasks of component presence.
+     std::pmr::vector< BlockMask > delayed;            ///< bitmasks of component delayed changes.
+     std::pmr::vector< std::uint64_t > blocks_present; ///< second-order bitmasks of component presence.
+     std::pmr::vector< std::uint64_t > blocks_delayed; ///< second-order bitmasks of component delayed changes.
+     std::pmr::vector< memory::SharedBufferPtr > data; ///< data of allocated blocks.
+     std::size_t component_size;                       ///< size of one component, in bytes.
+     LifetimeController construct;                     ///< function of component construction.
+     LifetimeController destruct;                      ///< function of component destruction.
+     bool has_delayed_changes;                         ///< flag of delayed changes.
+};
+
 
 /// @brief Manager of Entity-Component-System framework.
 /// @details Components in the ECS are allocated in blocks of continuous memory.
@@ -48,7 +115,7 @@ namespace _16nar::ecs
 ///
 /// ECS uses inner component type called EntityMetadata. It indicates that the entity
 /// exists and stores its generation ID for dangling reference safety.
-class NARENGINE_CORE_API EcsManager
+class NARENGINE_CORE_API EcsStorage
 {
 public:
      constexpr static std::size_t entities_per_page = 256;  ///< maximum count of entities per one page.
@@ -57,9 +124,12 @@ public:
      /// @param[in] type_names table of type and quasitype names.
      /// @param[in] resource memory resource for utility data allocations.
      /// @param[in] big_resource memory resource for ECS data allocations.
-     EcsManager( strings::NameTable& type_names,
+     EcsStorage( strings::NameTable& type_names,
           std::pmr::memory_resource& resource,
           std::pmr::memory_resource& big_resource );
+
+     /// @brief Destructor.
+     ~EcsStorage();
 
      /// @brief Register component type for ECS.
      /// @param[in] type name of component type.
@@ -84,7 +154,15 @@ public:
      /// @param[in] id identifier of an entity.
      void delete_entity( EntityId id );
 
+     /// @brief Check if entity with given identifier exists.
+     /// @param[in] id identifier of an entity.
+     /// @return true if entity exists, false otherwise.
+     bool has_entity( EntityId id ) const noexcept;
+
      /// @brief Add component to an entity.
+     /// @details Adding a component which is already added is an error.
+     /// Flag components must not be added with this function,
+     /// for flags see @b add_flag_component().
      /// @tparam T type of the component.
      /// @param[in] id identifier of an entity.
      /// @param[in] type name of the component type.
@@ -92,20 +170,16 @@ public:
      template < typename T >
      T *add_component( EntityId id, strings::StaticName type )
      {
-          const EcsId page_index = id.id / entities_per_page;
-          const EcsId local_index = id.id % entities_per_page;
-          if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
-          {
-               return nullptr;
-          }
-          const auto iter = components_.find( type );
-          if ( iter == components_.end() )
-          {
-               return nullptr;
-          }
-          return reinterpret_cast< T * >(
-               add_component_impl( iter->second, page_index, local_index ) );
+          return reinterpret_cast< T * >( add_component_raw( id, type ) );
      }
+
+     /// @brief Add flag component to an entity.
+     /// @details Unlike with @b add_component() function,
+     /// adding a flag component if it's already added is not an error.
+     /// @param[in] id identifier of an entity.
+     /// @param[in] type name of the component type.
+     /// @return true if the component added successfully, false otherwise.
+     bool add_flag_component( EntityId id, strings::StaticName type );
 
      /// @brief Delete component of an entity with given identifier.
      /// @details This function marks component for deletion, but the deleteion is
@@ -115,9 +189,40 @@ public:
      /// @param[in] type type of the component.
      void delete_component( EntityId id, strings::StaticName type );
 
+     /// @brief Check if entity has component of given type.
+     /// @param[in] id identifier of an entity.
+     /// @param[in] type name of the component type.
+     /// @return true if component exists, false otherwise.
+     bool has_component( EntityId id, strings::StaticName type ) const noexcept;
+
+     /// @brief Get component of an entity.
+     /// @tparam T type of the component.
+     /// @param[in] id identifier of an entity.
+     /// @param[in] type name of the component type.
+     /// @return pointer to the component if it exists, nullptr otherwise.
+     template < typename T >
+     T *get_component( EntityId id, strings::StaticName type ) noexcept
+     {
+          return reinterpret_cast< T * >( const_cast< std::byte * >( get_component_raw( id, type ) ) );
+     }
+
+     /// @brief Get constant component of an entity.
+     /// @tparam T type of the component.
+     /// @param[in] id identifier of an entity.
+     /// @param[in] type name of the component type.
+     /// @return pointer to the constant component if it exists, nullptr otherwise.
+     template < typename T >
+     const T *get_component( EntityId id, strings::StaticName type ) const noexcept
+     {
+          return reinterpret_cast< const T * >( get_component_raw( id, type ) );
+     }
+
      /// @brief Commit delayed structural changes.
      /// @details This function performs deletion of requested entities and components.
      void commit();
+
+     /// @brief Clear all entities and components and page assignments.
+     void clear();
 
      /// @brief Perform a pre-assignment of requested number of pages to a quasitype.
      /// @param[in] quasitype name of the quasitype.
@@ -125,68 +230,13 @@ public:
      void preassign_pages( strings::StaticName quasitype, std::size_t count );
 
 private:
-     EcsManager( const EcsManager&& ) = delete;
-     EcsManager& operator=( const EcsManager& ) = delete;
+     EcsStorage( const EcsStorage&& ) = delete;
+     EcsStorage& operator=( const EcsStorage& ) = delete;
 
      /// @brief Inner component type for entity management.
      struct EntityMetadata
      {
           EcsId gen_id{};     ///< generation ID of the ECS world at the moment of entity creation.
-     };
-
-     /// @brief Bitmask of a single 256-component block.
-     struct BlockMask
-     {
-          constexpr static std::size_t mask_size = 4;  ///< count of integers in bitmask.
-
-          /// @brief Check if no bits of the block are set.
-          /// @return true if the block is empty, false otherwise.
-          bool none() const noexcept;
-
-          /// @brief Check if all bits of the block are set.
-          /// @return true if the block is full, false otherwise.
-          bool all() const noexcept;
-
-          /// @brief Find index of the first unset bit of the block.
-          /// @return index of the first unset bit of the block, -1 if not found.
-          EcsId find_unset() const noexcept;
-
-          /// @brief Find index of the first set bit of the block.
-          /// @return index of the first set bit of the block, -1 if not found.
-          EcsId find_set() const noexcept;
-
-          /// @brief Test if specific bit is set.
-          /// @param[in] index index of the bit within the block.
-          /// @return true if the bit is set, false otherwise.
-          bool test( EcsId index ) const noexcept;
-
-          /// @brief Set specific bit.
-          /// @param[in] index index of the bit within the block.
-          void set( EcsId index ) noexcept;
-
-          BlockMask operator~() noexcept;
-          BlockMask& operator&=( const BlockMask& other ) noexcept;
-          BlockMask& operator|=( const BlockMask& other ) noexcept;
-
-          std::uint64_t mask[ mask_size ]{};           ///< representation of a bitmask.
-     };
-
-     /// @brief Description of a component type.
-     struct ComponentDescription
-     {
-          /// @brief Constructor.
-          /// @param[in] resource memory resource for utility data allocations.
-          ComponentDescription( std::pmr::memory_resource& resource );
-
-          std::pmr::vector< BlockMask > present;            ///< bitmasks of component presence.
-          std::pmr::vector< BlockMask > delayed;            ///< bitmasks of component delayed changes.
-          std::pmr::vector< std::uint64_t > blocks_present; ///< second-order bitmasks of component presence.
-          std::pmr::vector< std::uint64_t > blocks_delayed; ///< second-order bitmasks of component delayed changes.
-          std::pmr::vector< memory::SharedBufferPtr > data; ///< data of allocated blocks.
-          std::size_t component_size;                       ///< size of one component, in bytes.
-          LifetimeController construct;                     ///< function of component construction.
-          LifetimeController destruct;                      ///< function of component destruction.
-          bool has_delayed_changes;                         ///< flag of delayed changes.
      };
 
      /// @brief Information about single page.
@@ -209,12 +259,25 @@ private:
      /// @return true if entity exists, false otherwise.
      bool check_entity( EcsId gen_id, EcsId page_index, EcsId local_index ) const noexcept;
 
+     /// @brief Add component to an entity without type cast.
+     /// @details Adding a component which is already added is an error.
+     /// @param[in] id identifier of an entity.
+     /// @param[in] type name of the component type.
+     /// @return pointer to added component's raw data on success, nullptr otherwise.
+     std::byte *add_component_raw( EntityId id, strings::StaticName type );
+
      /// @brief Implementation of addition of a component to an entity.
      /// @param[in] desc component type description.
      /// @param[in] page_index index of the page.
      /// @param[in] local_index index of the entity on the page.
      /// @return pointer to added component memory on success, nullptr otherwise.
      std::byte *add_component_impl( ComponentDescription& desc, EcsId page_index, EcsId local_index );
+
+     /// @brief Get raw data of a component of an entity.
+     /// @param[in] id identifier of an entity.
+     /// @param[in] type name of the component type.
+     /// @return pointer to the component's raw data if it exists, nullptr otherwise.
+     const std::byte *get_component_raw( EntityId id, strings::StaticName type ) const noexcept;
 
      /// @brief Set first- and second-order bitmasks.
      /// @param[in] page_index index of the page.
@@ -223,7 +286,7 @@ private:
      /// @param[in,out] block_mask second-order bitmasks.
      void set_masks( EcsId page_index, EcsId local_index,
           std::pmr::vector< BlockMask >& mask,
-          std::pmr::vector< std::uint64_t > block_mask );
+          std::pmr::vector< std::uint64_t >& block_mask );
 
      /// @brief Resize page bitmasks according to updated page count.
      void adjust_page_masks();
@@ -244,6 +307,10 @@ private:
      /// @param[in] page_index index of the page.
      void commit_metadata_block( EcsId page_index );
 
+     /// @brief Clear all components of single type.
+     /// @param[in] desc component type description.
+     void clear_component_type( ComponentDescription& desc );
+
 private:
      ComponentMap components_;                    ///< description of all component types.
      RegistryMap registries_;                     ///< registries of pages per quasitype.
@@ -257,4 +324,4 @@ private:
 
 } // namespace _16nar::ecs
 
-#endif // #ifndef _16NAR_CORE_ECS_ECS_MANAGER_H
+#endif // #ifndef _16NAR_CORE_ECS_ECS_STORAGE_H
