@@ -12,14 +12,17 @@
 #include <memory_resource>
 #include <vector>
 #include <unordered_map>
+#include <climits>
 
 namespace _16nar::ecs
 {
 
 /// @brief Bitmask of a single 256-component block.
-struct BlockMask
+struct NARENGINE_CORE_API BlockMask
 {
      constexpr static std::size_t mask_size = 4;  ///< count of integers in bitmask.
+
+     constexpr static std::size_t mask_width = sizeof( std::uint64_t ) * CHAR_BIT;   ///< count of bits in bitmask.
 
      /// @brief Check if no bits of the block are set.
      /// @return true if the block is empty, false otherwise.
@@ -48,7 +51,7 @@ struct BlockMask
 
      /// @brief Binary NOT.
      /// @return Mask with all bits negated.
-     BlockMask operator~() noexcept;
+     BlockMask operator~() const noexcept;
 
      /// @brief Binary AND with assignment.
      /// @param[in] other right operand.
@@ -65,7 +68,7 @@ struct BlockMask
 
 
 /// @brief Description of a component type.
-struct ComponentDescription
+struct NARENGINE_CORE_API ComponentDescription
 {
      /// @brief Constructor.
      /// @param[in] resource memory resource for utility data allocations.
@@ -119,6 +122,8 @@ class NARENGINE_CORE_API EcsStorage
 {
 public:
      constexpr static std::size_t entities_per_page = 256;  ///< maximum count of entities per one page.
+
+     friend class Query;
 
      /// @brief Constructor.
      /// @param[in] type_names table of type and quasitype names.
@@ -310,6 +315,11 @@ private:
      /// @brief Clear all components of single type.
      /// @param[in] desc component type description.
      void clear_component_type( ComponentDescription& desc );
+
+     /// @brief Get full entity identifier.
+     /// @param[in] page_index index of the page.
+     /// @param[in] local_index index of the entity on the page.
+     EntityId get_entity_id( EcsId page_index, EcsId local_index ) const noexcept;
 
 private:
      ComponentMap components_;                    ///< description of all component types.

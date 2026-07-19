@@ -25,9 +25,25 @@ struct alignas( std::uint64_t ) EntityId
 {
      /// @brief Bool cast operator.
      /// @return true if identifier is valid, false otherwise.
-     explicit operator bool() const noexcept
+     explicit constexpr operator bool() const noexcept
      {
           return gen_id;
+     }
+
+     /// @brief Equality comparison operator.
+     /// @param[in] rhs right operand.
+     /// @return true if the operands are equal, false otherwise.
+     constexpr bool operator==( EntityId rhs ) const noexcept
+     {
+          return gen_id == rhs.gen_id && id == rhs.id;
+     }
+
+     /// @brief Inequality comparison operator.
+     /// @param[in] rhs right operand.
+     /// @return true if the operands are equal, false otherwise.
+     constexpr bool operator!=( EntityId rhs ) const noexcept
+     {
+          return gen_id != rhs.gen_id || id != rhs.id;
      }
 
      EcsId gen_id{};     ///< generation ID of the entity.

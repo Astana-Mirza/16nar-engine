@@ -1,37 +1,14 @@
 #include <16nar/core/ecs/ecs_storage.h>
 
+#include <16nar/platform/math/bits.h>
 #include <16nar/platform/logger/logger.h>
 
 #include <cinttypes>
 #include <limits>
-#include <climits>
 #include <cassert>
 
 namespace _16nar::ecs
 {
-namespace
-{
-
-constexpr static std::size_t bits_per_mask = sizeof( std::uint64_t ) * CHAR_BIT;
-
-/// @brief Count number of trailing zeroes in a 64-bit number.
-/// @param[in] x target number.
-/// @return number of trailing zeroes or 0 if @b x is 0.
-constexpr unsigned int ntz64( std::uint64_t x ) noexcept
-{
-    constexpr std::uint64_t debruijn{ 0x022fdd63cc95386d };
-    constexpr unsigned int debruijn_table[ 64 ] = {
-          0,  1,  2,  53, 3,  7,  54, 27, 4,  38, 41, 8,  34, 55, 48, 28,
-          62, 5,  39, 46, 44, 42, 22, 9,  24, 35, 59, 56, 49, 18, 29, 11,
-          63, 52, 6,  26, 37, 40, 33, 47, 61, 45, 43, 21, 23, 58, 17, 10,
-          51, 25, 36, 32, 60, 20, 57, 16, 50, 31, 19, 15, 30, 14, 13, 12
-    };
-    const auto lsb = x & -x;
-    return debruijn_table[ ( lsb * debruijn ) >> 58 ];
-}
-
-} // anonymous namespace
-
 
 EcsStorage::EcsStorage( strings::NameTable& type_names,
           std::pmr::memory_resource& resource,
@@ -64,21 +41,21 @@ bool EcsStorage::register_component_type( strings::StaticName type,
 {
      if ( type.empty() )
      {
-          LOG_16NAR_ERROR( "Cannot register ECS component with empty type name" );
+          LOG_16NAR_ERROR( "Cannot register ECS component type with empty name" );
           return false;
      }
      auto [ iter, result ] = components_.try_emplace( type, resource_ );
      if ( !result )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Component type '%.*s' is already registered",
+          LOG_16NAR_ERROR( "ECS component type '%.*s' is already registered",
                static_cast< int >( type_name.size() ), type_name.data() );
           return false;
      }
 
      const auto page_count = pages_.size();
      const auto page_mask_count = page_count ?
-          ( ( page_count + bits_per_mask - 1 ) / bits_per_mask ) : 1;
+          ( ( page_count + BlockMask::mask_width - 1 ) / BlockMask::mask_width ) : 1;
      iter->second.present.resize( page_count );
      iter->second.delayed.resize( page_count );
      iter->second.blocks_present.resize( page_mask_count );
@@ -172,7 +149,7 @@ bool EcsStorage::add_flag_component( EntityId id, strings::StaticName type )
      if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Cannot add flag component '%.*s' for entity [%" PRIu32 ".%"
+          LOG_16NAR_ERROR( "Cannot add ECS flag component '%.*s' for entity [%" PRIu32 ".%"
                     PRIu32 "], wrong parameter",
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return false;
@@ -181,7 +158,7 @@ bool EcsStorage::add_flag_component( EntityId id, strings::StaticName type )
      if ( iter == components_.end() )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Cannot add flag component '%.*s' for entity [%" PRIu32 ".%"
+          LOG_16NAR_ERROR( "Cannot add ECS flag component '%.*s' for entity [%" PRIu32 ".%"
                     PRIu32 "], unknown type",
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return false;
@@ -189,7 +166,7 @@ bool EcsStorage::add_flag_component( EntityId id, strings::StaticName type )
      if ( iter->second.component_size )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Cannot add flag component '%.*s' for entity [%" PRIu32 ".%"
+          LOG_16NAR_ERROR( "Cannot add ECS flag component '%.*s' for entity [%" PRIu32 ".%"
                     PRIu32 "], not a flag type",
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return false;
@@ -206,7 +183,7 @@ void EcsStorage::delete_component( EntityId id, strings::StaticName type )
      if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Cannot delete component '%.*s' for entity [%" PRIu32 ".%"
+          LOG_16NAR_ERROR( "Cannot delete ECS component '%.*s' for entity [%" PRIu32 ".%"
                     PRIu32 "], wrong parameter",
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return;
@@ -215,7 +192,7 @@ void EcsStorage::delete_component( EntityId id, strings::StaticName type )
      if ( iter == components_.end() )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Cannot delete component '%.*s' for entity [%" PRIu32 ".%"
+          LOG_16NAR_ERROR( "Cannot delete ECS component '%.*s' for entity [%" PRIu32 ".%"
                     PRIu32 "], unknown type",
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return;
@@ -287,7 +264,7 @@ void EcsStorage::preassign_pages( strings::StaticName quasitype, std::size_t cou
      if ( quasitype.empty() || !count )
      {
           const auto type_name = type_names_.get_name( quasitype, true );
-          LOG_16NAR_ERROR( "Cannot preassign %zu pages of quasitype '%.*s'",
+          LOG_16NAR_ERROR( "Cannot preassign %zu pages of ECS quasitype '%.*s'",
                count, static_cast< int >( type_name.size() ), type_name.data() );
           return;
      }
@@ -332,7 +309,7 @@ std::byte *EcsStorage::add_component_raw( EntityId id, strings::StaticName type 
      if ( type.empty() || !check_entity( id.gen_id, page_index, local_index ) )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Cannot add component '%.*s' for entity [%" PRIu32 ".%"
+          LOG_16NAR_ERROR( "Cannot add ECS component '%.*s' for entity [%" PRIu32 ".%"
                     PRIu32 "], wrong parameter",
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return nullptr;
@@ -341,7 +318,7 @@ std::byte *EcsStorage::add_component_raw( EntityId id, strings::StaticName type 
      if ( iter == components_.end() || !iter->second.component_size )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Cannot add component '%.*s' for entity [%" PRIu32 ".%"
+          LOG_16NAR_ERROR( "Cannot add ECS component '%.*s' for entity [%" PRIu32 ".%"
                     PRIu32 "], unknown or wrong type",
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return nullptr;
@@ -350,7 +327,7 @@ std::byte *EcsStorage::add_component_raw( EntityId id, strings::StaticName type 
      if ( !raw_ptr )
      {
           const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "Cannot add component '%.*s' for entity [%" PRIu32 ".%"
+          LOG_16NAR_ERROR( "Cannot add ECS component '%.*s' for entity [%" PRIu32 ".%"
                PRIu32 "], already added",
           static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
      }
@@ -406,7 +383,7 @@ void EcsStorage::set_masks( EcsId page_index, EcsId local_index,
      std::pmr::vector< std::uint64_t >& block_mask )
 {
      mask[ page_index ].set( local_index );
-     block_mask[ page_index / bits_per_mask ] |= ( 1ULL << ( page_index % bits_per_mask ) );
+     block_mask[ page_index / BlockMask::mask_width ] |= ( 1ULL << ( page_index % BlockMask::mask_width ) );
 }
 
 
@@ -414,7 +391,7 @@ void EcsStorage::adjust_page_masks()
 {
      const auto page_count = pages_.size();
      const auto page_mask_count = page_count ?
-          ( ( page_count + bits_per_mask - 1 ) / bits_per_mask ) : 1;
+          ( ( page_count + BlockMask::mask_width - 1 ) / BlockMask::mask_width ) : 1;
      for ( auto& [ type, desc ] : components_ )
      {
           desc.present.resize( page_count );
@@ -442,10 +419,10 @@ void EcsStorage::commit_component_type( ComponentDescription& desc )
                & desc.blocks_present[ pagemask_index ]
                | desc.blocks_delayed[ pagemask_index ];
           auto block_mask = orig_block_mask;
-          auto first_page_index = pagemask_index * bits_per_mask;
+          auto first_page_index = pagemask_index * BlockMask::mask_width;
           while ( block_mask )
           {
-               commit_block( desc, first_page_index + ntz64( block_mask ) );
+               commit_block( desc, first_page_index + math::ntz64( block_mask ) );
                block_mask &= ( block_mask - 1 );  // clear rightmost set bit
           }
           desc.blocks_present[ pagemask_index ] &= ~orig_block_mask;
@@ -467,7 +444,7 @@ void EcsStorage::commit_block( ComponentDescription& desc, EcsId page_index )
           {
                const auto local_index = mask.find_set();
                desc.destruct( desc.data[ page_index ].get_view().data + local_index * desc.component_size );
-               const auto mask_part = local_index / bits_per_mask;
+               const auto mask_part = local_index / BlockMask::mask_width;
                mask.mask[ mask_part ] &= ( mask.mask[ mask_part ] - 1 ); // clear rightmost set bit
           }
      }
@@ -494,10 +471,10 @@ void EcsStorage::commit_metadata()
      {
           const std::uint64_t orig_block_mask = metadata_->blocks_delayed[ pagemask_index ];
           auto block_mask = orig_block_mask;
-          auto first_page_index = pagemask_index * bits_per_mask;
+          auto first_page_index = pagemask_index * BlockMask::mask_width;
           while ( block_mask )
           {
-               commit_metadata_block( first_page_index + ntz64( block_mask ) );
+               commit_metadata_block( first_page_index + math::ntz64( block_mask ) );
                block_mask &= ( block_mask - 1 );  // clear rightmost set bit
           }
           metadata_->blocks_present[ pagemask_index ] &= ~orig_block_mask;
@@ -537,7 +514,7 @@ void EcsStorage::clear_component_type( ComponentDescription& desc )
                {
                     const auto local_index = mask.find_set();
                     desc.destruct( desc.data[ page_index ].get_view().data + local_index * desc.component_size );
-                    const auto mask_part = local_index / bits_per_mask;
+                    const auto mask_part = local_index / BlockMask::mask_width;
                     mask.mask[ mask_part ] &= ( mask.mask[ mask_part ] - 1 ); // clear rightmost set bit
                }
           }
@@ -548,6 +525,17 @@ void EcsStorage::clear_component_type( ComponentDescription& desc )
      desc.blocks_present.clear();
      desc.blocks_delayed.clear();
      desc.has_delayed_changes = false;
+}
+
+
+EntityId EcsStorage::get_entity_id( EcsId page_index, EcsId local_index ) const noexcept
+{
+     EntityId result{};
+     const auto buffer = metadata_->data[ page_index ].get_const_view();
+     result.gen_id = *reinterpret_cast< const EcsId * >(
+               buffer.data + local_index * metadata_->component_size );
+     result.id = page_index * entities_per_page + local_index;
+     return result;
 }
 
 
@@ -581,7 +569,7 @@ EcsId BlockMask::find_unset() const noexcept
      {
           if ( mask[ i ] != std::numeric_limits< std::uint64_t >::max() )
           {
-               return static_cast< EcsId >( i * bits_per_mask + ntz64( ~mask[ i ] ) );
+               return static_cast< EcsId >( i * mask_width + math::ntz64( ~mask[ i ] ) );
                break;
           }
      }
@@ -595,7 +583,7 @@ EcsId BlockMask::find_set() const noexcept
      {
           if ( mask[ i ] )
           {
-               return static_cast< EcsId >( i * bits_per_mask + ntz64( mask[ i ] ) );
+               return static_cast< EcsId >( i * mask_width + math::ntz64( mask[ i ] ) );
           }
      }
      return std::numeric_limits< EcsId >::max();
@@ -604,17 +592,17 @@ EcsId BlockMask::find_set() const noexcept
 
 bool BlockMask::test( EcsId index ) const noexcept
 {
-     return mask[ index / bits_per_mask ] & ( 1 << ( index % bits_per_mask ) );
+     return mask[ index / mask_width ] & ( 1 << ( index % mask_width ) );
 }
 
 
 void BlockMask::set( EcsId index ) noexcept
 {
-     mask[ index / bits_per_mask ] |= ( 1 << ( index % bits_per_mask ) );
+     mask[ index / mask_width ] |= ( 1 << ( index % mask_width ) );
 }
 
 
-BlockMask BlockMask::operator~() noexcept
+BlockMask BlockMask::operator~() const noexcept
 {
      BlockMask result;
      result.mask[ 0 ] = ~mask[ 0 ];
