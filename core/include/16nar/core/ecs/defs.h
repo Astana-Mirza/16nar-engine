@@ -1,5 +1,5 @@
 /// @file
-/// @brief File with EcsManager class definition.
+/// @brief File with basic definitions for ECS.
 #ifndef _16NAR_CORE_ECS_DEFS_H
 #define _16NAR_CORE_ECS_DEFS_H
 

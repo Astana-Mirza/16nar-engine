@@ -4,3 +4,4 @@
 
 * **[Верхнеуровневая архитектура](@ref top_level_arch)**
     * **[Уровень Plaform](@ref arch_platform)**
+    * **[Уровень Core](@ref arch_core)**
