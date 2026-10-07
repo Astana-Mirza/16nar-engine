@@ -21,7 +21,7 @@ StbTextureReader::StbTextureReader( std::pmr::memory_resource& big_resource ):
 
 memory::SharedBufferPtr StbTextureReader::read( strings::StaticName name, UnifiedStorage& storage )
 {
-     auto file_data = storage.load( name );
+     auto file_data = storage.load_raw( name );
      if ( !file_data )
      {
           LOG_16NAR_ERROR( "Cannot load resource from unified storage" );

@@ -37,7 +37,7 @@ struct Hash
 
 
 /// @brief Identifier of resource.
-/// @details Usually, only one of the fields is set, either hash or name.
+/// @details The string name is optional and is used as debug information.
 table ResourceId
 {
      hash:     Hash;

@@ -9,11 +9,11 @@ set(NARENGINE_FLATBUFFERS_SCHEMAS
     "flatbuffers/asset.fbs"
     "flatbuffers/resource.fbs"
 )
-if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+if("${NARENGINE_PROFILE}" STREQUAL "general")
     set(NARENGINE_FLATBUFFERS_SCHEMAS ${NARENGINE_FLATBUFFERS_SCHEMAS}
-        "flatbuffers/constructor2d.fbs"
+        "flatbuffers/profile_general.fbs"
     )
-endif() # if("${NARENGINE_BUILD_CONSTRUCTOR2D}")
+endif() # if("${NARENGINE_PROFILE}" STREQUAL "general")
 
 flatbuffers_generate_headers(TARGET flatbuffers-gen-cpp
     INCLUDE "${NARENGINE_SCHEMAS_DIR}"

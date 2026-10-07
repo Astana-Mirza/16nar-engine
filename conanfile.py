@@ -17,6 +17,7 @@ class NarengineRecipe(ConanFile):
     options = {
         "shared": [True, False],
         "log_level": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        "engine_profile": ["general"],
         "enable_tests": [True, False],
         "with_docs": [True, False],
         "with_utils": [True, False],
@@ -26,6 +27,7 @@ class NarengineRecipe(ConanFile):
     default_options = {
         "shared": True,
         "log_level": 9,
+        "engine_profile": "general",
         "enable_tests": True,
         "with_docs": False,
         "with_utils": True,
@@ -68,11 +70,10 @@ class NarengineRecipe(ConanFile):
             "NARENGINE_LOG_LEVEL": self.options.log_level,
             "NARENGINE_BUILD_DOCS": "ON" if self.options.with_docs else "OFF",
             "NARENGINE_BUILD_UTILS": "ON" if self.options.with_utils else "OFF",
-            "NARENGINE_RENDER_VULKAN": "ON" if self.options.with_render_vulkan else "OFF",
-            "NARENGINE_RENDER_OPENGL": "ON" if self.options.with_render_opengl else "OFF",
             "NARENGINE_VERSION_MAJOR": version_items[ 0 ],
             "NARENGINE_VERSION_MINOR": version_items[ 1 ],
             "NARENGINE_VERSION_PATCH": version_items[ 2 ],
+            "NARENGINE_PROFILE": self.options.engine_profile,
         })
         cmake.build()
         if self.options.enable_tests and can_run(self):

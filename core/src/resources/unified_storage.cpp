@@ -180,7 +180,7 @@ std::filesystem::path UnifiedStorage::get_path( strings::StaticName name ) const
 }
 
 
-memory::SharedBufferPtr UnifiedStorage::load( strings::StaticName name )
+memory::SharedBufferPtr UnifiedStorage::load_raw( strings::StaticName name )
 {
      if ( unpacked_ )
      {
@@ -240,6 +240,31 @@ memory::SharedBufferPtr UnifiedStorage::load( strings::StaticName name )
           return memory::SharedBufferPtr{};
      }
      return buffer;
+}
+
+
+memory::SharedBufferPtr UnifiedStorage::load_asset( strings::StaticName name )
+{
+     if ( !unpacked_ )
+     {
+          return load_raw( name );
+     }
+
+     system::File asset_file{};
+     const auto path = get_path( name ).string();
+     if ( path.empty() || !asset_file.open( path ) )
+     {
+          LOG_16NAR_ERROR( "Cannot open unpacked asset resource '%s'", path.c_str() );
+          return memory::SharedBufferPtr{};
+     }
+
+     auto data = file_processor_->read_asset_data( asset_file );
+     if ( !data )
+     {
+          LOG_16NAR_ERROR( "Cannot read data of unpacked asset '%s'", path.c_str() );
+          return memory::SharedBufferPtr{};
+     }
+     return data;
 }
 
 

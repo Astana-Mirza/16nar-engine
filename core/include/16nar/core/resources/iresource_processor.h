@@ -18,9 +18,10 @@ public:
      virtual ~IResourceProcessor() = default;
 
      /// @brief Start resource processing.
-     /// @param metadata resource metadata buffer.
-     /// @return current resource identifier.
-     virtual ResID start( memory::ConstByteView metadata ) = 0;
+     /// @param[in] metadata resource metadata buffer.
+     /// @param[in] res_id current resource identifier acting as its unique key.
+     /// @return true on success, false otherwise.
+     virtual bool start( ResID res_id, memory::ConstByteView metadata ) = 0;
 
      /// @brief Process part of resource data.
      /// @param[in] res_id resource identifier.

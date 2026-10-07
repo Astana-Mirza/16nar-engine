@@ -64,10 +64,15 @@ public:
      /// @return path of the requested file or empty path if the @b name is unknown.
      std::filesystem::path get_path( strings::StaticName name ) const;
 
-     /// @brief Load the resource data by name.
+     /// @brief Load raw resource data by name.
      /// @param[in] name name of the resource.
      /// @return data of the resource, nullptr if resource with given @b name does not exist.
-     memory::SharedBufferPtr load( strings::StaticName name );
+     memory::SharedBufferPtr load_raw( strings::StaticName name );
+
+     /// @brief Load resource data by name assuming that it is an asset.
+     /// @param[in] name name of the resource.
+     /// @return data of the resource, nullptr if resource with given @b name does not exist.
+     memory::SharedBufferPtr load_asset( strings::StaticName name );
 
      /// @brief Mount the package.
      /// @details If there are resources with the same name in differrent packages, then

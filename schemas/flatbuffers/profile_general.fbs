@@ -1,0 +1,34 @@
+include "asset.fbs";
+
+namespace _16nar.data.general;
+
+/// @brief Dependency of a unit of load.
+table UnitDependency
+{
+     resouce:       ResourceId     (required);
+     full_load:     bool = true;
+}
+
+
+/// @brief Description of unit of load dependencies.
+table UnitDeps
+{
+     entries:  [UnitDependency]    (required);
+}
+
+
+/// @brief Type of entity in an unit of load.
+enum EntityType : uint8
+{
+     Regular = 0,
+     Unfold,
+     Overlay
+}
+
+
+/// @brief Entity record in an unit of load.
+table Entity
+{
+     entity_type:   EntityType;
+     reference:     [uint32];
+}

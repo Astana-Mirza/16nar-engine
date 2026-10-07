@@ -38,6 +38,7 @@ set(NARENGINE_CORE_SOURCES
 
     "${NARENGINE_CORE_SRC_DIR}/resources/unified_storage.cpp"
     "${NARENGINE_CORE_SRC_DIR}/resources/resource_pkg_visitor.cpp"
+    "${NARENGINE_CORE_SRC_DIR}/resources/resource_handle.cpp"
     "${NARENGINE_CORE_SRC_DIR}/resources/stb_texture_reader.cpp"
     "${NARENGINE_CORE_SRC_DIR}/resources/stb_impl.cpp"
 
@@ -47,6 +48,12 @@ set(NARENGINE_CORE_SOURCES
     "${NARENGINE_CORE_SRC_DIR}/ecs/page_registry.cpp"
     "${NARENGINE_CORE_SRC_DIR}/ecs/query.cpp"
 )
+if("${NARENGINE_PROFILE}" STREQUAL "general")
+    set(NARENGINE_CORE_SOURCES ${NARENGINE_CORE_SOURCES}
+        "${NARENGINE_CORE_SRC_DIR}/profile/general/unit_manager.cpp"
+        "${NARENGINE_CORE_SRC_DIR}/profile/general/unit_visitor.cpp"
+    )
+endif() # if("${NARENGINE_PROFILE}" STREQUAL "general")
 add_library("${NAME}_core" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CORE_SOURCES})
 add_dependencies("${NAME}_core" "flatbuffers-gen-cpp" "GENERATE_flatbuffers-gen-cpp")
 narengine_add_deps("${NAME}_core" "NARENGINE_CORE")
