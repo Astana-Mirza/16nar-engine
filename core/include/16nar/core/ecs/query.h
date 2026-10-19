@@ -13,7 +13,7 @@ namespace _16nar::ecs
 
 /// @brief Query into ECS storage.
 /// @details Queries may check existence of components and get components data.
-/// 
+/// All queries related to an ECS storage must not outlive the storage itself.
 class NARENGINE_CORE_API Query
 {
 public:
@@ -188,16 +188,23 @@ private:
                DataWanted     = 1 << 2  ///< component data must be extracted.
           };
 
-          ComponentDescription *desc;   ///< component type description.
-          std::byte *data;              ///< data of current component, may be nullptr.
-          std::uint8_t flags;           ///< flags of the query element.
-          bool found;                   ///< true if the component is found, false otherwise.
+          strings::StaticName type{};   ///< name of component type.
+          ComponentDescription *desc{}; ///< component type description.
+          std::byte *data{};            ///< data of current component, may be nullptr.
+          std::uint8_t flags{};         ///< flags of the query element.
+          bool found{};                 ///< true if the component is found, false otherwise.
      };
 
      /// @brief Get component description.
      /// @param[in] type name of component type.
-     /// @return component description.
-     ComponentDescription *get_description( strings::StaticName type );
+     /// @param[in] data_wanted true if the query will need data of the component, false otherwise.
+     /// @param[out] desc component description, may be nullptr if such component is not created yet.
+     /// @return true on success, false otherwise.
+     bool get_description( strings::StaticName type, bool data_wanted, ComponentDescription *&desc );
+
+     /// @brief Preprocess the query and check if it can be omitted.
+     /// @return true if the query may be executed, false otherwise.
+     bool preprocess();
 
      /// @brief Advance query to the next result.
      void advance() noexcept;

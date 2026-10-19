@@ -6,6 +6,7 @@
 #include <16nar/core/defs.h>
 
 #include <cstdint>
+#include <memory>
 
 namespace _16nar::resources
 {
@@ -33,6 +34,8 @@ class IResourceLoader;
 class IResourceProcessor;
 class IResourceReader;
 class IResourceManager;
+
+using IResourceManagerPtr = std::shared_ptr< IResourceManager >;
 
 } // namespace _16nar::resources
 

@@ -10,65 +10,31 @@
 namespace _16nar::ecs
 {
 
-EcsStorage::EcsStorage( strings::NameTable& type_names,
+EcsStorage::EcsStorage( EcsRegistry& ecs_registry,
+          strings::NameTable& type_names,
           std::pmr::memory_resource& resource,
           std::pmr::memory_resource& big_resource )
-     : components_( &resource )
+     : ecs_registry_{ ecs_registry }
+     , components_( &resource )
      , registries_( &resource )
      , pages_( &resource )
      , metadata_{}
      , type_names_{ type_names }
      , resource_{ resource }
      , big_resource_{ big_resource }
+     , entity_metadata_desc_{}
+     , has_delayed_changes_{}
 {
      // register inner component EntityMetadata with empty type name
-     auto iter = components_.emplace( strings::StaticName{}, resource_ ).first;
+     entity_metadata_desc_.size = sizeof( EntityMetadata );
+     auto iter = components_.try_emplace( strings::StaticName{}, resource_, entity_metadata_desc_ ).first;
      metadata_ = &( iter->second );
-     metadata_->component_size = sizeof( EntityMetadata );
 }
 
 
 EcsStorage::~EcsStorage()
 {
      clear();
-}
-
-
-bool EcsStorage::register_component_type( strings::StaticName type,
-     std::size_t size,
-     LifetimeController construct,
-     LifetimeController destruct )
-{
-     if ( type.empty() )
-     {
-          LOG_16NAR_ERROR( "Cannot register ECS component type with empty name" );
-          return false;
-     }
-     auto [ iter, result ] = components_.try_emplace( type, resource_ );
-     if ( !result )
-     {
-          const auto type_name = type_names_.get_name( type, true );
-          LOG_16NAR_ERROR( "ECS component type '%.*s' is already registered",
-               static_cast< int >( type_name.size() ), type_name.data() );
-          return false;
-     }
-
-     const auto page_count = pages_.size();
-     const auto page_mask_count = page_count ?
-          ( ( page_count + BlockMask::mask_width - 1 ) / BlockMask::mask_width ) : 1;
-     iter->second.present.resize( page_count );
-     iter->second.delayed.resize( page_count );
-     iter->second.blocks_present.resize( page_mask_count );
-     iter->second.blocks_delayed.resize( page_mask_count );
-     iter->second.data.resize( page_count );
-     iter->second.component_size = size;
-     if ( size )
-     {
-          iter->second.construct = construct;
-          iter->second.destruct = destruct;
-     }
-
-     return true;
 }
 
 
@@ -154,8 +120,8 @@ bool EcsStorage::add_flag_component( EntityId id, strings::StaticName type )
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return false;
      }
-     const auto iter = components_.find( type );
-     if ( iter == components_.end() )
+     auto *component = try_add_component_type( type );
+     if ( !component )
      {
           const auto type_name = type_names_.get_name( type, true );
           LOG_16NAR_ERROR( "Cannot add ECS flag component '%.*s' for entity [%" PRIu32 ".%"
@@ -163,7 +129,7 @@ bool EcsStorage::add_flag_component( EntityId id, strings::StaticName type )
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return false;
      }
-     if ( iter->second.component_size )
+     if ( component->type.size )
      {
           const auto type_name = type_names_.get_name( type, true );
           LOG_16NAR_ERROR( "Cannot add ECS flag component '%.*s' for entity [%" PRIu32 ".%"
@@ -171,7 +137,7 @@ bool EcsStorage::add_flag_component( EntityId id, strings::StaticName type )
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return false;
      }
-     set_masks( page_index, local_index, iter->second.present, iter->second.blocks_present );
+     set_masks( page_index, local_index, component->present, component->blocks_present );
      return true;
 }
 
@@ -279,6 +245,36 @@ void EcsStorage::preassign_pages( strings::StaticName quasitype, std::size_t cou
 }
 
 
+ComponentDescription *EcsStorage::try_add_component_type( strings::StaticName type )
+{
+     auto iter = components_.find( type );
+     if ( iter == components_.cend() )
+     {
+          // no need to check type.empty() because metadata
+          // is always present and will be returned if needed
+
+          auto *component_type = ecs_registry_.get_component_type( type );
+          if ( !component_type )
+          {
+               const auto type_name = type_names_.get_name( type, true );
+               LOG_16NAR_ERROR( "ECS component type '%.*s' is unknown",
+                    static_cast< int >( type_name.size() ), type_name.data() );
+               return nullptr;
+          }
+          iter = components_.try_emplace( type, resource_, *component_type ).first;
+          const auto page_count = pages_.size();
+          const auto page_mask_count = page_count ?
+               ( ( page_count + BlockMask::mask_width - 1 ) / BlockMask::mask_width ) : 1;
+          iter->second.present.resize( page_count );
+          iter->second.delayed.resize( page_count );
+          iter->second.blocks_present.resize( page_mask_count );
+          iter->second.blocks_delayed.resize( page_mask_count );
+          iter->second.data.resize( page_count );
+     }
+     return &iter->second;
+}
+
+
 bool EcsStorage::check_entity( EcsId gen_id, EcsId page_index, EcsId local_index ) const noexcept
 {
      if ( page_index >= pages_.size() )
@@ -292,7 +288,7 @@ bool EcsStorage::check_entity( EcsId gen_id, EcsId page_index, EcsId local_index
      }
 
      auto buffer = metadata_->data[ page_index ].get_view();
-     auto entity = reinterpret_cast< EntityMetadata * >( buffer.data + local_index * metadata_->component_size );
+     auto entity = reinterpret_cast< EntityMetadata * >( buffer.data + local_index * metadata_->type.size );
      if ( entity->gen_id != gen_id )
      {
           // passed a dangling reference
@@ -314,8 +310,8 @@ std::byte *EcsStorage::add_component_raw( EntityId id, strings::StaticName type 
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return nullptr;
      }
-     const auto iter = components_.find( type );
-     if ( iter == components_.end() || !iter->second.component_size )
+     auto *component = try_add_component_type( type );
+     if ( !component || !component->type.size )
      {
           const auto type_name = type_names_.get_name( type, true );
           LOG_16NAR_ERROR( "Cannot add ECS component '%.*s' for entity [%" PRIu32 ".%"
@@ -323,7 +319,7 @@ std::byte *EcsStorage::add_component_raw( EntityId id, strings::StaticName type 
                static_cast< int >( type_name.size() ), type_name.data(), id.gen_id, id.id );
           return nullptr;
      }
-     auto *raw_ptr = add_component_impl( iter->second, page_index, local_index );
+     auto *raw_ptr = add_component_impl( *component, page_index, local_index );
      if ( !raw_ptr )
      {
           const auto type_name = type_names_.get_name( type, true );
@@ -347,13 +343,13 @@ std::byte *EcsStorage::add_component_impl(
      if ( !desc.data[ page_index ] )
      {
           desc.data[ page_index ] = memory::SharedBufferPtr::allocate(
-               big_resource_, entities_per_page * desc.component_size );
+               big_resource_, entities_per_page * desc.type.size );
      }
      auto buffer = desc.data[ page_index ].get_view();
-     result = buffer.data + local_index * desc.component_size;
-     if ( desc.construct )
+     result = buffer.data + local_index * desc.type.size;
+     if ( desc.type.construct )
      {
-          desc.construct( result );
+          desc.type.construct( result );
      }
      set_masks( page_index, local_index, desc.present, desc.blocks_present );
      return result;
@@ -374,7 +370,7 @@ const std::byte *EcsStorage::get_component_raw( EntityId id, strings::StaticName
           return nullptr;
      }
      auto buffer = iter->second.data[ page_index ].get_const_view();
-     return buffer.data + local_index * iter->second.component_size;
+     return buffer.data + local_index * iter->second.type.size;
 }
 
 
@@ -437,13 +433,13 @@ void EcsStorage::commit_block( ComponentDescription& desc, EcsId page_index )
      BlockMask orig_mask = metadata_->delayed[ page_index ];
      orig_mask &= desc.present[ page_index ];
      orig_mask |= desc.delayed[ page_index ];
-     if ( desc.component_size && desc.destruct )
+     if ( desc.type.size && desc.type.destruct )
      {
           auto mask = orig_mask;
           while ( !mask.none() )
           {
                const auto local_index = mask.find_set();
-               desc.destruct( desc.data[ page_index ].get_view().data + local_index * desc.component_size );
+               desc.type.destruct( desc.data[ page_index ].get_view().data + local_index * desc.type.size );
                const auto mask_part = local_index / BlockMask::mask_width;
                mask.mask[ mask_part ] &= ( mask.mask[ mask_part ] - 1 ); // clear rightmost set bit
           }
@@ -505,7 +501,7 @@ void EcsStorage::commit_metadata_block( EcsId page_index )
 
 void EcsStorage::clear_component_type( ComponentDescription& desc )
 {
-     if ( desc.destruct )
+     if ( desc.type.destruct )
      {
           for ( std::size_t page_index = 0; page_index < desc.data.size(); ++page_index )
           {
@@ -513,7 +509,7 @@ void EcsStorage::clear_component_type( ComponentDescription& desc )
                while ( !mask.none() )
                {
                     const auto local_index = mask.find_set();
-                    desc.destruct( desc.data[ page_index ].get_view().data + local_index * desc.component_size );
+                    desc.type.destruct( desc.data[ page_index ].get_view().data + local_index * desc.type.size );
                     const auto mask_part = local_index / BlockMask::mask_width;
                     mask.mask[ mask_part ] &= ( mask.mask[ mask_part ] - 1 ); // clear rightmost set bit
                }
@@ -533,21 +529,21 @@ EntityId EcsStorage::get_entity_id( EcsId page_index, EcsId local_index ) const 
      EntityId result{};
      const auto buffer = metadata_->data[ page_index ].get_const_view();
      result.gen_id = *reinterpret_cast< const EcsId * >(
-               buffer.data + local_index * metadata_->component_size );
+               buffer.data + local_index * metadata_->type.size );
      result.id = page_index * entities_per_page + local_index;
      return result;
 }
 
 
-ComponentDescription::ComponentDescription( std::pmr::memory_resource& resource )
+ComponentDescription::ComponentDescription(
+     std::pmr::memory_resource& resource, TypeDescription& type )
      : present( &resource )
      , delayed( &resource )
      , blocks_present( &resource )
      , blocks_delayed( &resource )
      , data( &resource )
-     , component_size{}
-     , construct{}
-     , destruct{}
+     , type{ type }
+     , has_delayed_changes{}
 {}
 
 

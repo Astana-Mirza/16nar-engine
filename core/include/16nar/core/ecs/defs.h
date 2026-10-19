@@ -10,8 +10,11 @@
 namespace _16nar::ecs
 {
 
-/// @brief Function for construction or destruction of a component at given memory.
-using LifetimeController = void ( * )( std::byte * );
+class TypeDescription;
+class ComponentDescription;
+class EcsRegistry;
+class EcsStorage;
+class Query;
 
 /// @brief Type of identifier in ECS.
 using EcsId = std::uint32_t;

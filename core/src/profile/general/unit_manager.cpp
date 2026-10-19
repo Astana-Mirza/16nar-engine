@@ -168,21 +168,23 @@ bool UnitManager::load_by_id( resources::ResID res_id, execution::Mode )
 }
 
 
-void UnitManager::instantiate( resources::ResID res_id )
+void UnitManager::instantiate( resources::ResID )
 {
      /// @todo check that the UoL is at least preloaded AND not unloading/unpreloading
 }
 
 
-bool UnitManager::wait_preload( resources::ResID res_id )
+bool UnitManager::wait_preload( resources::ResID )
 {
      /// @todo wait for preload task to complete
+     return true;
 }
 
 
-bool UnitManager::wait_load( resources::ResID res_id )
+bool UnitManager::wait_load( resources::ResID )
 {
      /// @todo wait for load task to complete
+     return true;
 }
 
 

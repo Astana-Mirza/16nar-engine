@@ -7,6 +7,7 @@
 
 #include <16nar/platform/strings/name_table.h>
 #include <16nar/platform/memory/shared_buffer_ptr.h>
+#include <16nar/core/ecs/ecs_registry.h>
 #include <16nar/core/ecs/page_registry.h>
 
 #include <memory_resource>
@@ -67,21 +68,20 @@ struct NARENGINE_CORE_API BlockMask
 };
 
 
-/// @brief Description of a component type.
+/// @brief Description of a component.
 struct NARENGINE_CORE_API ComponentDescription
 {
      /// @brief Constructor.
      /// @param[in] resource memory resource for utility data allocations.
-     ComponentDescription( std::pmr::memory_resource& resource );
+     /// @param[in] type description of component type.
+     ComponentDescription( std::pmr::memory_resource& resource, TypeDescription& type );
 
      std::pmr::vector< BlockMask > present;            ///< bitmasks of component presence.
      std::pmr::vector< BlockMask > delayed;            ///< bitmasks of component delayed changes.
      std::pmr::vector< std::uint64_t > blocks_present; ///< second-order bitmasks of component presence.
      std::pmr::vector< std::uint64_t > blocks_delayed; ///< second-order bitmasks of component delayed changes.
      std::pmr::vector< memory::SharedBufferPtr > data; ///< data of allocated blocks.
-     std::size_t component_size;                       ///< size of one component, in bytes.
-     LifetimeController construct;                     ///< function of component construction.
-     LifetimeController destruct;                      ///< function of component destruction.
+     TypeDescription& type;                            ///< description of component type.
      bool has_delayed_changes;                         ///< flag of delayed changes.
 };
 
@@ -126,26 +126,17 @@ public:
      friend class Query;
 
      /// @brief Constructor.
+     /// @param[in] ecs_registry registry of ECS component types.
      /// @param[in] type_names table of type and quasitype names.
      /// @param[in] resource memory resource for utility data allocations.
      /// @param[in] big_resource memory resource for ECS data allocations.
-     EcsStorage( strings::NameTable& type_names,
+     EcsStorage( EcsRegistry& ecs_registry,
+          strings::NameTable& type_names,
           std::pmr::memory_resource& resource,
           std::pmr::memory_resource& big_resource );
 
      /// @brief Destructor.
      ~EcsStorage();
-
-     /// @brief Register component type for ECS.
-     /// @param[in] type name of component type.
-     /// @param[in] size size of single component object, may be zero for flag components.
-     /// @param[in] construct function of component construction, only for non-flag components.
-     /// @param[in] destruct function of component destruction, only for non-flag components.
-     /// @return true on success, false otherwise.
-     bool register_component_type( strings::StaticName type,
-          std::size_t size = 0,
-          LifetimeController construct = nullptr,
-          LifetimeController destruct = nullptr );
 
      /// @brief Add entity of selected quasitype.
      /// @param[in] quasitype name of the quasitype of added entity.
@@ -257,6 +248,11 @@ private:
      /// @brief Descriptions of components with their type names.
      using ComponentMap = std::pmr::unordered_map< strings::StaticName, ComponentDescription >;
 
+     /// @brief Add or get existing component type description for current ECS storage.
+     /// @param[in] type name of component type.
+     /// @return component description if it existed or was successfully added, nullptr otherwise.
+     ComponentDescription *try_add_component_type( strings::StaticName type );
+
      /// @brief Check if entity with given parameters exist.
      /// @param[in] gen_id generation ID of the entity.
      /// @param[in] page_index index of the page.
@@ -322,6 +318,7 @@ private:
      EntityId get_entity_id( EcsId page_index, EcsId local_index ) const noexcept;
 
 private:
+     EcsRegistry& ecs_registry_;                  ///< registry of ECS component types.
      ComponentMap components_;                    ///< description of all component types.
      RegistryMap registries_;                     ///< registries of pages per quasitype.
      std::pmr::vector< PageInfo > pages_;         ///< information about each page.
@@ -329,6 +326,7 @@ private:
      strings::NameTable& type_names_;             ///< table of type and quasitype names.
      std::pmr::memory_resource& resource_;        ///< memory resource for utility data allocations.
      std::pmr::memory_resource& big_resource_;    ///< memory resource for ECS data allocations.
+     TypeDescription entity_metadata_desc_;       ///< description of metadata component type.
      bool has_delayed_changes_;                   ///< flag of any delayed changes.
 };
 

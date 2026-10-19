@@ -1,5 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include <16nar/core/ecs/ecs_registry.h>
 #include <16nar/core/ecs/ecs_storage.h>
 #include <16nar/core/ecs/query.h>
 
@@ -43,7 +44,8 @@ TEST_CASE( "Entities and components creation", "[ecs_storage]" )
      TestComp1::constructed = 0;
      TestComp1::destructed = 0;
      _16nar::strings::NameTable name_table{ *std::pmr::get_default_resource() };
-     _16nar::ecs::EcsStorage ecs{ name_table,
+     _16nar::ecs::EcsRegistry registry{ name_table, *std::pmr::get_default_resource() };
+     _16nar::ecs::EcsStorage ecs{ registry, name_table,
           *std::pmr::get_default_resource(), *std::pmr::get_default_resource() };
 
      _16nar::strings::StaticName test_comp1{ "TestComp1" };
@@ -52,10 +54,19 @@ TEST_CASE( "Entities and components creation", "[ecs_storage]" )
      _16nar::strings::StaticName quasitype1{ "Quasitype1" };
      _16nar::strings::StaticName quasitype2{ "Quasitype2" };
 
-     CHECK( ecs.register_component_type( test_comp1, sizeof( TestComp1 ),
-          &TestComp1::construct, &TestComp1::destruct ) );
-     CHECK( ecs.register_component_type( test_comp2, sizeof( TestComp2 ) ) );
-     CHECK( ecs.register_component_type( test_comp3 ) );
+     _16nar::ecs::TypeDescription desc{};
+     desc.size = sizeof( TestComp1 );
+     desc.construct = &TestComp1::construct;
+     desc.destruct = &TestComp1::destruct;
+     CHECK( registry.register_component_type( test_comp1, desc ) );
+
+     desc.size = sizeof( TestComp2 );
+     desc.construct = nullptr;
+     desc.destruct = nullptr;
+     CHECK( registry.register_component_type( test_comp2, desc ) );
+
+     desc.size = 0;
+     CHECK( registry.register_component_type( test_comp3, desc ) );
 
      CHECK( TestComp1::constructed == 0 );
      CHECK( TestComp1::destructed == 0 );
@@ -123,7 +134,8 @@ TEST_CASE( "Queries into ECS", "[ecs_query]" )
      TestComp1::constructed = 0;
      TestComp1::destructed = 0;
      _16nar::strings::NameTable name_table{ *std::pmr::get_default_resource() };
-     _16nar::ecs::EcsStorage ecs{ name_table,
+     _16nar::ecs::EcsRegistry registry{ name_table, *std::pmr::get_default_resource() };
+     _16nar::ecs::EcsStorage ecs{ registry, name_table,
           *std::pmr::get_default_resource(), *std::pmr::get_default_resource() };
 
      _16nar::strings::StaticName test_comp1{ "TestComp1" };
@@ -132,10 +144,19 @@ TEST_CASE( "Queries into ECS", "[ecs_query]" )
      _16nar::strings::StaticName quasitype1{ "Quasitype1" };
      _16nar::strings::StaticName quasitype2{ "Quasitype2" };
 
-     ecs.register_component_type( test_comp1, sizeof( TestComp1 ),
-          &TestComp1::construct, &TestComp1::destruct );
-     ecs.register_component_type( test_comp2, sizeof( TestComp2 ) );
-     ecs.register_component_type( test_comp3 );
+     _16nar::ecs::TypeDescription desc{};
+     desc.size = sizeof( TestComp1 );
+     desc.construct = &TestComp1::construct;
+     desc.destruct = &TestComp1::destruct;
+     CHECK( registry.register_component_type( test_comp1, desc ) );
+
+     desc.size = sizeof( TestComp2 );
+     desc.construct = nullptr;
+     desc.destruct = nullptr;
+     CHECK( registry.register_component_type( test_comp2, desc ) );
+
+     desc.size = 0;
+     CHECK( registry.register_component_type( test_comp3, desc ) );
 
      ecs.preassign_pages( quasitype1, 64 );
      ecs.preassign_pages( quasitype2, 1 );

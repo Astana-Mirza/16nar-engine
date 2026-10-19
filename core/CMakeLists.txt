@@ -44,6 +44,7 @@ set(NARENGINE_CORE_SOURCES
 
     "${NARENGINE_CORE_SRC_DIR}/config/config_manager.cpp"
 
+    "${NARENGINE_CORE_SRC_DIR}/ecs/ecs_registry.cpp"
     "${NARENGINE_CORE_SRC_DIR}/ecs/ecs_storage.cpp"
     "${NARENGINE_CORE_SRC_DIR}/ecs/page_registry.cpp"
     "${NARENGINE_CORE_SRC_DIR}/ecs/query.cpp"
