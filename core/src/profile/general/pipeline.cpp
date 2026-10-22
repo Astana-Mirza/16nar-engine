@@ -207,6 +207,7 @@ Pipeline::Impl::Impl( memory::MemoryManager& memory_manager )
      , ecs_storage{}
      , locator{}
      , config{}
+     , initialized{}
 {
      // ensure that the logger is created
      ( void ) logger::Logger::instance();
