@@ -29,10 +29,9 @@ class NARENGINE_CORE_API EcsRegistry
 {
 public:
      /// @brief Constructor.
-     /// @param[in] type_names table of component type names.
      /// @param[in] resource memory resource for utility data allocations.
-     EcsRegistry( strings::NameTable& type_names,
-          std::pmr::memory_resource& resource );
+     /// @param[in] type_names table of component type names.
+     EcsRegistry( std::pmr::memory_resource& resource, strings::NameTable& type_names );
 
      /// @brief Register component type for ECS.
      /// @param[in] type name of component type.
@@ -46,6 +45,9 @@ public:
      TypeDescription *get_component_type( strings::StaticName type );
 
 private:
+     EcsRegistry( const EcsRegistry& ) = delete;
+     EcsRegistry& operator=( const EcsRegistry& ) = delete;
+
      /// @brief Descriptions of component types with their names.
      using TypeMap = std::pmr::unordered_map< strings::StaticName, TypeDescription >;
 

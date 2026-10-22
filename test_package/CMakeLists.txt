@@ -10,4 +10,8 @@ add_executable("test_package"
     "${PROJECT_SOURCE_DIR}/test_package.cpp"
 )
 
-target_link_libraries("test_package" "16nar::16nar_core")
+target_link_libraries("test_package"
+    "16nar::16nar_assets_fb"
+    "16nar::16nar_core"
+    "16nar::16nar_platform"
+)

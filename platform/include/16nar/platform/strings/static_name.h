@@ -3,7 +3,7 @@
 #ifndef _16NAR_PLATFORM_STRINGS_STATIC_NAME_H
 #define _16NAR_PLATFORM_STRINGS_STATIC_NAME_H
 
-#include <16nar/platform/defs.h>
+#include <16nar/platform/strings/defs.h>
 #include <16nar/platform/strings/hash.h>
 
 namespace _16nar::strings

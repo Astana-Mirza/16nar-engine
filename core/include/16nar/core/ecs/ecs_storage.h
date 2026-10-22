@@ -126,14 +126,14 @@ public:
      friend class Query;
 
      /// @brief Constructor.
-     /// @param[in] ecs_registry registry of ECS component types.
-     /// @param[in] type_names table of type and quasitype names.
      /// @param[in] resource memory resource for utility data allocations.
      /// @param[in] big_resource memory resource for ECS data allocations.
-     EcsStorage( EcsRegistry& ecs_registry,
+     /// @param[in] type_names table of type and quasitype names.
+     /// @param[in] ecs_registry registry of ECS component types.
+     EcsStorage( std::pmr::memory_resource& resource,
+          std::pmr::memory_resource& big_resource,
           strings::NameTable& type_names,
-          std::pmr::memory_resource& resource,
-          std::pmr::memory_resource& big_resource );
+          EcsRegistry& ecs_registry );
 
      /// @brief Destructor.
      ~EcsStorage();
@@ -226,7 +226,7 @@ public:
      void preassign_pages( strings::StaticName quasitype, std::size_t count );
 
 private:
-     EcsStorage( const EcsStorage&& ) = delete;
+     EcsStorage( const EcsStorage& ) = delete;
      EcsStorage& operator=( const EcsStorage& ) = delete;
 
      /// @brief Inner component type for entity management.

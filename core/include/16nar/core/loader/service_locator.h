@@ -18,7 +18,7 @@ class NARENGINE_CORE_API ServiceLocator
 public:
      /// @brief Constructor.
      /// @param[in] resource memory resource for utility data allocations.
-     ServiceLocator( std::pmr::memory_resource& resource ): services_( resource ) {}
+     ServiceLocator( std::pmr::memory_resource& resource ): services_( &resource ) {}
 
      /// @brief Add service to the locator.
      /// @tparam T type of service.
@@ -40,6 +40,9 @@ public:
      }
 
 private:
+     ServiceLocator( const ServiceLocator& ) = delete;
+     ServiceLocator& operator=( const ServiceLocator& ) = delete;
+
      std::pmr::unordered_map< std::type_index, void * > services_;    ///< registered services.
 };
 

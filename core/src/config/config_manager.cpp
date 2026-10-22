@@ -42,7 +42,7 @@
 namespace _16nar::config
 {
 
-ConfigManager::ConfigManager( strings::NameTable& names, std::pmr::memory_resource& resource ):
+ConfigManager::ConfigManager( std::pmr::memory_resource& resource, strings::NameTable& names ):
      config_( &resource ), names_{ names }, resource_{ resource }, locked_{}
 {}
 

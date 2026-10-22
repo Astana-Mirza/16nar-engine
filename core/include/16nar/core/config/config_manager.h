@@ -60,9 +60,9 @@ public:
      };
 
      /// @brief Constructor.
-     /// @param[in] names table of parameter and section names.
      /// @param[in] resource memory resource for configuration data allocations.
-     ConfigManager( strings::NameTable& names, std::pmr::memory_resource& resource );
+     /// @param[in] names table of parameter and section names.
+     ConfigManager( std::pmr::memory_resource& resource, strings::NameTable& names );
 
      /// @brief Register configuration parameter.
      /// @details Parameter is registered with default value of its type.
@@ -162,7 +162,7 @@ public:
      bool set_string( strings::StaticName section, strings::StaticName name, std::string_view value );
 
 private:
-     ConfigManager( const ConfigManager&& ) = delete;
+     ConfigManager( const ConfigManager& ) = delete;
      ConfigManager& operator=( const ConfigManager& ) = delete;
 
      /// @brief Configuration entries of a single section.

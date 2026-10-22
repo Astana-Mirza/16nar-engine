@@ -5,8 +5,7 @@
 namespace _16nar::ecs
 {
 
-EcsRegistry::EcsRegistry( strings::NameTable& type_names,
-          std::pmr::memory_resource& resource )
+EcsRegistry::EcsRegistry( std::pmr::memory_resource& resource, strings::NameTable& type_names )
      : type_names_{ type_names }
      , types_( &resource )
 {}

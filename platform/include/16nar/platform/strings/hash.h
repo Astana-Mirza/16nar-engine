@@ -3,7 +3,7 @@
 #ifndef _16NAR_PLATFORM_STRINGS_HASH_H
 #define _16NAR_PLATFORM_STRINGS_HASH_H
 
-#include <16nar/platform/defs.h>
+#include <16nar/platform/strings/defs.h>
 
 #include <cstddef>
 #include <string_view>

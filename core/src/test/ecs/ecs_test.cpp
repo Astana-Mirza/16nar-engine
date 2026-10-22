@@ -44,9 +44,9 @@ TEST_CASE( "Entities and components creation", "[ecs_storage]" )
      TestComp1::constructed = 0;
      TestComp1::destructed = 0;
      _16nar::strings::NameTable name_table{ *std::pmr::get_default_resource() };
-     _16nar::ecs::EcsRegistry registry{ name_table, *std::pmr::get_default_resource() };
-     _16nar::ecs::EcsStorage ecs{ registry, name_table,
-          *std::pmr::get_default_resource(), *std::pmr::get_default_resource() };
+     _16nar::ecs::EcsRegistry registry{ *std::pmr::get_default_resource(), name_table };
+     _16nar::ecs::EcsStorage ecs{ *std::pmr::get_default_resource(),
+          *std::pmr::get_default_resource(), name_table, registry };
 
      _16nar::strings::StaticName test_comp1{ "TestComp1" };
      _16nar::strings::StaticName test_comp2{ "TestComp2" };
@@ -134,9 +134,9 @@ TEST_CASE( "Queries into ECS", "[ecs_query]" )
      TestComp1::constructed = 0;
      TestComp1::destructed = 0;
      _16nar::strings::NameTable name_table{ *std::pmr::get_default_resource() };
-     _16nar::ecs::EcsRegistry registry{ name_table, *std::pmr::get_default_resource() };
-     _16nar::ecs::EcsStorage ecs{ registry, name_table,
-          *std::pmr::get_default_resource(), *std::pmr::get_default_resource() };
+     _16nar::ecs::EcsRegistry registry{ *std::pmr::get_default_resource(), name_table };
+     _16nar::ecs::EcsStorage ecs{ *std::pmr::get_default_resource(),
+          *std::pmr::get_default_resource(), name_table, registry };
 
      _16nar::strings::StaticName test_comp1{ "TestComp1" };
      _16nar::strings::StaticName test_comp2{ "TestComp2" };

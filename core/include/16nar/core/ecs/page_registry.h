@@ -40,7 +40,7 @@ public:
      EcsId get_top_page();
 
 private:
-     PageRegistry( const PageRegistry&& ) = delete;
+     PageRegistry( const PageRegistry& ) = delete;
      PageRegistry& operator=( const PageRegistry& ) = delete;
 
      std::pmr::vector< EcsId > pages_;  ///< identifiers of available pages.

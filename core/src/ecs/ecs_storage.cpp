@@ -10,10 +10,10 @@
 namespace _16nar::ecs
 {
 
-EcsStorage::EcsStorage( EcsRegistry& ecs_registry,
+EcsStorage::EcsStorage( std::pmr::memory_resource& resource,
+          std::pmr::memory_resource& big_resource,
           strings::NameTable& type_names,
-          std::pmr::memory_resource& resource,
-          std::pmr::memory_resource& big_resource )
+          EcsRegistry& ecs_registry )
      : ecs_registry_{ ecs_registry }
      , components_( &resource )
      , registries_( &resource )

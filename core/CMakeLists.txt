@@ -53,6 +53,7 @@ if("${NARENGINE_PROFILE}" STREQUAL "general")
     set(NARENGINE_CORE_SOURCES ${NARENGINE_CORE_SOURCES}
         "${NARENGINE_CORE_SRC_DIR}/profile/general/unit_manager.cpp"
         "${NARENGINE_CORE_SRC_DIR}/profile/general/unit_visitor.cpp"
+        "${NARENGINE_CORE_SRC_DIR}/profile/general/pipeline.cpp"
     )
 endif() # if("${NARENGINE_PROFILE}" STREQUAL "general")
 add_library("${NAME}_core" "${NARENGINE_LIB_TYPE}" ${NARENGINE_CORE_SOURCES})

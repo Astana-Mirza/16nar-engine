@@ -3,7 +3,7 @@
 #ifndef _16NAR_PLATFORM_STRINGS_NAME_MANAGER_H
 #define _16NAR_PLATFORM_STRINGS_NAME_MANAGER_H
 
-#include <16nar/platform/defs.h>
+#include <16nar/platform/strings/defs.h>
 
 #include <16nar/platform/strings/name_table.h>
 #include <16nar/platform/memory/imemory_domain.h>

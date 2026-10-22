@@ -46,6 +46,7 @@ public:
                {
                     return nullptr;
                }
+               parent_domain = parent_node->domain.get();
           }
 
           const auto key = names_table_.add_name( name );
@@ -75,6 +76,10 @@ public:
      /// then root domain will be returned if the requested one is not found.
      /// @return memory domain or nullptr if suitable domain is not found.
      IMemoryDomain *get_domain( strings::StaticName name, bool strict = false );
+
+     /// @brief Get root memory domain.
+     /// @return root memory domain, never nullptr.
+     IMemoryDomain *get_root_domain() noexcept;
 
      /// @brief Reset memory of a domain and all its children.
      /// @param[in] name name of a domain to be reset.

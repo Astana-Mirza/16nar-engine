@@ -6,7 +6,7 @@
 TEST_CASE( "Parameters registration", "[config_manager]" )
 {
      _16nar::strings::NameTable name_table{ *std::pmr::get_default_resource() };
-     _16nar::config::ConfigManager config{ name_table, *std::pmr::get_default_resource() };
+     _16nar::config::ConfigManager config{ *std::pmr::get_default_resource(), name_table };
 
      CHECK( config.add_parameter( "static", "test_static_uint",
           _16nar::config::ConfigManager::ConfigType::Uint,
@@ -148,7 +148,7 @@ TEST_CASE( "Parameters registration", "[config_manager]" )
 TEST_CASE( "Config file reading and writing", "[config_manager]" )
 {
      _16nar::strings::NameTable name_table{ *std::pmr::get_default_resource() };
-     _16nar::config::ConfigManager config{ name_table, *std::pmr::get_default_resource() };
+     _16nar::config::ConfigManager config{ *std::pmr::get_default_resource(), name_table };
 
      CHECK( config.add_parameter( "static", "test_static_uint",
           _16nar::config::ConfigManager::ConfigType::Uint,

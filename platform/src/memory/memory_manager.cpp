@@ -35,6 +35,12 @@ IMemoryDomain *MemoryManager::get_domain( strings::StaticName name, bool strict 
 }
 
 
+IMemoryDomain *MemoryManager::get_root_domain() noexcept
+{
+     return &root_domain_;
+}
+
+
 void MemoryManager::reset_domain( strings::StaticName name )
 {
      auto *node = get_node( name );
