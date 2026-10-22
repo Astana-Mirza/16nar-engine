@@ -7,7 +7,7 @@ from conan.tools.build import can_run
 
 class NarengineTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    generators = "CMakeDeps", "CMakeToolchain"
+    generators = "CMakeDeps", "CMakeToolchain", "VirtualRunEnv"
 
     def requirements(self):
         self.requires(self.tested_reference_str)
@@ -21,6 +21,6 @@ class NarengineTestConan(ConanFile):
         cmake_layout(self)
 
     def test(self):
-        if self.settings.os != "Windows" and can_run(self):
+        if can_run(self):
             cmd = os.path.join(self.cpp.build.bindir, "test_package")
             self.run(cmd, env="conanrun")
